@@ -1,0 +1,17 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/ui/LutPostProcess.gd" id="1_lut"]
+
+[node name="MainGame" type="Node2D"]
+
+[node name="GameLayer" type="SubViewportContainer" parent="."]
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="GameLayer"]
+size = Vector2i(320, 180)
+script = ExtResource("1_lut")
+
+[node name="BackBufferCopy" type="BackBufferCopy" parent="GameLayer/SubViewport"]
+copy_mode = 2
+
+[node name="UILayer" type="CanvasLayer" parent="."]
