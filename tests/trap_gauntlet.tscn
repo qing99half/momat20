@@ -1,0 +1,65 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" path="res://tests/trap_gauntlet.gd" id="1_gd"]
+[ext_resource type="PackedScene" path="res://src/player/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_washboard.tscn" id="3_w"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_part.tscn" id="4_p"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_thorns.tscn" id="5_t"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_glass.tscn" id="6_g"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_conveyor.tscn" id="7_c"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_billwind.tscn" id="8_b"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_pendulum.tscn" id="9_pe"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_bottle.tscn" id="10_bo"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_press.tscn" id="11_pr"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_rotten.tscn" id="12_r"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_heart_big.tscn" id="13_h"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_soundwave.tscn" id="14_sw"]
+
+[node name="TrapGauntlet" type="Node2D"]
+script = ExtResource("1_gd")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(16, 144)
+
+[node name="TrapWashboard" parent="." instance=ExtResource("3_w")]
+position = Vector2(64, 140)
+
+[node name="TrapPart" parent="." instance=ExtResource("4_p")]
+position = Vector2(112, 140)
+
+[node name="TrapThorns" parent="." instance=ExtResource("5_t")]
+position = Vector2(160, 140)
+
+[node name="TrapGlass" parent="." instance=ExtResource("6_g")]
+position = Vector2(208, 140)
+
+[node name="TrapConveyor" parent="." instance=ExtResource("7_c")]
+position = Vector2(288, 140)
+
+[node name="TrapBillwind" parent="." instance=ExtResource("8_b")]
+position = Vector2(384, 132)
+scale = Vector2(6, 2)
+
+[node name="TrapPendulum" parent="." instance=ExtResource("9_pe")]
+position = Vector2(440, 96)
+
+[node name="TrapBottle" parent="." instance=ExtResource("10_bo")]
+position = Vector2(520, 96)
+
+[node name="TrapPress" parent="." instance=ExtResource("11_pr")]
+position = Vector2(600, 120)
+
+[node name="TrapRotten" parent="." instance=ExtResource("12_r")]
+position = Vector2(680, 140)
+
+[node name="TrapHeartBig" parent="." instance=ExtResource("13_h")]
+position = Vector2(760, 120)
+
+[node name="TrapSoundwave" parent="." instance=ExtResource("14_sw")]
+position = Vector2(840, 136)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(160, 90)
+zoom = Vector2(4, 4)
+position_smoothing_enabled = true
+position_smoothing_speed = 10.0

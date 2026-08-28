@@ -1,0 +1,22 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://tests/trap_test.gd" id="1_gd"]
+[ext_resource type="PackedScene" path="res://src/player/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_washboard.tscn" id="3_spike"]
+[ext_resource type="PackedScene" path="res://src/traps/scenes/trap_pendulum.tscn" id="4_pend"]
+
+[node name="TrapTest" type="Node2D"]
+script = ExtResource("1_gd")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(16, 144)
+
+[node name="TrapWashboard" parent="." instance=ExtResource("3_spike")]
+position = Vector2(120, 140)
+
+[node name="TrapPendulum" parent="." instance=ExtResource("4_pend")]
+position = Vector2(200, 96)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(160, 90)
+zoom = Vector2(4, 4)

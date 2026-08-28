@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/traps/TimedHazard.gd" id="1_gd"]
+[ext_resource type="Resource" path="res://src/traps/configs/rotten.tres" id="2_cfg"]
+
+[node name="TrapRotten" type="Area2D"]
+script = ExtResource("1_gd")
+config = ExtResource("2_cfg")

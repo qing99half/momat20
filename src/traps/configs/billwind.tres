@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TrapConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/traps/TrapConfig.gd" id="1_cfg"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/placeholder_trap_billwind.png" id="2_tex"]
+
+[resource]
+script = ExtResource("1_cfg")
+source_id = &"billwind"
+damage = 0
+texture = ExtResource("2_tex")
+hitbox_size = Vector2(8, 12)
+push = Vector2(-45, 0)
+gust_on = 1.5
+gust_off = 2.0

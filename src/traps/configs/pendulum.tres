@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TrapConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/traps/TrapConfig.gd" id="1_cfg"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/placeholder_trap_pendulum.png" id="2_tex"]
+
+[resource]
+script = ExtResource("1_cfg")
+source_id = &"pendulum"
+damage = 1
+texture = ExtResource("2_tex")
+hitbox_size = Vector2(16, 48)
+motion = 0
+amplitude = 60.0
+period = 2.0
+anchor_top = true

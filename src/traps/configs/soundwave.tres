@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TrapConfig" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/traps/TrapConfig.gd" id="1_cfg"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/placeholder_trap_soundwave.png" id="2_tex"]
+
+[resource]
+script = ExtResource("1_cfg")
+source_id = &"soundwave"
+damage = 1
+texture = ExtResource("2_tex")
+hitbox_size = Vector2(24, 16)
+timed_mode = 3
+period = 2.0
+warn_duration = 0.8
+amplitude = 24.0
+active_duration = 0.8
