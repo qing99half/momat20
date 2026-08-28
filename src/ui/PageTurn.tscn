@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/ui/PageTurn.gd" id="1_pageturn"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/placeholder_ui_page_turn.png" id="2_page"]
+
+[node name="PageTurn" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("1_pageturn")
+
+[node name="Page" type="TextureRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("2_page")
+expand_mode = 1
