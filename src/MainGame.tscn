@@ -1,9 +1,11 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
+[ext_resource type="Script" path="res://src/MainGame.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/ui/LutPostProcess.gd" id="1_lut"]
 [ext_resource type="PackedScene" path="res://src/ui/HUD.tscn" id="2_hud"]
 
 [node name="MainGame" type="Node2D"]
+script = ExtResource("1_main")
 
 [node name="GameLayer" type="SubViewportContainer" parent="."]
 stretch = true

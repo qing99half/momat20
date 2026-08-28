@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/props/DiaryDesk.gd" id="1_desk"]
+
+[node name="DiaryDesk" type="Area2D"]
+script = ExtResource("1_desk")

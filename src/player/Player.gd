@@ -255,6 +255,14 @@ func set_checkpoint(pos: Vector2, facing_left: bool) -> void:
 	_checkpoint_flip = facing_left
 
 
+# 过场调用(步骤8.4 日记演出):冻结/解冻输入与移动。与死亡流程共用 _frozen,互不嵌套。
+func set_frozen(frozen: bool) -> void:
+	_frozen = frozen
+	if frozen:
+		velocity = Vector2.ZERO
+		_w_just_pressed = false
+
+
 # 陷阱统一入口(TrapBase._try_hit 调用)。knockback 在即死系统下不生效(D-537 已删受伤态)。
 func receive_hazard(_knockback: Vector2, _source_id: StringName) -> void:
 	if not can_die:

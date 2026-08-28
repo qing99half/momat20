@@ -3,6 +3,11 @@ extends Control
 ## 硬性约束：整段文字(日期+正文)总计 5 秒打完。
 const TOTAL_TYPE_SECONDS := 5.0
 
+## 一章:字迹模糊(正文压半透明模拟)+笔尖沙沙;二章:逐字清晰+纸页摩挲(占位音效,真素材到位后替换)。
+const PEN_SFX := "res://assets/placeholder/placeholder_S1.wav"
+const PAPER_SFX := "res://assets/placeholder/placeholder_S2.wav"
+const BLUR_ALPHA := 0.45
+
 @onready var date_label: Label = $DateLabel
 @onready var body_text: RichTextLabel = $BodyText
 @onready var skip_hint: Label = $SkipHint
@@ -21,10 +26,22 @@ var _char_interval := 0.05
 var _date_text := ""
 var _body_text := ""
 
+var _sfx: AudioStreamPlayer
+
 
 func _ready() -> void:
-	# 【临时·视觉检验用】运行即触发,检验完成后删除此行
-	show_diary("1993年", "窗外的雨下了整整一夜。我把今天发生的事，一笔一笔写进这页纸里。等很多年以后，再回来看看。", 1)
+	add_to_group("diary_ui")  # 日记桌(DiaryDesk)按组查找,零硬引用
+	_sfx = AudioStreamPlayer.new()
+	add_child(_sfx)
+
+
+## 章节音效:打字期间循环,打完即停。
+func _play_sfx(path: String) -> void:
+	var stream: AudioStream = load(path)
+	if stream is AudioStreamWAV:
+		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	_sfx.stream = stream
+	_sfx.play()
 
 
 func show_diary(date: String, text: String, chapter: int) -> void:
@@ -37,12 +54,24 @@ func show_diary(date: String, text: String, chapter: int) -> void:
 	body_text.visible_ratio = 0.0
 	skip_hint.visible = true
 
+	# 章节差异:一章字迹模糊+笔尖沙沙;二章逐字清晰+纸页摩挲(日期先行=日期阶段恒在最前)
+	if chapter >= 2:
+		body_text.modulate = Color.WHITE
+		_play_sfx(PAPER_SFX)
+	else:
+		body_text.modulate = Color(1.0, 1.0, 1.0, BLUR_ALPHA)
+		_play_sfx(PEN_SFX)
+
 	_phase = PHASE_DATE
 	_char_index = 0
 	_elapsed = 0.0
 	# 每字间隔 = 总时长 / 总字数，保证「日期 + 正文」合计恰好 5 秒
 	_char_interval = TOTAL_TYPE_SECONDS / float(max(_date_text.length() + _body_text.length(), 1))
 	visible = true
+	# 叠化进入(步骤8.4:黑场→日记,约0.5s淡入)
+	modulate.a = 0.0
+	var fade := create_tween()
+	fade.tween_property(self, "modulate:a", 1.0, 0.5)
 
 
 func _process(delta: float) -> void:
@@ -79,6 +108,7 @@ func _reveal_one_char() -> void:
 func _finish() -> void:
 	_phase = PHASE_DONE
 	skip_hint.visible = false
+	_sfx.stop()
 	# 日记关闭:广播 diary_finished,由 HUD 监听后触发光片飞入。
 	visible = false
 	EventBus.diary_finished.emit()
