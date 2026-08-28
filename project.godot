@@ -1,0 +1,21 @@
+; 引擎配置文件。由策划案 H0~2 环境搭建生成(陈洒执行)。
+; 引擎: Godot 4.7.2(.NET 构建) + GDScript(不写 C#)。
+config_version=5
+
+[application]
+
+config/name="母亲二十岁"
+
+[autoload]
+
+EventBus="*res://src/EventBus.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="disabled"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
