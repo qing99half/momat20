@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dwah5v1pe4b3k"]
+
+[ext_resource type="Script" uid="uid://lmnp1prhvv2v" path="res://tests/whitebox_measure.gd" id="1_gd"]
+[ext_resource type="PackedScene" path="res://src/player/Player.tscn" id="2_player"]
+
+[node name="WhiteboxMeasure" type="Node2D" unique_id=1484428963]
+script = ExtResource("1_gd")
+
+[node name="Player" parent="." unique_id=1851383991 instance=ExtResource("2_player")]
+position = Vector2(16, 144)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=301408590]
+position = Vector2(160, 90)
+zoom = Vector2(4, 4)
+position_smoothing_enabled = true
+position_smoothing_speed = 10.0
