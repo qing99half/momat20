@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="TileSet" path="res://assets/tilesets/platform_tileset.tres" id="1_tileset"]
+
+[node name="LevelRoot" type="Node2D"]
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="Far" type="ParallaxLayer" parent="ParallaxBackground"]
+
+[node name="Mid" type="ParallaxLayer" parent="ParallaxBackground"]
+
+[node name="TileMapLayer" type="TileMapLayer" parent="."]
+tile_set = ExtResource("1_tileset")
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="Traps" type="Node2D" parent="."]
+
+[node name="Camera" type="Node2D" parent="."]

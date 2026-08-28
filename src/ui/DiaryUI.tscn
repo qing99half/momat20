@@ -1,0 +1,54 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/ui/DiaryUI.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/placeholder/placeholder_ui_diary_open.png" id="2_notebook"]
+
+[node name="DiaryUI" type="Control"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_script")
+
+[node name="Shade" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.55)
+
+[node name="Notebook" type="TextureRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("2_notebook")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DateLabel" type="Label" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -360.0
+offset_top = 72.0
+offset_right = -72.0
+offset_bottom = 108.0
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 2
+
+[node name="BodyText" type="RichTextLabel" parent="."]
+anchor_bottom = 1.0
+offset_left = 80.0
+offset_top = 180.0
+offset_right = -80.0
+offset_bottom = -140.0
+bbcode_enabled = true
+
+[node name="SkipHint" type="Label" parent="."]
+visible = false
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = -90.0
+offset_right = 160.0
+offset_bottom = -54.0
+theme_override_font_sizes/font_size = 22
+text = "按任意键跳过"
+horizontal_alignment = 1

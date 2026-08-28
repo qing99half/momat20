@@ -11,13 +11,14 @@ config_version=5
 [application]
 
 config/name="母亲二十岁"
-run/main_scene="res://src/MainGame.tscn"
+run/main_scene="res://src/levels/LevelTemplate.tscn"
 config/features=PackedStringArray("4.7")
 
 [autoload]
 
 EventBus="*res://src/EventBus.gd"
 GameState="*res://src/flow/GameState.gd"
+Conductor="*res://src/flow/Conductor.gd"
 
 [display]
 

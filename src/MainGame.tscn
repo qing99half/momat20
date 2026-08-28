@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://src/ui/LutPostProcess.gd" id="1_lut"]
+[ext_resource type="PackedScene" path="res://src/ui/HUD.tscn" id="2_hud"]
 
 [node name="MainGame" type="Node2D"]
 
@@ -15,3 +16,5 @@ script = ExtResource("1_lut")
 copy_mode = 2
 
 [node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UILayer" instance=ExtResource("2_hud")]
