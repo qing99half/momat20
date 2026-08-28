@@ -32,3 +32,8 @@ extends Resource
 @export_group("腐心平台")
 @export var crumble_delay := 1.0            # 踩上到碎裂的延迟
 @export var respawn_delay := 3.0            # 碎裂后重生延迟
+
+@export_group("节拍同步(任务3)")
+@export var beat_sync := true               # 订阅 EventBus.beat,击发/阵风对齐 120BPM 拍点;false=自由定时
+@export var active_beats := 0               # 激活拍数(0=由 period 按 0.5s/拍 换算)
+@export var cooldown_beats := 0             # 休眠拍数;周期拍数=active+cooldown,(active+cooldown)×0.5s 必须 ∈ {1.0,1.5,2.0,2.5,3.0}

@@ -12,6 +12,7 @@ var _stand_shape: CollisionShape2D = null
 var _droplet: Sprite2D = null
 var _crumbled := false
 var _crumbling := false
+var _loop_gen := -1  # 自由周期循环已启动的代际标记(-1=未启动/节拍驱动)
 
 
 func _on_ready() -> void:
@@ -21,7 +22,10 @@ func _on_ready() -> void:
 		2:
 			_build_droplet()
 	if config.timed_mode != 1:
-		_cycle_loop()
+		if config.beat_sync:
+			_beat_mode_boot(_cycle_loop)  # 对拍击发;无音乐时回退自由定时
+		else:
+			_cycle_loop()
 
 
 func _dangerous() -> bool:
@@ -60,10 +64,13 @@ func _on_body_entered(body: Node2D) -> void:
 
 
 func _crumble_loop() -> void:
+	var gen := _gen  # 代际守卫:死亡重置后中止,平台状态由 reset_trap 复原
 	_crumbling = true
 	# 踩上后的碎裂预警:摇晃 crumble_delay 秒(持续态预警)
 	play_warning_shake(config.crumble_delay)
 	await get_tree().create_timer(config.crumble_delay).timeout
+	if gen != _gen:
+		return
 	# 碎裂
 	_crumbled = true
 	_crumbling = false
@@ -71,6 +78,8 @@ func _crumble_loop() -> void:
 	_stand_shape.set_deferred("disabled", true)
 	monitoring = false
 	await get_tree().create_timer(config.respawn_delay).timeout
+	if gen != _gen:
+		return
 	# 重生
 	_crumbled = false
 	sprite.visible = true
@@ -90,19 +99,33 @@ func _build_droplet() -> void:
 # ---- 周期循环(模式 0/2/3) ----
 
 func _cycle_loop() -> void:
-	while is_inside_tree():
+	var gen := _gen
+	_loop_gen = gen  # 标记:本陷阱走自由定时(死亡重置后按此重排)
+	while is_inside_tree() and gen == _gen:
 		var flash_time := maxi(config.flash_frames, 1) / 60.0
 		var active_time := _active_window()
 		var idle := maxf(config.period - config.warn_duration - flash_time - active_time, 0.1)
 		await get_tree().create_timer(idle).timeout
-		# 第一层:持续态预警
-		_do_warning()
-		await get_tree().create_timer(config.warn_duration).timeout
-		# 第二层:击发前白闪
-		await flash_white()
-		# 激活
-		trap_activated.emit()
-		await _activate_once()
+		if gen != _gen:
+			return  # 代际作废:旧循环退出,新循环由 reset_trap 重排
+		await _run_fire_sequence()  # 自由定时:不做落拍等待
+
+
+# 击发序列·前半(任务3:基类排程调用,trap_activated 由基类在拍点上发射)
+func _fire_warn_flash() -> void:
+	var gen := _gen
+	# 第一层:持续态预警
+	_do_warning()
+	await get_tree().create_timer(config.warn_duration).timeout
+	if gen != _gen:
+		return  # 死亡重置:预警中止,位置/缩放/调制已由 reset_trap 复原
+	# 第二层:击发前白闪
+	await flash_white()
+
+
+# 击发序列·后半:激活窗口
+func _fire_activate() -> void:
+	await _activate_once()
 
 
 func _active_window() -> float:
@@ -126,6 +149,7 @@ func _do_warning() -> void:
 
 
 func _activate_once() -> void:
+	var gen := _gen  # 代际守卫:死亡重置后中止,后续属性写入一律作废
 	match config.timed_mode:
 		0:  # 冲压下砸
 			_active = true
@@ -133,12 +157,17 @@ func _activate_once() -> void:
 			tween.set_parallel(true)
 			tween.tween_property(sprite, "position:y", _sprite_base_pos.y + config.amplitude, 0.08)
 			tween.tween_property(hitbox, "position:y", _hitbox_base_pos.y + config.amplitude, 0.08)
+			if not await _await_tween(tween, gen):
+				return
 			await get_tree().create_timer(config.active_duration).timeout
+			if gen != _gen:
+				return
 			var back := create_tween()
 			back.set_parallel(true)
 			back.tween_property(sprite, "position:y", _sprite_base_pos.y, 0.15)
 			back.tween_property(hitbox, "position:y", _hitbox_base_pos.y, 0.15)
-			await back.finished
+			if not await _await_tween(back, gen):
+				return
 			_active = false
 		2:  # 滴液坠落(判定体缩放到液滴尺寸,不用巨心的大判定)
 			_active = true
@@ -155,7 +184,8 @@ func _activate_once() -> void:
 				.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 			tween.tween_property(hitbox, "position:y", hitbox_start.y + config.fall_distance, fall_time) \
 				.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-			await tween.finished
+			if not await _await_tween(tween, gen):
+				return
 			_droplet.visible = false
 			hitbox.scale = Vector2.ONE
 			hitbox.position = _hitbox_base_pos
@@ -169,20 +199,24 @@ func _activate_once() -> void:
 			tween.set_parallel(true)
 			tween.tween_property(sprite, "scale", Vector2(target, target), 0.8)
 			tween.tween_property(hitbox, "scale", Vector2(target, target), 0.8)
-			await tween.finished
+			if not await _await_tween(tween, gen):
+				return
 			sprite.scale = Vector2.ONE
 			hitbox.scale = Vector2.ONE
 			_active = false
 
 
 func reset_trap() -> void:
+	var was_free := _loop_gen >= 0  # 先记驱动方式,super 会推进代际
 	super.reset_trap()
 	_active = false
 	if _droplet:
 		_droplet.visible = false
-	if config.timed_mode == 1 and _crumbled:
+	if config.timed_mode == 1 and (_crumbled or _crumbling):
 		_crumbled = false
 		_crumbling = false
 		sprite.visible = true
 		_stand_shape.set_deferred("disabled", false)
 		monitoring = true
+	elif config.timed_mode != 1 and was_free and is_inside_tree():
+		_cycle_loop()  # 自由定时:旧循环已随代际退出,从待机相位重排
