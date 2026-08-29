@@ -60,27 +60,52 @@ static func build(json_path: String) -> Node2D:
 	return root
 
 
-static func _make_parallax(far_path: String, mid_path: String) -> ParallaxBackground:
-	var bg := ParallaxBackground.new()
+static func _make_parallax(far_path: String, mid_path: String) -> Node2D:
+	# 不用 ParallaxBackground(CanvasLayer layer=-100):游戏画面在 SubViewport 里走
+	# BackBufferCopy→LUT 后处理,负层画布内容与后处理采样顺序相冲,背景会被丢掉。
+	# 改为普通 Node2D 视差精灵:默认画布、树顺序在关卡内容之前,后处理能采到。
+	var bg := Node2D.new()
 	bg.name = "ParallaxBackground"
-	if far_path != "":
+	if far_path != "" and ResourceLoader.exists(far_path):
 		bg.add_child(_make_layer(far_path, 0.2, "Far"))
-	if mid_path != "":
+	if mid_path != "" and ResourceLoader.exists(mid_path):
 		bg.add_child(_make_layer(mid_path, 0.5, "Mid"))
 	return bg
 
 
-static func _make_layer(tex_path: String, scale: float, layer_name: String) -> ParallaxLayer:
-	var layer := ParallaxLayer.new()
-	layer.name = layer_name
-	layer.motion_scale = Vector2(scale, scale)
+static func _make_layer(tex_path: String, scale: float, layer_name: String) -> Node2D:
 	# 素材未到位(如二章bg_ch2_*)时跳过该层,不报错不挡路
-	if not ResourceLoader.exists(tex_path):
-		return layer
-	var sprite := Sprite2D.new()
-	sprite.texture = load(tex_path)
-	sprite.centered = false
-	layer.add_child(sprite)
-	# 镜像宽度跟随贴图实际宽(素材换尺寸不用改代码)
-	layer.motion_mirroring = Vector2(float(sprite.texture.get_width()), 0.0)
+	var layer := _ParallaxSprite.new()
+	layer.name = layer_name
+	layer.scroll_scale = scale
+	layer.tex = load(tex_path)
 	return layer
+
+
+# 手写视差层:两块贴图横向无缝平铺,按相机左上角的 scroll_scale 倍率慢移(与相机只横移的约定配套)。
+class _ParallaxSprite:
+	extends Node2D
+	var scroll_scale := 0.2
+	var tex: Texture2D
+	var _sprites: Array[Sprite2D] = []
+
+	func _ready() -> void:
+		for i in 2:
+			var s := Sprite2D.new()
+			s.texture = tex
+			s.centered = false
+			add_child(s)
+			_sprites.append(s)
+
+	func _process(_delta: float) -> void:
+		var cam := get_viewport().get_camera_2d()
+		if cam == null or tex == null:
+			return
+		var w := float(tex.get_width())
+		var tl: Vector2 = cam.get_screen_center_position() - get_viewport().get_visible_rect().size / 2.0 / cam.zoom.x
+		var off := fmod(tl.x * scroll_scale, w)
+		if off < 0.0:
+			off += w
+		# 屏幕 x=-off 与 -off+w 两块即可盖住 640 宽视野(w=640);y 固定 0(相机不纵移)
+		_sprites[0].global_position = Vector2(tl.x - off, 0.0)
+		_sprites[1].global_position = Vector2(tl.x - off + w, 0.0)

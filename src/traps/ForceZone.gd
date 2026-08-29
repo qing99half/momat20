@@ -13,6 +13,23 @@ func _on_ready() -> void:
 			_gust_beat_boot()  # 阵风按拍启停;无音乐时回退自由定时
 		else:
 			_gust_loop()
+	_build_stand_surface()  # 传送带可站立:实体面+触发区上移1px保持重叠推动
+
+
+# 传送带站立面(与腐心平台同约定):StaticBody2D layer=1 供玩家站立;
+# 触发区上移1px——站立时脚底与台面同线(零深度不算重叠),上移保证推带持续生效。
+func _build_stand_surface() -> void:
+	var body := StaticBody2D.new()
+	body.collision_layer = 1  # 玩家 mask=1 可站立
+	body.collision_mask = 0
+	var shape := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = config.hitbox_size  # 站立面不内缩,与贴图同大
+	shape.shape = rect
+	body.add_child(shape)
+	add_child(body)
+	hitbox.position += Vector2(0.0, -1.0)
+	_hitbox_base_pos = hitbox.position
 
 
 func _gust_beat_boot() -> void:
