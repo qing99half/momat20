@@ -20,6 +20,15 @@
       "py": 280.0
     },
     {
+      "id": "platform_h1",
+      "params": {
+        "h": 1.0,
+        "w": 1.0
+      },
+      "px": 120.0,
+      "py": 200.0
+    },
+    {
       "id": "part",
       "params": {
         "rot": 180
@@ -50,6 +59,18 @@
       "py": 260.0
     },
     {
+      "id": "conveyor",
+      "params": {},
+      "px": 280.0,
+      "py": 160.0
+    },
+    {
+      "id": "press",
+      "params": {},
+      "px": 300.0,
+      "py": -540.0
+    },
+    {
       "id": "part",
       "params": {
         "rot": 180
@@ -66,6 +87,15 @@
       "py": 360.0
     },
     {
+      "id": "platform_h1",
+      "params": {
+        "h": 1.0,
+        "w": 1.0
+      },
+      "px": 400.0,
+      "py": 200.0
+    },
+    {
       "id": "part",
       "params": {
         "rot": 180
@@ -74,21 +104,38 @@
       "py": 360.0
     },
     {
-      "id": "platform_h5",
-      "params": {
-        "h": 1.0,
-        "w": 5.0
-      },
-      "px": 460.0,
-      "py": 280.0
-    },
-    {
       "id": "part",
       "params": {
         "rot": 180
       },
       "px": 480.0,
       "py": 360.0
+    },
+    {
+      "id": "glass",
+      "params": {
+        "rot": 90
+      },
+      "px": 480.0,
+      "py": 200.0
+    },
+    {
+      "id": "platform_h4",
+      "params": {
+        "h": 1.0,
+        "w": 4.0
+      },
+      "px": 480.0,
+      "py": 280.0
+    },
+    {
+      "id": "platform_h4",
+      "params": {
+        "h": 1.0,
+        "w": 4.0
+      },
+      "px": 500.0,
+      "py": 160.0
     },
     {
       "id": "part",
@@ -148,11 +195,390 @@
       "py": 360.0
     },
     {
-      "id": "part",
+      "id": "ground_h5",
       "params": {
-        "rot": 90
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
       },
       "px": 740.0,
+      "py": 280.0
+    },
+    {
+      "id": "lamp",
+      "params": {},
+      "px": 800.0,
+      "py": 280.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 860.0,
+      "py": 360.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 920.0,
+      "py": 360.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 980.0,
+      "py": 360.0
+    },
+    {
+      "id": "conveyor",
+      "params": {},
+      "px": 1000.0,
+      "py": 280.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 1040.0,
+      "py": 360.0
+    },
+    {
+      "id": "platform_v2",
+      "params": {
+        "h": 2.0,
+        "style": "platform",
+        "w": 1.0
+      },
+      "px": 1060.0,
+      "py": 200.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 1100.0,
+      "py": 360.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 1140.0,
+      "py": 280.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 1160.0,
+      "py": 360.0
+    },
+    {
+      "id": "conveyor",
+      "params": {},
+      "px": 1160.0,
+      "py": 200.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 1220.0,
+      "py": 360.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 1280.0,
+      "py": 360.0
+    },
+    {
+      "id": "conveyor",
+      "params": {},
+      "px": 1300.0,
+      "py": 280.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 1340.0,
+      "py": 360.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 1400.0,
+      "py": 360.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 1460.0,
+      "py": 360.0
+    },
+    {
+      "id": "platform_h2",
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      },
+      "px": 1480.0,
+      "py": 240.0
+    },
+    {
+      "id": "press",
+      "params": {},
+      "px": 1500.0,
+      "py": 180.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 1520.0,
+      "py": 360.0
+    },
+    {
+      "id": "platform_h2",
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      },
+      "px": 1560.0,
+      "py": 280.0
+    },
+    {
+      "id": "press",
+      "params": {},
+      "px": 1580.0,
+      "py": 220.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 1580.0,
+      "py": 360.0
+    },
+    {
+      "id": "part",
+      "params": {},
+      "px": 1640.0,
+      "py": 360.0
+    },
+    {
+      "id": "ground_h3",
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 3.0
+      },
+      "px": 1660.0,
+      "py": 280.0
+    },
+    {
+      "id": "lamp",
+      "params": {},
+      "px": 1700.0,
+      "py": 280.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 1700.0,
+      "py": 360.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 1760.0,
+      "py": 360.0
+    },
+    {
+      "id": "conveyor",
+      "params": {},
+      "px": 1820.0,
+      "py": 300.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 1820.0,
+      "py": 360.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 1880.0,
+      "py": 360.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 1940.0,
+      "py": 360.0
+    },
+    {
+      "id": "platform_h2",
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      },
+      "px": 1960.0,
+      "py": 260.0
+    },
+    {
+      "id": "press",
+      "params": {},
+      "px": 1980.0,
+      "py": 200.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 2000.0,
+      "py": 360.0
+    },
+    {
+      "id": "platform_v2",
+      "params": {
+        "h": 2.0,
+        "style": "platform",
+        "w": 1.0
+      },
+      "px": 2000.0,
+      "py": 240.0
+    },
+    {
+      "id": "platform_h2",
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      },
+      "px": 2020.0,
+      "py": 220.0
+    },
+    {
+      "id": "press",
+      "params": {},
+      "px": 2040.0,
+      "py": 160.0
+    },
+    {
+      "id": "platform_v2",
+      "params": {
+        "h": 2.0,
+        "style": "platform",
+        "w": 1.0
+      },
+      "px": 2060.0,
+      "py": 200.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 2060.0,
+      "py": 360.0
+    },
+    {
+      "id": "ground_h2",
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 2.0
+      },
+      "px": 2080.0,
+      "py": 300.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 2120.0,
+      "py": 360.0
+    },
+    {
+      "id": "platform_h2",
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      },
+      "px": 2160.0,
+      "py": 280.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 2180.0,
+      "py": 360.0
+    },
+    {
+      "id": "press",
+      "params": {},
+      "px": 2180.0,
+      "py": 220.0
+    },
+    {
+      "id": "platform_v2",
+      "params": {
+        "h": 2.0,
+        "style": "platform",
+        "w": 1.0
+      },
+      "px": 2200.0,
+      "py": 260.0
+    },
+    {
+      "id": "platform_h2",
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      },
+      "px": 2240.0,
+      "py": 280.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 2240.0,
+      "py": 360.0
+    },
+    {
+      "id": "press",
+      "params": {},
+      "px": 2260.0,
+      "py": 220.0
+    },
+    {
+      "id": "platform_v2",
+      "params": {
+        "h": 2.0,
+        "style": "platform",
+        "w": 1.0
+      },
+      "px": 2280.0,
+      "py": 260.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 2300.0,
+      "py": 360.0
+    },
+    {
+      "id": "platform_h2",
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      },
+      "px": 2320.0,
+      "py": 300.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 2360.0,
+      "py": 360.0
+    },
+    {
+      "id": "ground_h1",
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 1.0
+      },
+      "px": 2380.0,
       "py": 320.0
     },
     {
@@ -162,8 +588,24 @@
         "style": "ground",
         "w": 5.0
       },
-      "px": 740.0,
-      "py": 280.0
+      "px": 2400.0,
+      "py": 320.0
+    },
+    {
+      "id": "diary_desk",
+      "params": {},
+      "px": 2500.0,
+      "py": 320.0
+    },
+    {
+      "id": "ground_h5",
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      },
+      "px": 2500.0,
+      "py": 320.0
     }
   ]
 }

@@ -6,11 +6,13 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 import numpy as np
 
-A = Path("assets/art")
+A = Path("assets/art/char-young/strips")
+OUT = Path("assets/art/char-young")
 
 def strip_frames(name, n):
     s = np.asarray(Image.open(A / name).convert("RGBA"))
-    return [s[:, i*20:(i+1)*20].copy() for i in range(n)]
+    # 条带素材原始朝向=左;游戏约定基准帧朝右(代码 flip_h = dir<0 时镜像为左),逐帧水平翻转
+    return [s[:, i*20:(i+1)*20][:, ::-1].copy() for i in range(n)]
 
 idle = strip_frames("char_young_idle_v2_strip.png", 3)
 run = strip_frames("char_young_run_v2_strip.png", 6)
@@ -28,7 +30,7 @@ assert len(frames) == 24, len(frames)
 sheet = np.zeros((20, 480, 4), dtype=np.uint8)
 for i, f in enumerate(frames):
     sheet[:, i*20:(i+1)*20] = f
-Image.fromarray(sheet, "RGBA").save(A / "char_young_spritesheet.png")
+Image.fromarray(sheet, "RGBA").save(OUT / "char_young_spritesheet.png")
 
 # 标签预览条
 sc = 8
@@ -40,10 +42,10 @@ labels = ["id0","id1","id2","id3","r0","r1","r2","r3","r4","r5","w0","w1","w2","
 for i, lb in enumerate(labels):
     d.line([(i*20*sc, 0), (i*20*sc, 20*sc)], fill=(30, 30, 30))
     d.text((i*20*sc+2, 2), lb, fill=(255, 255, 0))
-bgp.save(A / "char_young_spritesheet_preview.png")
+bgp.save(OUT / "previews" / "char_young_spritesheet_preview.png")
 
 # 全帧 QA
-spec = json.load(open(A / "style_spec.json", encoding="utf-8"))
+spec = json.load(open(OUT / "style_spec.json", encoding="utf-8"))
 PAL = np.array([p["rgb"] for p in spec["palette"]], dtype=float)
 print("final QA:")
 all_ok = True

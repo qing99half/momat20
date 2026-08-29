@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://src/player/Player.gd" id="1_gd"]
-[ext_resource type="Texture2D" path="res://assets/placeholder/placeholder_char_young_spritesheet.png" id="2_tex"]
+[ext_resource type="Texture2D" path="res://assets/art/char-young/char_young_spritesheet.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
 size = Vector2(20, 20)
