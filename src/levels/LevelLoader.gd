@@ -80,6 +80,9 @@ static func build(json_path: String) -> Node2D:
 	return root
 
 
+const BG_SHADER := "res://assets/shaders/bg_dim_blur.gdshader"
+const MID_TEX_SCALE := 0.55  # 中景贴图缩放到 55%(规格 50%~60%)
+
 static func _make_parallax(far_path: String, mid_path: String) -> Node2D:
 	# 不用 ParallaxBackground(CanvasLayer layer=-100):游戏画面在 SubViewport 里走
 	# BackBufferCopy→LUT 后处理,负层画布内容与后处理采样顺序相冲,背景会被丢掉。
@@ -87,18 +90,26 @@ static func _make_parallax(far_path: String, mid_path: String) -> Node2D:
 	var bg := Node2D.new()
 	bg.name = "ParallaxBackground"
 	if far_path != "" and ResourceLoader.exists(far_path):
-		bg.add_child(_make_layer(far_path, 0.2, "Far"))
+		# 远景:调暗+轻模糊(景深),原生尺寸平铺
+		bg.add_child(_make_layer(far_path, 0.2, "Far", 1.0, false, true))
 	if mid_path != "" and ResourceLoader.exists(mid_path):
-		bg.add_child(_make_layer(mid_path, 0.5, "Mid"))
+		# 中景:缩小到 55% 平铺滚动,底对齐(地平线剪影惯例),不模糊
+		bg.add_child(_make_layer(mid_path, 0.5, "Mid", MID_TEX_SCALE, true, false))
 	return bg
 
 
-static func _make_layer(tex_path: String, scale: float, layer_name: String) -> Node2D:
+static func _make_layer(tex_path: String, scale: float, layer_name: String, tex_scale: float, bottom_align: bool, dim_blur: bool) -> Node2D:
 	# 素材未到位(如二章bg_ch2_*)时跳过该层,不报错不挡路
 	var layer := _ParallaxSprite.new()
 	layer.name = layer_name
 	layer.scroll_scale = scale
 	layer.tex = load(tex_path)
+	layer.tex_scale = tex_scale
+	layer.bottom_align = bottom_align
+	if dim_blur:
+		var mat := ShaderMaterial.new()
+		mat.shader = load(BG_SHADER) as Shader
+		layer.overlay_material = mat
 	return layer
 
 
@@ -107,6 +118,9 @@ class _ParallaxSprite:
 	extends Node2D
 	var scroll_scale := 0.2
 	var tex: Texture2D
+	var tex_scale := 1.0        # 贴图缩放(中景 0.55)
+	var bottom_align := false   # true=底边对齐 360(地平线剪影),false=顶对齐
+	var overlay_material: Material  # 远景调暗+模糊
 	var _sprites: Array[Sprite2D] = []
 
 	func _ready() -> void:
@@ -114,6 +128,9 @@ class _ParallaxSprite:
 			var s := Sprite2D.new()
 			s.texture = tex
 			s.centered = false
+			s.scale = Vector2(tex_scale, tex_scale)
+			if overlay_material != null:
+				s.material = overlay_material
 			add_child(s)
 			_sprites.append(s)
 
@@ -121,11 +138,12 @@ class _ParallaxSprite:
 		var cam := get_viewport().get_camera_2d()
 		if cam == null or tex == null:
 			return
-		var w := float(tex.get_width())
+		var w := float(tex.get_width()) * tex_scale
 		var tl: Vector2 = cam.get_screen_center_position() - get_viewport().get_visible_rect().size / 2.0 / cam.zoom.x
 		var off := fmod(tl.x * scroll_scale, w)
 		if off < 0.0:
 			off += w
-		# 屏幕 x=-off 与 -off+w 两块即可盖住 640 宽视野(w=640);y 固定 0(相机不纵移)
-		_sprites[0].global_position = Vector2(tl.x - off, 0.0)
-		_sprites[1].global_position = Vector2(tl.x - off + w, 0.0)
+		# 屏幕 x=-off 与 -off+w 两块盖住视野;y 顶对齐 0 或底对齐 360(相机不纵移)
+		var y := 360.0 - float(tex.get_height()) * tex_scale if bottom_align else 0.0
+		_sprites[0].global_position = Vector2(tl.x - off, y)
+		_sprites[1].global_position = Vector2(tl.x - off + w, y)
