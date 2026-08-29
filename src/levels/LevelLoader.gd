@@ -31,7 +31,13 @@ static func build(json_path: String) -> Node2D:
 	root.name = "LevelRoot"
 
 	# 背景(可选):只保留远景视差;中景层已全部删除(2026-08-30 决定,太丑)
+	# 真素材优先(2026-08-30):assets/art/bg_<level_id>_far.png 存在就用它,丢图即生效;
+	# 否则回退 JSON 里的 bg_far(通常是占位图)。JSON 路径写错/过期也不影响真素材显示。
+	var level_id := str(data.get("level_id", ""))
 	var bg_far: String = data.get("bg_far", "")
+	var art_bg := "res://assets/art/bg_%s_far.png" % level_id
+	if level_id != "" and ResourceLoader.exists(art_bg):
+		bg_far = art_bg
 	if bg_far != "":
 		root.add_child(_make_parallax(bg_far))
 
@@ -55,6 +61,9 @@ static func build(json_path: String) -> Node2D:
 	# 玩家;相机右边界跟随布局末端(阻-02:按实际布局+半屏微调,不留地图外空白,也不设上限)
 	var player := (load(PLAYER_SCENE) as PackedScene).instantiate()
 	player.position = spawn
+	# 从右向左闯关(二章,2026-08-30):出生点在关卡右半时面朝左,不脸朝墙
+	if spawn.x > max_x * 0.5:
+		(player.get_node("Sprite2D") as Sprite2D).flip_h = true
 	root.add_child(player)
 	var cam := player.get_node_or_null("Camera2D") as Camera2D
 	if cam:

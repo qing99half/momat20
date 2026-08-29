@@ -1,0 +1,594 @@
+{
+  "level_id": "ch2_lv3",
+  "bg_far": "res://assets/art/bg_ch2_lv3_far.png",
+  "modules": [
+    {
+      "id": "ground_h5",
+      "px": 0.0,
+      "py": 320.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "ground_h5",
+      "px": 100.0,
+      "py": 320.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "diary_desk",
+      "px": 100.0,
+      "py": 320.0,
+      "params": {
+        "diary_date": "1996"
+      }
+    },
+    {
+      "id": "ground_h1",
+      "px": 200.0,
+      "py": 320.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "platform_h2",
+      "px": 240.0,
+      "py": 300.0,
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 240.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_v2",
+      "px": 300.0,
+      "py": 260.0,
+      "params": {
+        "h": 2.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 300.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h2",
+      "px": 320.0,
+      "py": 280.0,
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      }
+    },
+    {
+      "id": "press",
+      "px": 340.0,
+      "py": 220.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 360.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_v2",
+      "px": 380.0,
+      "py": 260.0,
+      "params": {
+        "h": 2.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "platform_h2",
+      "px": 400.0,
+      "py": 280.0,
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 420.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "press",
+      "px": 420.0,
+      "py": 220.0,
+      "params": {}
+    },
+    {
+      "id": "ground_h2",
+      "px": 480.0,
+      "py": 300.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 480.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_v2",
+      "px": 520.0,
+      "py": 200.0,
+      "params": {
+        "h": 2.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "platform_h2",
+      "px": 540.0,
+      "py": 220.0,
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 540.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "press",
+      "px": 560.0,
+      "py": 160.0,
+      "params": {}
+    },
+    {
+      "id": "platform_v2",
+      "px": 580.0,
+      "py": 240.0,
+      "params": {
+        "h": 2.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "platform_h2",
+      "px": 600.0,
+      "py": 260.0,
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 600.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "press",
+      "px": 620.0,
+      "py": 200.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 660.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 720.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "conveyor",
+      "px": 780.0,
+      "py": 300.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "glass",
+      "px": 780.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 840.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 900.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "part",
+      "px": 960.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h2",
+      "px": 1020.0,
+      "py": 280.0,
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      }
+    },
+    {
+      "id": "press",
+      "px": 1020.0,
+      "py": 220.0,
+      "params": {}
+    },
+    {
+      "id": "part",
+      "px": 1020.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h2",
+      "px": 1080.0,
+      "py": 240.0,
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      }
+    },
+    {
+      "id": "part",
+      "px": 1080.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "press",
+      "px": 1100.0,
+      "py": 180.0,
+      "params": {}
+    },
+    {
+      "id": "part",
+      "px": 1140.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "part",
+      "px": 1200.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "conveyor",
+      "px": 1260.0,
+      "py": 280.0,
+      "params": {
+        "rot": 0
+      }
+    },
+    {
+      "id": "part",
+      "px": 1260.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "lamp",
+      "px": 1300.0,
+      "py": 274.0,
+      "params": {}
+    },
+    {
+      "id": "part",
+      "px": 1320.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "part",
+      "px": 1380.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "part",
+      "px": 1440.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "conveyor",
+      "px": 1440.0,
+      "py": 200.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "part",
+      "px": 1500.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_v2",
+      "px": 1520.0,
+      "py": 200.0,
+      "params": {
+        "h": 2.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "part",
+      "px": 1560.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "conveyor",
+      "px": 1600.0,
+      "py": 280.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "part",
+      "px": 1620.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "part",
+      "px": 1680.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "part",
+      "px": 1740.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "ground_h5",
+      "px": 1760.0,
+      "py": 280.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "part",
+      "px": 1880.0,
+      "py": 360.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "platform_h5",
+      "px": 1900.0,
+      "py": 220.0,
+      "params": {
+        "h": 1.0,
+        "w": 5.0
+      }
+    },
+    {
+      "id": "part",
+      "px": 1940.0,
+      "py": 360.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "platform_v3",
+      "px": 1980.0,
+      "py": 220.0,
+      "params": {
+        "h": 3.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "part",
+      "px": 2000.0,
+      "py": 360.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "platform_h4",
+      "px": 2020.0,
+      "py": 160.0,
+      "params": {
+        "h": 1.0,
+        "w": 4.0
+      }
+    },
+    {
+      "id": "platform_h4",
+      "px": 2040.0,
+      "py": 280.0,
+      "params": {
+        "h": 1.0,
+        "w": 4.0
+      }
+    },
+    {
+      "id": "part",
+      "px": 2060.0,
+      "py": 360.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "press",
+      "px": 2060.0,
+      "py": 220.0,
+      "params": {}
+    },
+    {
+      "id": "part",
+      "px": 2120.0,
+      "py": 360.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "platform_h1",
+      "px": 2180.0,
+      "py": 200.0,
+      "params": {
+        "h": 1.0,
+        "w": 1.0
+      }
+    },
+    {
+      "id": "part",
+      "px": 2180.0,
+      "py": 360.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "part",
+      "px": 2240.0,
+      "py": 360.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "part",
+      "px": 2300.0,
+      "py": 360.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "press",
+      "px": 2300.0,
+      "py": -540.0,
+      "params": {}
+    },
+    {
+      "id": "conveyor",
+      "px": 2320.0,
+      "py": 160.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "conveyor",
+      "px": 2340.0,
+      "py": 260.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "part",
+      "px": 2360.0,
+      "py": 360.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "part",
+      "px": 2420.0,
+      "py": 360.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "platform_h1",
+      "px": 2460.0,
+      "py": 200.0,
+      "params": {
+        "h": 1.0,
+        "w": 1.0
+      }
+    },
+    {
+      "id": "part",
+      "px": 2480.0,
+      "py": 360.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "ground_h5",
+      "px": 2500.0,
+      "py": 280.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "spawn",
+      "px": 2560.0,
+      "py": 280.0,
+      "params": {}
+    }
+  ]
+}

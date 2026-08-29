@@ -56,6 +56,8 @@ var _dash_cooldown := 0.0
 var _dash_buffer := 0.0
 var _air_dash_used := false    # 空中限一次,落地重置
 var _shift_just_pressed := false
+var _dash_key_was_pressed := false  # 轮询边沿检测:冲刺三键位上一帧状态
+var _w_key_was_pressed := false     # 轮询边沿检测:W 跳上一帧状态
 var _afterimage_t := 0.0
 var _ghost_alpha := AFTERIMAGE_ALPHA
 var _cutscene := false         # 赠予演出中:屏蔽输入但保持物理运行(演示冲刺)
@@ -125,7 +127,23 @@ func _jump_held() -> bool:
 	return Input.is_action_pressed("ui_accept") or Input.is_physical_key_pressed(KEY_W)
 
 
+# 轮询边沿检测(2026-08-30 修复):游戏画面在 SubViewport 里用 GameView 精灵显示,
+# SubViewport 不包 SubViewportContainer 时收不到窗口输入事件,_input 永不触发,
+# 冲刺三键位(F/Shift/右键)和 W 跳曾因此全部失灵;改为物理帧轮询全局输入状态。
+# _input 保留:直跑 Player 场景(无 SubViewport)时仍作兜底,幂等。
+func _poll_input_edges() -> void:
+	var dash_now := Input.is_physical_key_pressed(KEY_F) or Input.is_physical_key_pressed(KEY_SHIFT) or Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
+	if dash_now and not _dash_key_was_pressed and not _frozen:
+		_shift_just_pressed = true
+	_dash_key_was_pressed = dash_now
+	var w_now := Input.is_physical_key_pressed(KEY_W)
+	if w_now and not _w_key_was_pressed and not _frozen:
+		_w_just_pressed = true
+	_w_key_was_pressed = w_now
+
+
 func _physics_process(delta: float) -> void:
+	_poll_input_edges()
 	if _frozen:
 		return  # 死亡流程中冻结移动(粒子/计时走协程,不吃物理帧)
 	var was_on_floor := is_on_floor()

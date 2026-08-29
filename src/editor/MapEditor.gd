@@ -351,9 +351,13 @@ func _save_level() -> void:
 			"params": c.get_meta("params", {}),
 		})
 	modules.sort_custom(func(a, b): return a.px < b.px)
+	var level_id := _level_edit.text.strip_edges()
+	# 背景绑真素材优先:assets/art/bg_<level_id>_far.png 存在就写真路径,否则写占位(2026-08-30)
+	var art_bg := "res://assets/art/bg_%s_far.png" % level_id
+	var bg_path := art_bg if ResourceLoader.exists(art_bg) else "res://assets/placeholder/placeholder_bg_%s_far.png" % level_id
 	var data := {
-		"level_id": _level_edit.text.strip_edges(),
-		"bg_far": "res://assets/placeholder/placeholder_bg_%s_far.png" % _level_edit.text.strip_edges(),
+		"level_id": level_id,
+		"bg_far": bg_path,
 		"modules": modules,
 	}
 	var f := FileAccess.open(_level_path(), FileAccess.WRITE)
@@ -408,7 +412,7 @@ func _playtest() -> void:
 
 class _BgDraw:
 	extends Node2D
-	# 背景预览:按当前关卡名读占位远景图,铺满整关(X0~关底, Y0~360视野高),半透明便于看网格
+	# 背景预览:真素材(assets/art/bg_<id>_far.png)优先,回退占位远景图,铺满整关(X0~关底, Y0~360视野高),半透明便于看网格
 	var editor: Node2D
 	var _cache_id := ""
 	var _tex: Texture2D = null
@@ -417,7 +421,8 @@ class _BgDraw:
 		var id: String = editor._level_edit.text.strip_edges()
 		if id != _cache_id:
 			_cache_id = id
-			var p := "res://assets/placeholder/placeholder_bg_%s_far.png" % id
+			var art_p := "res://assets/art/bg_%s_far.png" % id
+			var p := art_p if ResourceLoader.exists(art_p) else "res://assets/placeholder/placeholder_bg_%s_far.png" % id
 			_tex = load(p) if ResourceLoader.exists(p) else null
 		if _tex == null:
 			return

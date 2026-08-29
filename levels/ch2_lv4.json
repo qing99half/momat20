@@ -1,0 +1,582 @@
+{
+  "level_id": "ch2_lv4",
+  "bg_far": "res://assets/art/bg_ch2_lv4_far.png",
+  "modules": [
+    {
+      "id": "ground_h5",
+      "px": -60.0,
+      "py": 320.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "ground_h5",
+      "px": 40.0,
+      "py": 320.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "diary_desk",
+      "px": 100.0,
+      "py": 320.0,
+      "params": {
+        "diary_date": "1993"
+      }
+    },
+    {
+      "id": "ground_h5",
+      "px": 140.0,
+      "py": 320.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "platform_h3",
+      "px": 240.0,
+      "py": 300.0,
+      "params": {
+        "h": 1.0,
+        "w": 3.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 260.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "bottle",
+      "px": 260.0,
+      "py": -80.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 320.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "pendulum",
+      "px": 320.0,
+      "py": 140.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h3",
+      "px": 360.0,
+      "py": 300.0,
+      "params": {
+        "h": 1.0,
+        "w": 3.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 380.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h4",
+      "px": 420.0,
+      "py": 200.0,
+      "params": {
+        "h": 1.0,
+        "w": 4.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 440.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 500.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 500.0,
+      "py": 240.0,
+      "params": {
+        "rot": 90
+      }
+    },
+    {
+      "id": "platform_h1",
+      "px": 540.0,
+      "py": 260.0,
+      "params": {
+        "h": 1.0,
+        "w": 1.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 560.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h5",
+      "px": 600.0,
+      "py": 300.0,
+      "params": {
+        "h": 1.0,
+        "w": 5.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 620.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 680.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "pendulum",
+      "px": 700.0,
+      "py": 100.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 700.0,
+      "py": 280.0,
+      "params": {
+        "rot": 90
+      }
+    },
+    {
+      "id": "platform_h5",
+      "px": 720.0,
+      "py": 240.0,
+      "params": {
+        "h": 1.0,
+        "w": 5.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 740.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 800.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "bottle",
+      "px": 800.0,
+      "py": -600.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h5",
+      "px": 820.0,
+      "py": 280.0,
+      "params": {
+        "h": 1.0,
+        "w": 5.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 860.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "bottle",
+      "px": 880.0,
+      "py": -60.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 920.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "ground_h5",
+      "px": 940.0,
+      "py": 300.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 980.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 1040.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "bottle",
+      "px": 1080.0,
+      "py": -300.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 1100.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 1160.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "ground_h2",
+      "px": 1180.0,
+      "py": 280.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "bottle",
+      "px": 1200.0,
+      "py": -80.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 1220.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "ground_h2",
+      "px": 1240.0,
+      "py": 280.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "lamp",
+      "px": 1260.0,
+      "py": 280.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 1280.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "bottle",
+      "px": 1340.0,
+      "py": -60.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 1340.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h1",
+      "px": 1360.0,
+      "py": 240.0,
+      "params": {
+        "h": 1.0,
+        "w": 1.0
+      }
+    },
+    {
+      "id": "platform_h1",
+      "px": 1400.0,
+      "py": 180.0,
+      "params": {
+        "h": 1.0,
+        "w": 1.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 1400.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h1",
+      "px": 1440.0,
+      "py": 240.0,
+      "params": {
+        "h": 1.0,
+        "w": 1.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 1460.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "pendulum",
+      "px": 1500.0,
+      "py": 120.0,
+      "params": {}
+    },
+    {
+      "id": "ground_h2",
+      "px": 1520.0,
+      "py": 280.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 1520.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "pendulum",
+      "px": 1560.0,
+      "py": 120.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 1580.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "ground_h2",
+      "px": 1640.0,
+      "py": 280.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 1640.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 1700.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "pendulum",
+      "px": 1700.0,
+      "py": 120.0,
+      "params": {}
+    },
+    {
+      "id": "ground_h5",
+      "px": 1760.0,
+      "py": 280.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 1760.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 1820.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "bottle",
+      "px": 1860.0,
+      "py": -320.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 1880.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "bottle",
+      "px": 1920.0,
+      "py": -580.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 1940.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "bottle",
+      "px": 1980.0,
+      "py": -20.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 2000.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 2060.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 2120.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "conveyor",
+      "px": 2160.0,
+      "py": 280.0,
+      "params": {
+        "rot": 180
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 2180.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "pendulum",
+      "px": 2200.0,
+      "py": 100.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 2240.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h5",
+      "px": 2260.0,
+      "py": 200.0,
+      "params": {
+        "h": 1.0,
+        "w": 5.0
+      }
+    },
+    {
+      "id": "pendulum",
+      "px": 2270.0,
+      "py": 120.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 2300.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 2360.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h5",
+      "px": 2380.0,
+      "py": 240.0,
+      "params": {
+        "h": 1.0,
+        "w": 5.0
+      }
+    },
+    {
+      "id": "washboard",
+      "px": 2420.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "washboard",
+      "px": 2480.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "ground_h5",
+      "px": 2500.0,
+      "py": 280.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "spawn",
+      "px": 2560.0,
+      "py": 280.0,
+      "params": {}
+    }
+  ]
+}

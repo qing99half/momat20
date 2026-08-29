@@ -1,281 +1,652 @@
 {
-  "bg_far": "res://assets/placeholder/placeholder_bg_ch2_lv1_far.png",
-  "bg_mid": "res://assets/placeholder/placeholder_bg_ch2_lv1_mid.png",
   "level_id": "ch2_lv1",
+  "bg_far": "res://assets/art/bg_ch2_lv1_far.png",
   "modules": [
     {
       "id": "ground_h5",
+      "px": -60.0,
+      "py": 320.0,
       "params": {
         "h": 4.0,
         "style": "ground",
         "w": 5.0
-      },
-      "px": 0.0,
-      "py": 280.0
+      }
     },
     {
-      "id": "spawn",
-      "params": {},
+      "id": "ground_h5",
       "px": 40.0,
-      "py": 280.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 120.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 180.0,
-      "py": 360.0
-    },
-    {
-      "id": "platform_h4",
-      "params": {
-        "h": 1.0,
-        "w": 4.0
-      },
-      "px": 180.0,
-      "py": 260.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 240.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 300.0,
-      "py": 360.0
-    },
-    {
-      "id": "pendulum",
-      "params": {},
-      "px": 320.0,
-      "py": 80.0
-    },
-    {
-      "id": "platform_h4",
-      "params": {
-        "h": 1.0,
-        "w": 4.0
-      },
-      "px": 360.0,
-      "py": 260.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 360.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 420.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 480.0,
-      "py": 360.0
-    },
-    {
-      "id": "platform_h4",
-      "params": {
-        "h": 1.0,
-        "w": 4.0
-      },
-      "px": 500.0,
-      "py": 220.0
-    },
-    {
-      "id": "bottle",
-      "params": {},
-      "px": 520.0,
-      "py": -40.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 540.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 600.0,
-      "py": 360.0
-    },
-    {
-      "id": "bottle",
-      "params": {},
-      "px": 600.0,
-      "py": -100.0
-    },
-    {
-      "id": "platform_h3",
-      "params": {
-        "h": 1.0,
-        "w": 3.0
-      },
-      "px": 620.0,
-      "py": 160.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 660.0,
-      "py": 360.0
-    },
-    {
-      "id": "bottle",
-      "params": {},
-      "px": 660.0,
-      "py": -160.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 720.0,
-      "py": 360.0
-    },
-    {
-      "id": "ground_h5",
+      "py": 320.0,
       "params": {
         "h": 4.0,
         "style": "ground",
         "w": 5.0
-      },
-      "px": 740.0,
-      "py": 280.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 780.0,
-      "py": 360.0
-    },
-    {
-      "id": "lamp",
-      "params": {},
-      "px": 800.0,
-      "py": 280.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 840.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 900.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 960.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 1020.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 1080.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 1140.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 1200.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 1260.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 1320.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 1380.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 1440.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 1500.0,
-      "py": 360.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 1560.0,
-      "py": 360.0
-    },
-    {
-      "id": "ground_h5",
-      "params": {
-        "h": 4.0,
-        "style": "ground",
-        "w": 5.0
-      },
-      "px": 1560.0,
-      "py": 280.0
-    },
-    {
-      "id": "lamp",
-      "params": {},
-      "px": 1600.0,
-      "py": 280.0
-    },
-    {
-      "id": "ground_h5",
-      "params": {
-        "h": 4.0,
-        "style": "ground",
-        "w": 5.0
-      },
-      "px": 2440.0,
-      "py": 320.0
+      }
     },
     {
       "id": "diary_desk",
-      "params": {},
+      "px": 100.0,
+      "py": 320.0,
+      "params": {
+        "diary_date": "1999"
+      }
+    },
+    {
+      "id": "ground_h5",
+      "px": 140.0,
+      "py": 320.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 260.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h3",
+      "px": 280.0,
+      "py": 280.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 3.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 320.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h2",
+      "px": 360.0,
+      "py": 260.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 380.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h1",
+      "px": 420.0,
+      "py": 220.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 440.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h1",
+      "px": 460.0,
+      "py": 180.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "soundwave",
+      "px": 480.0,
+      "py": 260.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h1",
+      "px": 500.0,
+      "py": 220.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 500.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 560.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h2",
+      "px": 580.0,
+      "py": 260.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 620.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_v2",
+      "px": 640.0,
+      "py": 200.0,
+      "params": {
+        "h": 2.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "platform_h2",
+      "px": 660.0,
+      "py": 240.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 680.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "soundwave",
+      "px": 740.0,
+      "py": 160.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 740.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h2",
+      "px": 760.0,
+      "py": 260.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 800.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_v3",
+      "px": 820.0,
+      "py": 200.0,
+      "params": {
+        "h": 3.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 860.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h1",
+      "px": 880.0,
+      "py": 160.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "soundwave",
+      "px": 900.0,
+      "py": 240.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h1",
+      "px": 920.0,
+      "py": 200.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 920.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h1",
+      "px": 960.0,
+      "py": 240.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 980.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_v2",
+      "px": 1020.0,
+      "py": 180.0,
+      "params": {
+        "h": 2.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "platform_h2",
+      "px": 1040.0,
+      "py": 220.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 1040.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h2",
+      "px": 1100.0,
+      "py": 260.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 1100.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "soundwave",
+      "px": 1100.0,
+      "py": 240.0,
+      "params": {}
+    },
+    {
+      "id": "ground_h5",
+      "px": 1120.0,
+      "py": 300.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 1160.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "lamp",
+      "px": 1170.0,
+      "py": 300.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 1220.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_v3",
+      "px": 1280.0,
+      "py": 180.0,
+      "params": {
+        "h": 3.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 1280.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h2",
+      "px": 1300.0,
+      "py": 240.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 1340.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h1",
+      "px": 1380.0,
+      "py": 160.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "soundwave",
+      "px": 1380.0,
+      "py": 240.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 1400.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h1",
+      "px": 1420.0,
+      "py": 200.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "ground_h1",
+      "px": 1440.0,
+      "py": 160.0,
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 1
+      }
+    },
+    {
+      "id": "platform_h3",
+      "px": 1460.0,
+      "py": 240.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 3.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 1460.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 1520.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_v2",
+      "px": 1580.0,
+      "py": 160.0,
+      "params": {
+        "h": 2.0,
+        "style": "platform",
+        "w": 1.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 1580.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h2",
+      "px": 1600.0,
+      "py": 200.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "soundwave",
+      "px": 1620.0,
+      "py": 240.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 1640.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h2",
+      "px": 1680.0,
+      "py": 240.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 2.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 1700.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "ground_h5",
+      "px": 1760.0,
+      "py": 280.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 1760.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 1820.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 1880.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 1940.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h5",
+      "px": 1980.0,
+      "py": 240.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 2000.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "soundwave",
+      "px": 2030.0,
+      "py": 240.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 2060.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 2120.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 2180.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h4",
+      "px": 2200.0,
+      "py": 220.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 4.0
+      }
+    },
+    {
+      "id": "soundwave",
+      "px": 2240.0,
+      "py": 260.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 2240.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h5",
+      "px": 2280.0,
+      "py": 240.0,
+      "params": {
+        "h": 1.0,
+        "style": "platform",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "glass",
+      "px": 2300.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 2360.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "platform_h3",
+      "px": 2410.0,
+      "py": 320.0,
+      "params": {
+        "h": 1,
+        "style": "platform",
+        "w": 3
+      }
+    },
+    {
+      "id": "glass",
+      "px": 2420.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "glass",
+      "px": 2480.0,
+      "py": 360.0,
+      "params": {}
+    },
+    {
+      "id": "ground_h5",
       "px": 2500.0,
-      "py": 320.0
+      "py": 280.0,
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      }
+    },
+    {
+      "id": "spawn",
+      "px": 2560.0,
+      "py": 280.0,
+      "params": {}
     }
   ]
 }
