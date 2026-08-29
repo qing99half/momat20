@@ -1,25 +1,37 @@
 class_name PlatformModule
 extends StaticBody2D
-# 平台模块(地图编辑器):规格=横向1~5格×1格高 / 纵向1格宽×2~3格高。
-# 原点=左上角,按格吸附(1格=8px)。白盒期为色块;换美术时只换 _build_visual。
+# 平台/地面模块(地图编辑器):
+#   平台 platform = 横向1~5格×1格高 / 纵向1格宽×2~3格高(悬浮,可站)
+#   地面 ground   = 横向1~5格×4格高(实心方块,从落脚点一直填到画面底)
+# 原点=左上角,按格吸附(1格=8px)。白盒期为色块;换美术时只换 _rebuild 视觉部分。
 
 const CELL := 8.0
-const COLOR_FILL := Color(0.34, 0.36, 0.44)     # 平台面
-const COLOR_TOP := Color(0.55, 0.58, 0.68)      # 顶面高光(读得出"可站")
+# 平台:冷灰,顶面高光(读得出"悬浮可站")
+const PLAT_FILL := Color(0.34, 0.36, 0.44)
+const PLAT_TOP := Color(0.55, 0.58, 0.68)
+# 地面:暖褐实心,顶面土黄(读得出"踏实的地")
+const GROUND_FILL := Color(0.30, 0.24, 0.19)
+const GROUND_TOP := Color(0.48, 0.40, 0.30)
 
 var w_cells := 3
 var h_cells := 1
+var style := "platform"  # "platform" | "ground"
 
 
-func set_cells(w: int, h: int) -> void:
+func configure(w: int, h: int, p_style: String = "platform") -> void:
+	style = p_style
 	w_cells = clampi(w, 1, 5)
-	h_cells = clampi(h, 1, 3)
+	h_cells = clampi(h, 1, 4)
 	if is_node_ready():
 		_rebuild()
 
 
+func set_cells(w: int, h: int) -> void:
+	configure(w, h, style)
+
+
 func _ready() -> void:
-	collision_layer = 1  # 约定:角色Layer=1,平台与角色同层供站立
+	collision_layer = 1  # 约定:角色Layer=1,平台与地面同层供站立
 	collision_mask = 0
 	_rebuild()
 
@@ -35,12 +47,14 @@ func _rebuild() -> void:
 	shape.shape = rect
 	shape.position = size / 2.0
 	add_child(shape)
-	# 视觉:底色 + 顶面高光条
+	# 视觉:底色 + 顶面条(平台=高光,地面=土层)
+	var fill := GROUND_FILL if style == "ground" else PLAT_FILL
+	var top_color := GROUND_TOP if style == "ground" else PLAT_TOP
 	var body := Polygon2D.new()
 	body.polygon = PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), size, Vector2(0, size.y)])
-	body.color = COLOR_FILL
+	body.color = fill
 	add_child(body)
 	var top := Polygon2D.new()
 	top.polygon = PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), Vector2(size.x, 2.0), Vector2(0, 2.0)])
-	top.color = COLOR_TOP
+	top.color = top_color
 	add_child(top)

@@ -8,6 +8,7 @@ const LEVEL_DIR := "res://levels/"
 
 var _entries: Array[Dictionary] = []
 var _placing: Dictionary = {}      # 正在放置的模块条目(空=未处于放置模式)
+var _eraser := false               # 橡皮擦模式:左键点谁删谁
 var _dragging: Node2D = null       # 正在拖动的已放置模块
 var _panning := false
 
@@ -84,6 +85,17 @@ func _build_ui() -> void:
 	var vbox := VBoxContainer.new()
 	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(vbox)
+	# 工具:橡皮擦(点选删除单个模块;任何时候也可直接右键删除)
+	var tool_header := Label.new()
+	tool_header.text = "【工具】"
+	vbox.add_child(tool_header)
+	var eraser_btn := Button.new()
+	eraser_btn.text = "橡皮擦(点谁删谁)"
+	eraser_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	eraser_btn.toggle_mode = true
+	eraser_btn.pressed.connect(_on_eraser_pressed)
+	vbox.add_child(eraser_btn)
+	_palette_buttons["__eraser"] = eraser_btn
 	var last_cat := ""
 	for e in _entries:
 		if e.category != last_cat:
@@ -106,11 +118,19 @@ func _build_ui() -> void:
 
 
 func _on_palette_pressed(id: String) -> void:
+	_eraser = false
 	for e in _entries:
 		if e.id == id:
 			_placing = e
 	for bid in _palette_buttons:
 		_palette_buttons[bid].button_pressed = (bid == id and _placing.get("id", "") == id)
+
+
+func _on_eraser_pressed() -> void:
+	_eraser = true
+	_placing = {}
+	for bid in _palette_buttons:
+		_palette_buttons[bid].button_pressed = (bid == "__eraser")
 
 
 # ---- 输入 ----
@@ -130,10 +150,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			else:
 				_dragging = null
 		elif mb.button_index == MOUSE_BUTTON_RIGHT and mb.pressed:
-			if not _placing.is_empty():
-				_cancel_placing()
+			# 右键优先删除悬停模块;没点到东西才退出当前模式
+			var hovered := _pick(get_global_mouse_position())
+			if hovered:
+				hovered.free()
 			else:
-				_delete_hovered()
+				_cancel_placing()
 	elif event is InputEventMouseMotion:
 		var mm := event as InputEventMouseMotion
 		if _panning:
@@ -161,8 +183,8 @@ func _process(_delta: float) -> void:
 	_ghost.queue_redraw()
 	# 状态栏
 	var mp := get_global_mouse_position()
-	var mode := "放置:%s(右键取消)" % _placing.name if not _placing.is_empty() else ("拖动中" if _dragging else "选择模块")
-	_status.text = "%s | 格(%d,%d) px(%d,%d) | 模块数 %d | 中键平移 滚轮缩放 右键删除 Ctrl+S保存" % [
+	var mode := "放置:%s" % _placing.name if not _placing.is_empty() else ("橡皮擦:点谁删谁" if _eraser else ("拖动中" if _dragging else "选择模块"))
+	_status.text = "%s | 格(%d,%d) px(%d,%d) | 模块数 %d | 左键放/拖 右键删 中键平移 滚轮缩放 Ctrl+S保存" % [
 		mode, floori(mp.x / CELL), floori(mp.y / CELL), int(mp.x), int(mp.y), _world.get_child_count()]
 
 
@@ -179,6 +201,9 @@ func _snap(p: Vector2) -> Vector2:
 
 
 func _left_click() -> void:
+	if _eraser:
+		_delete_hovered()
+		return
 	if not _placing.is_empty():
 		_place_module(_placing, _snap(get_global_mouse_position()))
 		return
@@ -207,6 +232,7 @@ func _delete_hovered() -> void:
 
 func _cancel_placing() -> void:
 	_placing = {}
+	_eraser = false
 	for bid in _palette_buttons:
 		_palette_buttons[bid].button_pressed = false
 
@@ -276,7 +302,7 @@ func _load_level() -> void:
 		var node := _place_module(e, Vector2(m.get("px", 0.0), m.get("py", 0.0)))
 		if node and m.get("params", {}) is Dictionary and node is PlatformModule:
 			node.set_meta("params", m.params)
-			node.set_cells(int(m.params.get("w", 3)), int(m.params.get("h", 1)))
+			node.configure(int(m.params.get("w", 3)), int(m.params.get("h", 1)), str(m.params.get("style", "platform")))
 	print("[编辑器] 已读取 %s" % _level_path())
 
 
@@ -320,6 +346,16 @@ class _GhostDraw:
 	var editor: Node2D
 
 	func _draw() -> void:
+		var thin := 2.0 / editor._camera.zoom.x
+		# 橡皮擦模式:红框标出"将被删除"的悬停模块
+		if editor._eraser:
+			var hovered: Node2D = editor._pick(editor.get_global_mouse_position())
+			if hovered:
+				var he := ModuleRegistry.get_entry(hovered.get_meta("module_id"))
+				if not he.is_empty():
+					draw_rect(Rect2(hovered.position + he.fp_offset, he.fp_size), Color(1.0, 0.2, 0.2, 0.25), true)
+					draw_rect(Rect2(hovered.position + he.fp_offset, he.fp_size), Color(1.0, 0.2, 0.2, 0.9), false, thin)
+			return
 		if editor._placing.is_empty():
 			return
 		var e: Dictionary = editor._placing
@@ -327,7 +363,7 @@ class _GhostDraw:
 		var rect := Rect2(pos + e.fp_offset, e.fp_size)
 		var color := Color(0.4, 1.0, 0.6, 0.35) if e.category != "陷阱" else Color(1.0, 0.4, 0.3, 0.35)
 		draw_rect(rect, color, true)
-		draw_rect(rect, Color(color, 0.9), false, 2.0 / editor._camera.zoom.x)
+		draw_rect(rect, Color(color, 0.9), false, thin)
 
 
 class _SpawnMarker:

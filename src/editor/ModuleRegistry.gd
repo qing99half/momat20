@@ -24,8 +24,16 @@ static func get_entries() -> Array[Dictionary]:
 		entries.append({
 			"id": "platform_v%d" % h, "name": "竖平台 %d格" % h, "category": "平台",
 			"scene": "res://src/modules/PlatformModule.gd",
-			"params": {"w": 1, "h": h},
+			"params": {"w": 1, "h": h, "style": "platform"},
 			"fp_offset": Vector2.ZERO, "fp_size": Vector2(CELL, h * CELL),
+		})
+	# ---- 地面:实心方块,横向1~5格 × 4格高(顶面对齐落脚线,向下填实) ----
+	for w in range(1, 6):
+		entries.append({
+			"id": "ground_h%d" % w, "name": "地面 %d格" % w, "category": "地面",
+			"scene": "res://src/modules/PlatformModule.gd",
+			"params": {"w": w, "h": 4, "style": "ground"},
+			"fp_offset": Vector2.ZERO, "fp_size": Vector2(w * CELL, 4 * CELL),
 		})
 	# ---- 陷阱:12种,脚印从各自 TrapConfig 读取(单一事实源) ----
 	var trap_names := {
@@ -83,5 +91,5 @@ static func instantiate(id: String, params: Dictionary = {}) -> Node2D:
 	else:
 		node = (load(entry.scene) as PackedScene).instantiate()
 	if node is PlatformModule:
-		node.set_cells(int(params.get("w", 3)), int(params.get("h", 1)))
+		node.configure(int(params.get("w", 3)), int(params.get("h", 1)), str(params.get("style", "platform")))
 	return node
