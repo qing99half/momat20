@@ -3,9 +3,9 @@ extends Control
 ## 硬性约束：整段文字(日期+正文)总计 5 秒打完。
 const TOTAL_TYPE_SECONDS := 5.0
 
-## 一章:字迹模糊(正文压半透明模拟)+笔尖沙沙;二章:逐字清晰+纸页摩挲(占位音效,真素材到位后替换)。
-const PEN_SFX := "res://assets/placeholder/placeholder_S1.wav"
-const PAPER_SFX := "res://assets/placeholder/placeholder_S2.wav"
+## 一章:字迹模糊(正文压半透明模拟)+笔尖沙沙(S7);二章:逐字清晰+纸页摩挲(S6)。
+const PEN_SFX := "res://assets/audio/sfx_pen_writing.ogg"
+const PAPER_SFX := "res://assets/audio/sfx_diary_open.ogg"
 const BLUR_ALPHA := 0.45
 
 @onready var date_label: Label = $DateLabel
@@ -40,6 +40,8 @@ func _play_sfx(path: String) -> void:
 	var stream: AudioStream = load(path)
 	if stream is AudioStreamWAV:
 		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	elif stream is AudioStreamOggVorbis:
+		stream.loop = true  # ogg 真素材:打字期间循环,打完即停
 	_sfx.stream = stream
 	_sfx.play()
 

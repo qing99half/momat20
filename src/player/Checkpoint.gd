@@ -7,7 +7,7 @@ extends Area2D
 # 零直接调用:台灯只调玩家公开的 set_checkpoint 接口(与 TrapBase.receive_hazard 同一模式)。
 
 const LAMP_TEXTURE := preload("res://assets/placeholder/placeholder_prop_lamp.png")
-const CHECKPOINT_SFX := preload("res://assets/placeholder/placeholder_S5.wav")  # S5=台灯检查点音
+const CHECKPOINT_SFX := preload("res://assets/audio/sfx_checkpoint.ogg")  # S5=台灯检查点音
 
 const COLOR_DIM := Color(0.45, 0.42, 0.38)   # 灭:昏沉沉的暗灯
 const COLOR_LIT := Color(1.7, 1.4, 0.85)     # 亮:昏黄暖光(超亮调制模拟发光)

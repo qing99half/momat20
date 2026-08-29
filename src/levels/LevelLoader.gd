@@ -6,6 +6,12 @@ extends RefCounted
 
 const PLAYER_SCENE := "res://src/player/Player.tscn"
 const DEFAULT_SPAWN := Vector2(60.0, 320.0)
+# 关卡环境底噪(S9 争吵闷响/S14 机器嗡鸣/S16 婴儿啼哭):按 level_id 的 lv 序号取,同族自动命中
+const AMBIENT_SFX := {
+	"lv1": "res://assets/audio/sfx_quarrel_muffled.ogg",
+	"lv2": "res://assets/audio/sfx_machine_hum.ogg",
+	"lv4": "res://assets/audio/sfx_baby_cry.ogg",
+}
 
 
 static func build(json_path: String) -> Node2D:
@@ -34,7 +40,7 @@ static func build(json_path: String) -> Node2D:
 		if id == "spawn":
 			spawn = pos
 			continue
-		var node := ModuleRegistry.instantiate(id, m.get("params", {}))
+		var node := ModuleRegistry.instantiate(id, m.get("params", {}), str(data.get("level_id", "")))
 		if node == null:
 			continue
 		node.position = pos
@@ -55,6 +61,20 @@ static func build(json_path: String) -> Node2D:
 	conductor.name = "Conductor"
 	conductor.set_meta("autoplay_track", "res://assets/placeholder/placeholder_M1.wav")
 	root.add_child(conductor)
+
+	# 关卡环境底噪(循环):按 lv 序号取素材,缺文件则静默跳过不挡路
+	var lv_key := str(data.get("level_id", "")).get_slice("_", 1)
+	var amb_path: String = AMBIENT_SFX.get(lv_key, "")
+	if amb_path != "" and ResourceLoader.exists(amb_path):
+		var amb := AudioStreamPlayer.new()
+		amb.name = "LevelAmbient"
+		var amb_stream: AudioStream = load(amb_path)
+		if amb_stream is AudioStreamOggVorbis:
+			amb_stream.loop = true
+		amb.stream = amb_stream
+		amb.volume_db = -12.0
+		amb.autoplay = true
+		root.add_child(amb)
 
 	print("[LevelLoader] %s: %d 个模块, 出生点 %s" % [json_path, data.get("modules", []).size(), spawn])
 	return root

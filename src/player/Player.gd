@@ -92,6 +92,9 @@ var _shatter: GPUParticles2D         # 碎裂:像素方块向四周飞散
 var _gather: GPUParticles2D          # 重生:碎裂倒放=向中心聚合
 var _sfx_death: AudioStreamPlayer    # S4 死亡碎裂音
 var _sfx_rebirth: AudioStreamPlayer  # S13 重生上行单音
+var _sfx_jump: AudioStreamPlayer     # S1 跳跃
+var _sfx_land: AudioStreamPlayer     # S2 落地
+var _sfx_dash: AudioStreamPlayer     # S3 冲刺
 
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -178,6 +181,7 @@ func _physics_process(delta: float) -> void:
 		_airborne_from_jump = true
 		_jump_start = position
 		_jump_peak_y = position.y
+		_sfx_jump.play()
 
 	# ---- 可变跳高:上升中松开跳跃键(W或空格)砍半 ----
 	var held := _jump_held()
@@ -214,6 +218,7 @@ func _physics_process(delta: float) -> void:
 	var on_floor_now := is_on_floor()
 	if on_floor_now and not was_on_floor:
 		_land_timer = 0.08
+		_sfx_land.play()
 		if _airborne_from_jump:
 			_airborne_from_jump = false
 			var dist := position.x - _jump_start.x
@@ -317,13 +322,22 @@ func _build_death_fx() -> void:
 	gather_mat.damping_max = 120.0
 	_gather.process_material = gather_mat
 	add_child(_gather)
-	# 音效(占位 wav;S4=死亡碎裂,S13=重生上行单音)
+	# 音效(S1=跳跃,S2=落地,S3=冲刺,S4=死亡碎裂,S13=重生上行单音)
 	_sfx_death = AudioStreamPlayer.new()
-	_sfx_death.stream = load("res://assets/placeholder/placeholder_S4.wav")
+	_sfx_death.stream = load("res://assets/audio/sfx_death.ogg")
 	add_child(_sfx_death)
 	_sfx_rebirth = AudioStreamPlayer.new()
-	_sfx_rebirth.stream = load("res://assets/placeholder/placeholder_S13.wav")
+	_sfx_rebirth.stream = load("res://assets/audio/sfx_rebirth.ogg")
 	add_child(_sfx_rebirth)
+	_sfx_jump = AudioStreamPlayer.new()
+	_sfx_jump.stream = load("res://assets/audio/sfx_jump.ogg")
+	add_child(_sfx_jump)
+	_sfx_land = AudioStreamPlayer.new()
+	_sfx_land.stream = load("res://assets/audio/sfx_land.ogg")
+	add_child(_sfx_land)
+	_sfx_dash = AudioStreamPlayer.new()
+	_sfx_dash.stream = load("res://assets/audio/sfx_dash.ogg")
+	add_child(_sfx_dash)
 
 
 func _pixel_texture() -> ImageTexture:
@@ -452,6 +466,7 @@ func _start_dash(air: bool) -> void:
 	velocity = Vector2(_dash_dir * DASH_SPEED, 0.0)
 	_hitstop()
 	_camera_shake()
+	_sfx_dash.play()
 	# 冲刺照常判定死亡、无伤害豁免(D-537):can_die 全程不动,陷阱命中=即死
 
 

@@ -1,8 +1,8 @@
 extends Control
 # 翻页转场:纸页从屏幕右侧外向左横扫,遮满全屏(扫到一半)时切换场景,扫完后销毁自身。
 
-## 翻页音效(占位 S8;真素材 sfx_page_turn.ogg 到位后替换)。
-const PAGE_TURN_SFX := "res://assets/placeholder/placeholder_S8.wav"
+## 翻页音效(S8 真素材)。
+const PAGE_TURN_SFX := "res://assets/audio/sfx_page_turn.ogg"
 
 ## 纸页横扫总时长(秒)。
 const SWEEP_SECONDS := 0.8

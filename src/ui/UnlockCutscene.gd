@@ -13,9 +13,9 @@ const FRAGMENT_TEXTURES := [
 	"res://assets/placeholder/placeholder_ui_memory_fragment_3.png",
 	"res://assets/placeholder/placeholder_ui_memory_fragment_4.png",
 ]
-const SFX_BUZZ := "res://assets/placeholder/placeholder_S10.wav"    # 锁共鸣低频震颤
-const SFX_LOCK := "res://assets/placeholder/placeholder_S11.wav"    # 锁弹开"咔哒"
-const SFX_BREATH := "res://assets/placeholder/placeholder_S17.wav"  # 呼吸+心跳(D-533 绝不砍)
+const SFX_BUZZ := "res://assets/audio/sfx_lock_buzz.ogg"          # 锁共鸣低频震颤
+const SFX_LOCK := "res://assets/audio/sfx_lock_open.ogg"          # 锁弹开"咔哒"
+const SFX_BREATH := "res://assets/audio/sfx_breath_heartbeat.ogg"  # 呼吸+心跳(D-533 绝不砍)
 
 const BLACKOUT_FADE := 0.3     # 11.2 画面定格黑屏淡入
 const BUZZ_SECONDS := 0.5      # 11.2 锁共鸣时长

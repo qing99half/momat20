@@ -4,8 +4,8 @@ extends Control
 # 章节门控(任务10.5):仅 current_chapter>=2 显示并响应 diary_finished——一章无 HUD、不飞光片
 # (光片是二章专属收集物,防反转泄底)。计数存 GameState(切场景不丢),本节点每关重建只做显示。
 
-## 光片获得音效"叮"(占位 S9;真素材 sfx_light_shard.ogg 到位后替换)。
-const FRAGMENT_SFX := "res://assets/placeholder/placeholder_S9.wav"
+## 光片获得音效"叮"(S9 真素材)。
+const FRAGMENT_SFX := "res://assets/audio/sfx_light_shard.ogg"
 
 ## 光片飞行时长(秒),照任务写死。
 const FLIGHT_SECONDS := 0.8

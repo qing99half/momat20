@@ -82,7 +82,12 @@ static func get_entry(id: String) -> Dictionary:
 
 
 ## 实例化模块(spawn 无实体,返回 null);平台按 params.w/h 设格数
-static func instantiate(id: String, params: Dictionary = {}) -> Node2D:
+## level_id 非空时按关寻址真美术(assets/art/<level_id>/);缺文件自动回退占位/色块,不报错
+const TRAP_SKIN_SUFFIX := {"heart_big": "heart_mold", "rotten": "heart_platform"}  # 代码id → 美术文件后缀
+const PLATFORM_VARIANT_DEFAULT := {"ch1_lv3": "warm", "ch2_lv2": "warm", "ch3": "real"}  # 双态关默认态
+
+
+static func instantiate(id: String, params: Dictionary = {}, level_id: String = "") -> Node2D:
 	var entry := get_entry(id)
 	if entry.is_empty() or (entry.scene as String).is_empty():
 		return null
@@ -93,6 +98,12 @@ static func instantiate(id: String, params: Dictionary = {}) -> Node2D:
 		node = (load(entry.scene) as PackedScene).instantiate()
 	if node is PlatformModule:
 		node.configure(int(params.get("w", 3)), int(params.get("h", 1)), str(params.get("style", "platform")))
+		node.tex_path = _platform_tex(level_id, node.style, node.w_cells, node.h_cells,
+				str(params.get("variant", "")), str(params.get("vsub", "a")))
+	elif node is TrapBase:
+		var skin := _trap_skin(level_id, id)
+		if skin != "":
+			node.set_meta("skin_texture", skin)  # TrapBase._build_visual 读取
 	# 日记桌(任务10.5):编辑器摆关底桌时可配 level_id/chapter/二章的 diary_date/diary_text
 	if node is DiaryDesk:
 		if params.has("level_id"):
@@ -108,3 +119,35 @@ static func instantiate(id: String, params: Dictionary = {}) -> Node2D:
 	if rot != 0 and bool(entry.get("rotatable", false)):
 		node.rotation_degrees = float(rot)
 	return node
+
+
+# ---- 按关美术寻址 ----
+
+# 平台/地面贴图:ground_<lv>_<w>w / platform_<lv>_<w>w / platform_<lv>_h<h><a|b>,双态关可带 _variant 后缀
+static func _platform_tex(level_id: String, style: String, w: int, h: int, variant: String, vsub: String) -> String:
+	if level_id == "":
+		return ""
+	if variant == "":
+		variant = PLATFORM_VARIANT_DEFAULT.get(level_id, "")
+	var base := ""
+	if style == "ground":
+		base = "res://assets/art/%s/ground_%s_%dw" % [level_id, level_id, w]
+	elif w == 1 and h >= 2:
+		base = "res://assets/art/%s/platform_%s_h%d%s" % [level_id, level_id, h, vsub]
+	else:
+		base = "res://assets/art/%s/platform_%s_%dw" % [level_id, level_id, w]
+	if variant != "":
+		var pv := "%s_%s.png" % [base, variant]
+		if ResourceLoader.exists(pv):
+			return pv
+	var p := "%s.png" % base
+	return p if ResourceLoader.exists(p) else ""
+
+
+# 陷阱按关换皮:trap_<lv>_<后缀>.png;缺文件=保持 TrapConfig 占位贴图
+static func _trap_skin(level_id: String, id: String) -> String:
+	if level_id == "":
+		return ""
+	var suffix: String = TRAP_SKIN_SUFFIX.get(id, id)
+	var p := "res://assets/art/%s/trap_%s_%s.png" % [level_id, level_id, suffix]
+	return p if ResourceLoader.exists(p) else ""

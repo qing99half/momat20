@@ -57,7 +57,12 @@ func _on_ready() -> void:
 
 func _build_visual() -> void:
 	sprite = Sprite2D.new()
-	sprite.texture = config.texture
+	# 按关换皮(附录E扩展):ModuleRegistry 按 level_id 寻址真素材,缺图回退 config 占位贴图
+	var skin := str(get_meta("skin_texture", ""))
+	if skin != "" and ResourceLoader.exists(skin):
+		sprite.texture = load(skin)
+	else:
+		sprite.texture = config.texture
 	if config.anchor_top:
 		sprite.position = Vector2(0.0, config.hitbox_size.y / 2.0)
 	var shader := Shader.new()

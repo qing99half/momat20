@@ -17,6 +17,7 @@ const GROUND_TOP := Color(0.48, 0.40, 0.30)
 var w_cells := 3
 var h_cells := 1
 var style := "platform"  # "platform" | "ground"
+var tex_path := ""  # 由 ModuleRegistry 按关寻址填入;空=白盒色块(换美术不改碰撞)
 
 
 func configure(w: int, h: int, p_style: String = "platform") -> void:
@@ -53,7 +54,15 @@ func _rebuild() -> void:
 	shape.shape = rect
 	shape.position = size / 2.0
 	add_child(shape)
-	# 视觉:底色 + 顶面条(平台=高光,地面=土层)
+	# 视觉:有贴图用贴图(判定不变),无贴图回退白盒色块
+	if tex_path != "" and ResourceLoader.exists(tex_path):
+		var tex := Sprite2D.new()
+		tex.texture = load(tex_path)
+		tex.centered = false  # 原点=左上角,与模块原点一致
+		if style == "platform" and w_cells == 1:
+			tex.position.x = -PLAT_THICK / 2.0  # 竖板贴图20宽、板厚10,水平居中
+		add_child(tex)
+		return
 	var fill := GROUND_FILL if style == "ground" else PLAT_FILL
 	var top_color := GROUND_TOP if style == "ground" else PLAT_TOP
 	var body := Polygon2D.new()

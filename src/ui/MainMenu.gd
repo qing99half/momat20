@@ -3,6 +3,19 @@ extends Control
 @onready var hint_label: Label = $HintLabel
 
 
+func _ready() -> void:
+	# S19 菜单环境底噪(循环,压低至背景层)
+	var amb := AudioStreamPlayer.new()
+	amb.name = "MenuAmbient"
+	var stream: AudioStream = load("res://assets/audio/sfx_menu_ambient.ogg")
+	if stream is AudioStreamOggVorbis:
+		stream.loop = true
+	amb.stream = stream
+	amb.volume_db = -10.0
+	add_child(amb)
+	amb.play()
+
+
 func _process(_delta: float) -> void:
 	# 提示文字颜色呼吸闪烁：透明度按正弦脉动
 	var t := Time.get_ticks_msec() / 1000.0

@@ -13,6 +13,13 @@ var _droplet: Sprite2D = null
 var _crumbled := false
 var _crumbling := false
 var _loop_gen := -1  # 自由周期循环已启动的代际标记(-1=未启动/节拍驱动)
+var _rings: Array[Sprite2D] = []  # 啼哭声波:错相扩散的同心环(_rings[0]=主 sprite)
+
+# 啼哭声波(模式3)节奏参数:三环错相 0.15s,单环扩散 0.8s,判定只跟到 0.6s(尾段淡出不再致死)
+const RING_COUNT := 3
+const RING_STAGGER := 0.15
+const RING_EXPAND := 0.8
+const RING_HITBOX_EXPAND := 0.6
 
 
 func _on_ready() -> void:
@@ -22,7 +29,18 @@ func _on_ready() -> void:
 		2:
 			_build_droplet()
 		3:
-			sprite.visible = false  # 啼哭声波:平时隐藏,预警时出现,击发扩散,结束再隐藏
+			# 啼哭声波:主 sprite + 2 个克隆环组成同心波;平时全隐藏,预警时出现,击发扩散,淡出收尾
+			_rings = [sprite]
+			for i in RING_COUNT - 1:
+				var r := Sprite2D.new()
+				r.texture = sprite.texture
+				r.centered = sprite.centered
+				r.offset = sprite.offset
+				r.position = sprite.position
+				r.visible = false
+				add_child(r)
+				_rings.append(r)
+			sprite.visible = false
 	if config.timed_mode != 1:
 		if config.beat_sync:
 			_beat_mode_boot(_cycle_loop)  # 对拍击发;无音乐时回退自由定时
@@ -134,7 +152,7 @@ func _active_window() -> float:
 	if config.timed_mode == 2:
 		return config.fall_distance / 1000.0
 	if config.timed_mode == 3:
-		return 0.8
+		return RING_STAGGER * (RING_COUNT - 1) + RING_EXPAND  # 激活窗口=尾环播完(1.1s)
 	return config.active_duration
 
 
@@ -146,8 +164,9 @@ func _do_warning() -> void:
 			var tween := create_tween()
 			tween.tween_property(sprite, "scale", Vector2(0.85, 0.85), config.warn_duration)
 			tween.tween_property(sprite, "scale", Vector2.ONE, 0.1)
-		3:  # 啼哭声波:出现(小圈)+摇晃预警
+		3:  # 啼哭声波:出现(小圈)+摇晃预警;复原上一轮淡出留下的透明度
 			sprite.visible = true
+			sprite.modulate = Color.WHITE
 			sprite.scale = Vector2(0.3, 0.3)
 			play_warning_shake(config.warn_duration)
 
@@ -194,22 +213,35 @@ func _activate_once() -> void:
 			hitbox.scale = Vector2.ONE
 			hitbox.position = _hitbox_base_pos
 			_active = false
-		3:  # 声波环扩散(出现→扩大→消失)
+		3:  # 啼哭声波:三环错相扩散(出现→向四周扩散→淡化消失),判定只跟首环前段
 			_active = true
-			sprite.visible = true
-			sprite.scale = Vector2(0.3, 0.3)
-			hitbox.scale = Vector2(0.3, 0.3)
 			var target := config.amplitude / (config.hitbox_size.x / 2.0)
-			var tween := create_tween()
-			tween.set_parallel(true)
-			tween.tween_property(sprite, "scale", Vector2(target, target), 0.8)
-			tween.tween_property(hitbox, "scale", Vector2(target, target), 0.8)
-			if not await _await_tween(tween, gen):
+			var target_v := Vector2(target, target)
+			hitbox.scale = Vector2(0.3, 0.3)
+			var hb := create_tween()
+			hb.tween_property(hitbox, "scale", target_v, RING_HITBOX_EXPAND)
+			# 三环依次推迟 0.15s 出发,边放大边淡化,形成一圈追一圈的波前;
+			# 未到出发时刻的环保持隐藏,避免起点处堆三个静止小点
+			for i in _rings.size():
+				var ring := _rings[i]
+				ring.visible = false
+				ring.scale = Vector2(0.3, 0.3)
+				ring.modulate = Color.WHITE
+				var tw := create_tween()
+				tw.set_parallel(true)
+				tw.tween_callback(ring.set_visible.bind(true)).set_delay(i * RING_STAGGER)
+				tw.tween_property(ring, "scale", target_v, RING_EXPAND).set_delay(i * RING_STAGGER)
+				tw.tween_property(ring, "modulate:a", 0.0, RING_EXPAND).set_delay(i * RING_STAGGER)
+			await get_tree().create_timer(RING_HITBOX_EXPAND).timeout
+			if gen != _gen:
 				return
-			sprite.visible = false
-			sprite.scale = Vector2.ONE
+			_active = false  # 判定先撤:尾段只剩淡出动画,看着没碰到就不会死
+			await get_tree().create_timer(RING_STAGGER * (_rings.size() - 1) + RING_EXPAND - RING_HITBOX_EXPAND).timeout
+			if gen != _gen:
+				return
+			for ring in _rings:
+				ring.visible = false
 			hitbox.scale = Vector2.ONE
-			_active = false
 
 
 func reset_trap() -> void:
@@ -219,7 +251,10 @@ func reset_trap() -> void:
 	if _droplet:
 		_droplet.visible = false
 	if config.timed_mode == 3:
-		sprite.visible = false  # 死亡重置:声波环立即藏回(预警期出现的状态一并归零)
+		for ring in _rings:  # 死亡重置:全部声波环立即藏回并复原(预警/扩散中的状态一并归零)
+			ring.visible = false
+			ring.scale = Vector2.ONE
+			ring.modulate = Color.WHITE
 	if config.timed_mode == 1 and (_crumbled or _crumbling):
 		_crumbled = false
 		_crumbling = false
