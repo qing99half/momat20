@@ -21,6 +21,8 @@ func _on_ready() -> void:
 			_build_stand_surface()
 		2:
 			_build_droplet()
+		3:
+			sprite.visible = false  # 啼哭声波:平时隐藏,预警时出现,击发扩散,结束再隐藏
 	if config.timed_mode != 1:
 		if config.beat_sync:
 			_beat_mode_boot(_cycle_loop)  # 对拍击发;无音乐时回退自由定时
@@ -144,7 +146,9 @@ func _do_warning() -> void:
 			var tween := create_tween()
 			tween.tween_property(sprite, "scale", Vector2(0.85, 0.85), config.warn_duration)
 			tween.tween_property(sprite, "scale", Vector2.ONE, 0.1)
-		3:  # 啼哭声波:摇篮摇晃预警
+		3:  # 啼哭声波:出现(小圈)+摇晃预警
+			sprite.visible = true
+			sprite.scale = Vector2(0.3, 0.3)
 			play_warning_shake(config.warn_duration)
 
 
@@ -190,8 +194,9 @@ func _activate_once() -> void:
 			hitbox.scale = Vector2.ONE
 			hitbox.position = _hitbox_base_pos
 			_active = false
-		3:  # 声波环扩散
+		3:  # 声波环扩散(出现→扩大→消失)
 			_active = true
+			sprite.visible = true
 			sprite.scale = Vector2(0.3, 0.3)
 			hitbox.scale = Vector2(0.3, 0.3)
 			var target := config.amplitude / (config.hitbox_size.x / 2.0)
@@ -201,6 +206,7 @@ func _activate_once() -> void:
 			tween.tween_property(hitbox, "scale", Vector2(target, target), 0.8)
 			if not await _await_tween(tween, gen):
 				return
+			sprite.visible = false
 			sprite.scale = Vector2.ONE
 			hitbox.scale = Vector2.ONE
 			_active = false
@@ -212,6 +218,8 @@ func reset_trap() -> void:
 	_active = false
 	if _droplet:
 		_droplet.visible = false
+	if config.timed_mode == 3:
+		sprite.visible = false  # 死亡重置:声波环立即藏回(预警期出现的状态一并归零)
 	if config.timed_mode == 1 and (_crumbled or _crumbling):
 		_crumbled = false
 		_crumbling = false

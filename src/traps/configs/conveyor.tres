@@ -8,6 +8,6 @@ script = ExtResource("1_cfg")
 source_id = &"conveyor"
 damage = 0
 texture = ExtResource("2_tex")
-hitbox_size = Vector2(240, 12)
+hitbox_size = Vector2(200, 12)
 rotatable = true
 push = Vector2(112.5, 0)
