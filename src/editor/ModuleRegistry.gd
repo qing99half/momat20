@@ -7,7 +7,7 @@ extends RefCounted
 #   fp_offset/fp_size — 脚印矩形(相对节点原点的px),编辑器画幽灵/拾取/对齐用
 # 脚印约定:平台=左上角原点;陷阱=贴图中心(摆锤=顶部悬挂点);台灯/日记桌/出生点=底部落地线。
 
-const CELL := 8.0
+const CELL := 20.0
 
 
 static func get_entries() -> Array[Dictionary]:
@@ -57,17 +57,17 @@ static func get_entries() -> Array[Dictionary]:
 	entries.append({
 		"id": "lamp", "name": "台灯(检查点)", "category": "道具",
 		"scene": "res://src/player/Checkpoint.tscn", "params": {},
-		"fp_offset": Vector2(-4.0, -16.0), "fp_size": Vector2(8.0, 16.0),
+		"fp_offset": Vector2(-10.0, -40.0), "fp_size": Vector2(20.0, 40.0),
 	})
 	entries.append({
 		"id": "diary_desk", "name": "日记桌(关底)", "category": "道具",
 		"scene": "res://src/props/DiaryDesk.tscn", "params": {},
-		"fp_offset": Vector2(-24.0, -32.0), "fp_size": Vector2(48.0, 32.0),
+		"fp_offset": Vector2(-60.0, -80.0), "fp_size": Vector2(120.0, 80.0),
 	})
 	entries.append({
 		"id": "spawn", "name": "出生点", "category": "道具",
 		"scene": "", "params": {},  # 编辑器内画标记,游戏内由 LevelLoader 放置玩家
-		"fp_offset": Vector2(-4.0, -16.0), "fp_size": Vector2(8.0, 16.0),
+		"fp_offset": Vector2(-10.0, -20.0), "fp_size": Vector2(20.0, 20.0),
 	})
 	return entries
 

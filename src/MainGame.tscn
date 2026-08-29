@@ -14,7 +14,7 @@ anchor_bottom = 1.0
 stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="GameLayer"]
-size = Vector2i(320, 180)
+size = Vector2i(400, 180)
 script = ExtResource("1_lut")
 
 [node name="BackBufferCopy" type="BackBufferCopy" parent="GameLayer/SubViewport"]

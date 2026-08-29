@@ -8,5 +8,5 @@ script = ExtResource("1_cfg")
 source_id = &"conveyor"
 damage = 0
 texture = ExtResource("2_tex")
-hitbox_size = Vector2(64, 8)
-push = Vector2(45, 0)
+hitbox_size = Vector2(160, 20)
+push = Vector2(112.5, 0)

@@ -1,11 +1,11 @@
 class_name LevelSpecs
 extends RefCounted
 # 关卡范围规格(照抄策划案任务8.3 + 附录C,不许自改):
-#   每关约130格(1040px,相机Limit Right=1040),四段式,地面行Y=18(y=144px,Y=0为地面)。
+#   每关约130格(2600px,相机Limit Right=2600),四段式,地面行Y=8(y=160px,Y=0为地面,视野9格高)。
 # 各关差异仅在核心段/考试段分界:关1=80,关2/3=85,关4=70。
 
 const LENGTH_CELLS := 130
-const GROUND_Y_PX := 144.0
+const GROUND_Y_PX := 160.0
 const DESK_CELL := 125  # 日记桌推荐位 X=125
 
 

@@ -8,4 +8,4 @@ script = ExtResource("1_cfg")
 source_id = &"glass"
 damage = 1
 texture = ExtResource("2_tex")
-hitbox_size = Vector2(24, 8)
+hitbox_size = Vector2(60, 20)

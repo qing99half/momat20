@@ -7,7 +7,7 @@ extends Area2D
 signal trap_activated
 signal trap_hit_player
 
-const HITBOX_INSET := 2.0
+const HITBOX_INSET := 5.0  # ¼主角宽,与蔚蓝宽容度一致
 # 白闪 shader(击发前2帧强调;内嵌代码避免占用 assets/shaders 目录)
 const FLASH_SHADER_CODE := """shader_type canvas_item;
 uniform float flash : hint_range(0.0, 1.0) = 0.0;

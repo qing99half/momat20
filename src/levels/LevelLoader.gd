@@ -5,7 +5,7 @@ extends RefCounted
 # spawn 模块不实例化,只决定玩家出生位置;无 spawn 时默认 (24, 144)。
 
 const PLAYER_SCENE := "res://src/player/Player.tscn"
-const DEFAULT_SPAWN := Vector2(24.0, 144.0)
+const DEFAULT_SPAWN := Vector2(60.0, 160.0)
 
 
 static func build(json_path: String) -> Node2D:
@@ -25,12 +25,12 @@ static func build(json_path: String) -> Node2D:
 		root.add_child(_make_parallax(bg_far, bg_mid))
 
 	var spawn := DEFAULT_SPAWN
-	var max_x := 320.0  # 相机右边界=最右模块+余量
+	var max_x := 400.0  # 相机右边界=最右模块+余量(半屏200px)
 
 	for m in data.get("modules", []):
 		var id: String = m.get("id", "")
 		var pos := Vector2(m.get("px", 0.0), m.get("py", 0.0))
-		max_x = maxf(max_x, pos.x + 160.0)
+		max_x = maxf(max_x, pos.x + 200.0)
 		if id == "spawn":
 			spawn = pos
 			continue
@@ -50,7 +50,8 @@ static func build(json_path: String) -> Node2D:
 		cam.limit_right = int(max_x)
 
 	# Conductor 节拍器(任务3):挂关卡根,MainGame 进场后播 M1,全关陷阱按 120BPM 对拍
-	var conductor := Conductor.new()
+	# 动态加载:静态引用会把 Conductor 拉进启动编译链,看不到 autoload(EventBus)
+	var conductor: Node = (load("res://src/flow/Conductor.gd") as GDScript).new()
 	conductor.name = "Conductor"
 	conductor.set_meta("autoplay_track", "res://assets/placeholder/placeholder_M1.wav")
 	root.add_child(conductor)
@@ -73,9 +74,10 @@ static func _make_layer(tex_path: String, scale: float, layer_name: String) -> P
 	var layer := ParallaxLayer.new()
 	layer.name = layer_name
 	layer.motion_scale = Vector2(scale, scale)
-	layer.motion_mirroring = Vector2(640.0, 0.0)
 	var sprite := Sprite2D.new()
 	sprite.texture = load(tex_path)
 	sprite.centered = false
 	layer.add_child(sprite)
+	# 镜像宽度跟随贴图实际宽(素材换尺寸不用改代码)
+	layer.motion_mirroring = Vector2(float(sprite.texture.get_width()), 0.0)
 	return layer

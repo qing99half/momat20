@@ -1,28 +1,28 @@
 extends CharacterBody2D
 # 玩家角色控制器(任务1:蔚蓝手感移植)
-# 单位: 像素/秒,1格=8px。碰撞体8×16px(1×2格),底部居中锚点。
+# 单位: 像素/秒,1格=20px。碰撞体20×20px(1×1格,主角=格基准),底部居中锚点。
 # move_and_slide() 无参数(Godot 4.7 写法);CharacterBody2D + 手写 velocity,非 RigidBody2D。
 # 实测跳跃数据会在控制台打印(供策划案附录B白盒度量速查表回填)。
 
 # ---- 移动 ----
-const MAX_SPEED := 90.0        # 全速(px/s)
-const ACCEL := 900.0           # 6帧(0.1s)到全速
-const DECEL := 1800.0          # 3帧(0.05s)刹停;转向同率=转向无打滑
-const AIR_ACCEL := 900.0       # 空中加速
-const AIR_DECEL := 600.0       # 空气摩擦(空中无输入时的减速)
+const MAX_SPEED := 225.0        # 全速(px/s)
+const ACCEL := 2250.0           # 6帧(0.1s)到全速
+const DECEL := 4500.0          # 3帧(0.05s)刹停;转向同率=转向无打滑
+const AIR_ACCEL := 2250.0       # 空中加速
+const AIR_DECEL := 1500.0       # 空气摩擦(空中无输入时的减速)
 
 # ---- 跳跃 ----
-const GRAVITY := 1400.0
-const JUMP_VELOCITY := -265.0  # 净空≈27.8px(3.48格,含顶点滞空增益)
+const GRAVITY := 3500.0
+const JUMP_VELOCITY := -662.5  # 净空≈70px(3.48格,格数不变,含顶点滞空增益)
 const JUMP_CUT_MULT := 0.5     # 可变跳高:上升中松键,竖直速度砍半
-const APEX_THRESHOLD := 40.0   # 顶点滞空:|vy|低于此值重力减半
+const APEX_THRESHOLD := 100.0   # 顶点滞空:|vy|低于此值重力减半
 const APEX_GRAVITY_MULT := 0.5
-const MAX_FALL_SPEED := 240.0  # 下落限速
+const MAX_FALL_SPEED := 600.0  # 下落限速
 
 # ---- 宽容机制 ----
 const COYOTE_TIME := 0.15      # 土狼时间:离开平台0.15s内仍可跳
 const JUMP_BUFFER := 0.1       # 跳跃缓冲:落地前0.1s按跳,落地自动跳
-const CORNER_CORRECT_MAX := 6  # 撞角修正:斜角碰撞最大横移(px)
+const CORNER_CORRECT_MAX := 15  # 撞角修正:斜角碰撞最大横移(px)
 
 # ---- 动画帧号(占位spritesheet 24帧,帧序见策划案-美术音乐附录) ----
 const FRAME_LAND := 20
@@ -44,11 +44,11 @@ var _jump_peak_y := 0.0
 # 无无敌帧系统(D-537):仅重生后 0.5s 内 can_die=false,防"重生瞬间与陷阱相位重叠即死"连死循环。
 const RESPAWN_DELAY := 1.0       # 死亡→重生等待(秒)
 const RESPAWN_PROTECT := 0.5     # 重生保护窗(秒,防连死,非无敌帧)
-const KILL_Y := 220.0            # 坠落死亡线:掉出世界(坑底)即死,回最近台灯
+const KILL_Y := 220.0  # 锚视野底180+40,与格体系无关(视野高不变)            # 坠落死亡线:掉出世界(坑底)即死,回最近台灯
 const SHATTER_LIFETIME := 0.8    # 碎裂粒子寿命(秒)
-const SHATTER_GRAVITY := 300.0   # 碎裂粒子重力(px/s²)
-const SHATTER_SPEED_MIN := 200.0 # 碎裂粒子初速下限(px/s)
-const SHATTER_SPEED_MAX := 400.0 # 碎裂粒子初速上限(px/s)
+const SHATTER_GRAVITY := 750.0   # 碎裂粒子重力(px/s²)
+const SHATTER_SPEED_MIN := 500.0 # 碎裂粒子初速下限(px/s)
+const SHATTER_SPEED_MAX := 1000.0 # 碎裂粒子初速上限(px/s)
 
 var can_die := true                  # 死亡期间/重生保护窗内=false(防连续触发)
 var _frozen := false                 # 死亡流程中冻结输入与移动

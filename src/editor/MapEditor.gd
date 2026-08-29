@@ -3,7 +3,7 @@ extends Node2D
 # 模块目录见 ModuleRegistry;存档为 res://levels/<关卡id>.json,游戏经 LevelLoader 读取。
 # 启动:运行本场景(地图编辑器.bat)或 godot --path <项目> res://src/editor/MapEditor.tscn
 
-const CELL := 8.0
+const CELL := 20.0
 const LEVEL_DIR := "res://levels/"
 
 var _entries: Array[Dictionary] = []
@@ -45,7 +45,7 @@ func _ready() -> void:
 
 	_camera = Camera2D.new()
 	_camera.position = Vector2(160.0, 90.0)
-	_camera.zoom = Vector2(4.0, 4.0)
+	_camera.zoom = Vector2(3.2, 3.2)  # 20px格:等效旧8px格zoom4的视野
 	add_child(_camera)
 	_camera.make_current()
 
@@ -206,7 +206,7 @@ func _process(_delta: float) -> void:
 
 func _zoom_at_mouse(factor: float) -> void:
 	var before := get_global_mouse_position()
-	var z := clampf(_camera.zoom.x * factor, 1.0, 8.0)
+	var z := clampf(_camera.zoom.x * factor, 0.5, 8.0)
 	_camera.zoom = Vector2(z, z)
 	_camera.position += before - get_global_mouse_position()
 	_grid.queue_redraw()
@@ -348,14 +348,14 @@ class _GridDraw:
 		var thin := 1.0 / cam.zoom.x
 		var c8 := Color(1, 1, 1, 0.06)
 		var c40 := Color(1, 1, 1, 0.14)
-		var x := floorf(tl.x / 8.0) * 8.0
+		var x := floorf(tl.x / 20.0) * 20.0
 		while x <= br.x:
-			draw_line(Vector2(x, tl.y), Vector2(x, br.y), c40 if int(x) % 40 == 0 else c8, thin)
-			x += 8.0
-		var y := floorf(tl.y / 8.0) * 8.0
+			draw_line(Vector2(x, tl.y), Vector2(x, br.y), c40 if int(x) % 100 == 0 else c8, thin)
+			x += 20.0
+		var y := floorf(tl.y / 20.0) * 20.0
 		while y <= br.y:
-			draw_line(Vector2(tl.x, y), Vector2(br.x, y), c40 if int(y) % 40 == 0 else c8, thin)
-			y += 8.0
+			draw_line(Vector2(tl.x, y), Vector2(br.x, y), c40 if int(y) % 100 == 0 else c8, thin)
+			y += 20.0
 
 
 class _GhostDraw:
@@ -388,8 +388,8 @@ class _SpawnMarker:
 
 	func _draw() -> void:
 		# 小旗子:杆+三角旗,底部=出生落地线
-		draw_line(Vector2.ZERO, Vector2(0, -16), Color(0.5, 0.9, 1.0), 1.5)
-		draw_colored_polygon(PackedVector2Array([Vector2(0, -16), Vector2(10, -13), Vector2(0, -10)]), Color(0.5, 0.9, 1.0, 0.8))
+		draw_line(Vector2.ZERO, Vector2(0, -20), Color(0.5, 0.9, 1.0), 2.5)
+		draw_colored_polygon(PackedVector2Array([Vector2(0, -20), Vector2(25, -16), Vector2(0, -12)]), Color(0.5, 0.9, 1.0, 0.8))
 
 
 class _RangeDraw:
@@ -412,11 +412,11 @@ class _RangeDraw:
 		var thin: float = 1.0 / cam.zoom.x
 		var thick: float = 2.0 / cam.zoom.x
 		var font := ThemeDB.fallback_font
-		var fs := 5  # 世界px字号(zoom4时=20px屏幕)
+		var fs := 6  # 世界px字号(zoom3.2时≈19px屏幕)
 
 		var spec: Dictionary = LevelSpecs.get_spec(editor._level_edit.text.strip_edges())
 		var sections: Array = spec.sections
-		var length_px: float = spec.length_cells * 8.0
+		var length_px: float = spec.length_cells * 20.0
 		var ground_y: float = spec.ground_y
 
 		# 越界暗区:关卡范围之外(X<0 或 X>130格 或 Y<0画面上边界之上)罩暗红,提示不要摆东西
@@ -436,8 +436,8 @@ class _RangeDraw:
 		# 段落分带底色(交替极淡) + 分界线 + 段名标签
 		for i in sections.size():
 			var s: Dictionary = sections[i]
-			var x0: float = s.from * 8.0
-			var x1: float = s.to * 8.0
+			var x0: float = s.from * 20.0
+			var x1: float = s.to * 20.0
 			var color: Color = SECTION_COLORS[i % SECTION_COLORS.size()]
 			draw_rect(Rect2(x0, tl.y, x1 - x0, view.y), Color(color, 0.04), true)
 			if s.from > 0:
@@ -446,9 +446,9 @@ class _RangeDraw:
 			var lw := font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 			draw_string(font, Vector2((x0 + x1) / 2.0 - lw / 2.0, tl.y + fs + 2.0), label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, color)
 
-		# 关底红线:X=130格=1040px(策划案:每关约130格,Limit Right=1040)
+		# 关底红线:X=130格=2600px(策划案:每关约130格)
 		draw_line(Vector2(length_px, tl.y), Vector2(length_px, br.y), Color(1.0, 0.2, 0.2, 0.9), thick * 1.5)
-		var end_label := "关底 X=130 (1040px)"
+		var end_label := "关底 X=130 (2600px)"
 		var ew := font.get_string_size(end_label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 		draw_string(font, Vector2(length_px - ew - 2.0, tl.y + 2.0 * (fs + 2.0)), end_label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1.0, 0.3, 0.3))
 
@@ -457,6 +457,6 @@ class _RangeDraw:
 		draw_string(font, Vector2(tl.x + 2.0, ground_y - 2.0), "地面 Y=0", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.7, 0.6, 0.35))
 
 		# 日记桌推荐位:X=125
-		var desk_x: float = spec.desk_cell * 8.0
-		draw_line(Vector2(desk_x, ground_y - 8.0), Vector2(desk_x, ground_y), Color(0.6, 1.0, 0.6, 0.9), thick)
-		draw_string(font, Vector2(desk_x + 2.0, ground_y - 10.0), "日记桌 X=125", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.6, 1.0, 0.6))
+		var desk_x: float = spec.desk_cell * 20.0
+		draw_line(Vector2(desk_x, ground_y - 20.0), Vector2(desk_x, ground_y), Color(0.6, 1.0, 0.6, 0.9), thick)
+		draw_string(font, Vector2(desk_x + 5.0, ground_y - 25.0), "日记桌 X=125", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.6, 1.0, 0.6))

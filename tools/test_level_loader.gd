@@ -7,12 +7,12 @@ func _initialize() -> void:
 	var data := {
 		"level_id": "_test",
 		"modules": [
-			{"id": "platform_h5", "px": 0, "py": 144, "params": {"w": 5, "h": 1}},
-			{"id": "platform_v2", "px": 400, "py": 128, "params": {"w": 1, "h": 2}},
-			{"id": "pendulum", "px": 200, "py": 96, "params": {}},
-			{"id": "lamp", "px": 24, "py": 144, "params": {}},
-			{"id": "diary_desk", "px": 500, "py": 144, "params": {}},
-			{"id": "spawn", "px": 32, "py": 144, "params": {}},
+			{"id": "platform_h5", "px": 0, "py": 160, "params": {"w": 5, "h": 1}},
+			{"id": "platform_v2", "px": 1000, "py": 120, "params": {"w": 1, "h": 2}},
+			{"id": "pendulum", "px": 500, "py": 40, "params": {}},
+			{"id": "lamp", "px": 60, "py": 160, "params": {}},
+			{"id": "diary_desk", "px": 1250, "py": 160, "params": {}},
+			{"id": "spawn", "px": 80, "py": 160, "params": {}},
 		],
 	}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://levels/"))
@@ -30,7 +30,7 @@ func _initialize() -> void:
 		var player := level.find_child("Player", true, false)
 		if player == null:
 			failures.append("未生成玩家")
-		elif player.position != Vector2(32, 144):
+		elif player.position != Vector2(80, 160):
 			failures.append("玩家出生点错误: %s" % player.position)
 		var platforms := 0
 		var traps := 0
@@ -44,7 +44,7 @@ func _initialize() -> void:
 		if traps != 3:
 			failures.append("Area2D模块数=%d,期望3" % traps)
 		var cam := player.get_node("Camera2D") as Camera2D if player else null
-		if cam and cam.limit_right < 500:
+		if cam and cam.limit_right < 1250:
 			failures.append("相机右边界未扩展: %d" % cam.limit_right)
 
 	if failures.is_empty():

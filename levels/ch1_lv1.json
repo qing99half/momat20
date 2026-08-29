@@ -4,65 +4,162 @@
   "level_id": "ch1_lv1",
   "modules": [
     {
+      "id": "platform_h2",
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      },
+      "px": -300.0,
+      "py": -520.0
+    },
+    {
+      "id": "ground_h5",
+      "params": {
+        "h": 4.0,
+        "style": "ground",
+        "w": 5.0
+      },
+      "px": -20.0,
+      "py": 100.0
+    },
+    {
+      "id": "spawn",
+      "params": {},
+      "px": 20.0,
+      "py": 100.0
+    },
+    {
+      "id": "platform_h4",
+      "params": {
+        "h": 1.0,
+        "w": 4.0
+      },
+      "px": 80.0,
+      "py": 60.0
+    },
+    {
+      "id": "bottle",
+      "params": {},
+      "px": 140.0,
+      "py": -220.0
+    },
+    {
+      "id": "platform_h4",
+      "params": {
+        "h": 1.0,
+        "w": 4.0
+      },
+      "px": 180.0,
+      "py": 20.0
+    },
+    {
+      "id": "bottle",
+      "params": {},
+      "px": 200.0,
+      "py": -300.0
+    },
+    {
+      "id": "platform_h4",
+      "params": {
+        "h": 1.0,
+        "w": 4.0
+      },
+      "px": 260.0,
+      "py": 80.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 360.0,
+      "py": 80.0
+    },
+    {
+      "id": "platform_h4",
+      "params": {
+        "h": 1.0,
+        "w": 4.0
+      },
+      "px": 380.0,
+      "py": 80.0
+    },
+    {
+      "id": "platform_h4",
+      "params": {
+        "h": 1.0,
+        "w": 4.0
+      },
+      "px": 480.0,
+      "py": 40.0
+    },
+    {
+      "id": "platform_h2",
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      },
+      "px": 500.0,
+      "py": -160.0
+    },
+    {
+      "id": "pendulum",
+      "params": {},
+      "px": 520.0,
+      "py": -140.0
+    },
+    {
+      "id": "platform_h4",
+      "params": {
+        "h": 1.0,
+        "w": 4.0
+      },
+      "px": 560.0,
+      "py": 80.0
+    },
+    {
+      "id": "platform_h4",
+      "params": {
+        "h": 1.0,
+        "w": 4.0
+      },
+      "px": 640.0,
+      "py": 40.0
+    },
+    {
+      "id": "platform_h2",
+      "params": {
+        "h": 1.0,
+        "w": 2.0
+      },
+      "px": 660.0,
+      "py": -160.0
+    },
+    {
+      "id": "pendulum",
+      "params": {},
+      "px": 680.0,
+      "py": -140.0
+    },
+    {
       "id": "ground_h5",
       "params": {
         "h": 4,
         "style": "ground",
         "w": 5
       },
-      "px": 0.0,
-      "py": 112.0
+      "px": 740.0,
+      "py": 80.0
     },
     {
-      "id": "spawn",
+      "id": "lamp",
       "params": {},
-      "px": 16.0,
-      "py": 112.0
-    },
-    {
-      "id": "platform_h5",
-      "params": {
-        "h": 1,
-        "w": 5
-      },
-      "px": 40.0,
-      "py": 96.0
-    },
-    {
-      "id": "bottle",
-      "params": {},
-      "px": 64.0,
-      "py": 56.0
-    },
-    {
-      "id": "platform_h5",
-      "params": {
-        "h": 1,
-        "w": 5
-      },
-      "px": 80.0,
+      "px": 800.0,
       "py": 80.0
     },
     {
       "id": "bottle",
       "params": {},
-      "px": 88.0,
-      "py": 80.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 128.0,
-      "py": 80.0
-    },
-    {
-      "id": "platform_h3",
-      "params": {
-        "h": 1,
-        "w": 3
-      },
-      "px": 136.0,
-      "py": 80.0
+      "px": 860.0,
+      "py": -240.0
     },
     {
       "id": "platform_h2",
@@ -70,29 +167,115 @@
         "h": 1,
         "w": 2
       },
-      "px": 168.0,
-      "py": 64.0
-    },
-    {
-      "id": "pendulum",
-      "params": {},
-      "px": 176.0,
-      "py": 0.0
-    },
-    {
-      "id": "platform_h4",
-      "params": {
-        "h": 1,
-        "w": 4
-      },
-      "px": 192.0,
-      "py": 96.0
+      "px": 860.0,
+      "py": 40.0
     },
     {
       "id": "washboard",
       "params": {},
-      "px": 232.0,
-      "py": 96.0
+      "px": 860.0,
+      "py": 140.0
+    },
+    {
+      "id": "bottle",
+      "params": {},
+      "px": 920.0,
+      "py": -340.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 920.0,
+      "py": 140.0
+    },
+    {
+      "id": "platform_h2",
+      "params": {
+        "h": 1,
+        "w": 2
+      },
+      "px": 940.0,
+      "py": 0.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 980.0,
+      "py": 140.0
+    },
+    {
+      "id": "ground_h3",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 3
+      },
+      "px": 980.0,
+      "py": 80.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1040.0,
+      "py": 140.0
+    },
+    {
+      "id": "bottle",
+      "params": {},
+      "px": 1060.0,
+      "py": -240.0
+    },
+    {
+      "id": "platform_h3",
+      "params": {
+        "h": 1,
+        "w": 3
+      },
+      "px": 1080.0,
+      "py": 20.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1100.0,
+      "py": 140.0
+    },
+    {
+      "id": "bottle",
+      "params": {},
+      "px": 1140.0,
+      "py": -440.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1160.0,
+      "py": 140.0
+    },
+    {
+      "id": "ground_h3",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 3
+      },
+      "px": 1160.0,
+      "py": 80.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1220.0,
+      "py": 140.0
+    },
+    {
+      "id": "platform_h2",
+      "params": {
+        "h": 1,
+        "w": 2
+      },
+      "px": 1240.0,
+      "py": 40.0
     },
     {
       "id": "platform_v2",
@@ -101,8 +284,20 @@
         "style": "platform",
         "w": 1
       },
-      "px": 240.0,
-      "py": 88.0
+      "px": 1260.0,
+      "py": 0.0
+    },
+    {
+      "id": "pendulum",
+      "params": {},
+      "px": 1260.0,
+      "py": -220.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1280.0,
+      "py": 140.0
     },
     {
       "id": "platform_h3",
@@ -110,24 +305,76 @@
         "h": 1,
         "w": 3
       },
-      "px": 264.0,
-      "py": 88.0
+      "px": 1300.0,
+      "py": -40.0
     },
     {
-      "id": "ground_h5",
+      "id": "washboard",
+      "params": {},
+      "px": 1340.0,
+      "py": 140.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1380.0,
+      "py": 140.0
+    },
+    {
+      "id": "pendulum",
+      "params": {},
+      "px": 1420.0,
+      "py": -220.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1440.0,
+      "py": 140.0
+    },
+    {
+      "id": "ground_h3",
       "params": {
         "h": 4,
         "style": "ground",
-        "w": 5
+        "w": 3
       },
-      "px": 296.0,
-      "py": 112.0
+      "px": 1460.0,
+      "py": 80.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1500.0,
+      "py": 140.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1540.0,
+      "py": 140.0
+    },
+    {
+      "id": "ground_h3",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 3
+      },
+      "px": 1580.0,
+      "py": 80.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1600.0,
+      "py": 140.0
     },
     {
       "id": "lamp",
       "params": {},
-      "px": 320.0,
-      "py": 112.0
+      "px": 1600.0,
+      "py": 80.0
     }
   ]
 }

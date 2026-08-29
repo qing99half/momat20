@@ -4,7 +4,7 @@ extends TrapBase
 #   1=酒瓶发射器:本体固定在发射口不动,周期性向下发射酒瓶弹体;
 #     弹体加速下坠 fall_distance px,全程致死,掉落 3s 后消失(BottleProjectile)。
 
-const FALL_SPEED := 400.0      # 弹体坠落速度(px/s)
+const FALL_SPEED := 1000.0      # 弹体坠落速度(px/s)
 const BOTTLE_LIFETIME := 3.0   # 弹体掉落后存活(秒),到期淡出消失
 
 var _t := 0.0
@@ -101,7 +101,7 @@ class BottleProjectile:
 		var shape := CollisionShape2D.new()
 		var rect := RectangleShape2D.new()
 		# 与 TrapBase 同一硬约束:致死判定体四边各内缩2px(擦尖不死)
-		rect.size = Vector2(maxf(cfg.hitbox_size.x - 4.0, 2.0), maxf(cfg.hitbox_size.y - 4.0, 2.0))
+		rect.size = Vector2(maxf(cfg.hitbox_size.x - 10.0, 5.0), maxf(cfg.hitbox_size.y - 10.0, 5.0))
 		shape.shape = rect
 		add_child(shape)
 		body_entered.connect(_on_body_entered)

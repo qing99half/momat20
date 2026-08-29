@@ -5,7 +5,7 @@ extends StaticBody2D
 #   地面 ground   = 横向1~5格×4格高(实心方块,从落脚点一直填到画面底)
 # 原点=左上角,按格吸附(1格=8px)。白盒期为色块;换美术时只换 _rebuild 视觉部分。
 
-const CELL := 8.0
+const CELL := 20.0
 # 平台:冷灰,顶面高光(读得出"悬浮可站")
 const PLAT_FILL := Color(0.34, 0.36, 0.44)
 const PLAT_TOP := Color(0.55, 0.58, 0.68)
@@ -55,6 +55,6 @@ func _rebuild() -> void:
 	body.color = fill
 	add_child(body)
 	var top := Polygon2D.new()
-	top.polygon = PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), Vector2(size.x, 2.0), Vector2(0, 2.0)])
+	top.polygon = PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), Vector2(size.x, 5.0), Vector2(0, 5.0)])
 	top.color = top_color
 	add_child(top)

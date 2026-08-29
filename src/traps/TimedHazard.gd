@@ -130,7 +130,7 @@ func _fire_activate() -> void:
 
 func _active_window() -> float:
 	if config.timed_mode == 2:
-		return config.fall_distance / 400.0
+		return config.fall_distance / 1000.0
 	if config.timed_mode == 3:
 		return 0.8
 	return config.active_duration
@@ -177,7 +177,7 @@ func _activate_once() -> void:
 			hitbox.scale = Vector2(drop_scale, drop_scale)
 			var hitbox_start := _droplet.position
 			hitbox.position = hitbox_start
-			var fall_time := config.fall_distance / 400.0
+			var fall_time := config.fall_distance / 1000.0
 			var tween := create_tween()
 			tween.set_parallel(true)
 			tween.tween_property(_droplet, "position:y", hitbox_start.y + config.fall_distance, fall_time) \

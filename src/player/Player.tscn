@@ -4,17 +4,17 @@
 [ext_resource type="Texture2D" path="res://assets/placeholder/placeholder_char_young_spritesheet.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
-size = Vector2(8, 16)
+size = Vector2(20, 20)
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_gd")
 
 [node name="Hitbox" type="CollisionShape2D" parent="."]
-position = Vector2(0, -8)
+position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_hitbox")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(0, -12)
+position = Vector2(0, -10)
 texture = ExtResource("2_tex")
 hframes = 24
 
@@ -22,6 +22,6 @@ hframes = 24
 position_smoothing_enabled = true
 position_smoothing_speed = 10.0
 limit_left = 0
-limit_right = 1040
+limit_right = 2600
 limit_top = 0
 limit_bottom = 180

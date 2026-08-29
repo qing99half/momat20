@@ -12,7 +12,7 @@ const CHECKPOINT_SFX := preload("res://assets/placeholder/placeholder_S5.wav")  
 const COLOR_DIM := Color(0.45, 0.42, 0.38)   # 灭:昏沉沉的暗灯
 const COLOR_LIT := Color(1.7, 1.4, 0.85)     # 亮:昏黄暖光(超亮调制模拟发光)
 
-@export var respawn_offset := Vector2(8.0, 0.0)  # 重生点相对灯座的偏移(默认站台灯旁,不叠灯上)
+@export var respawn_offset := Vector2(20.0, 0.0)  # 重生点相对灯座的偏移(默认站台灯旁,不叠灯上)
 
 var lit := false
 
@@ -25,7 +25,7 @@ func _ready() -> void:
 	collision_mask = 1
 	_sprite = Sprite2D.new()
 	_sprite.texture = LAMP_TEXTURE
-	_sprite.position = Vector2(0.0, -8.0)  # 8×16 贴图,底部与玩家脚底同线(原点=落地线)
+	_sprite.position = Vector2(0.0, -20.0)  # 20×40 贴图,底部与玩家脚底同线(原点=落地线)
 	_sprite.modulate = COLOR_DIM
 	add_child(_sprite)
 	var hitbox := CollisionShape2D.new()

@@ -21,13 +21,13 @@ func _ready() -> void:
 	collision_mask = 1
 	var sprite := Sprite2D.new()
 	sprite.texture = DESK_TEXTURE
-	sprite.position = Vector2(0.0, -16.0)  # 48×32贴图,原点=桌面落地线(底部居中)
+	sprite.position = Vector2(0.0, -40.0)  # 120×80贴图,原点=桌面落地线(底部居中)
 	add_child(sprite)
 	var hitbox := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
-	rect.size = Vector2(56.0, 40.0)  # 触发区比桌子大一圈,走近即触发
+	rect.size = Vector2(140.0, 100.0)  # 触发区比桌子大一圈,走近即触发
 	hitbox.shape = rect
-	hitbox.position = Vector2(0.0, -20.0)
+	hitbox.position = Vector2(0.0, -50.0)
 	add_child(hitbox)
 	body_entered.connect(_on_body_entered)
 
