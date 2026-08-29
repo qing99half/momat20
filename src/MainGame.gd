@@ -65,14 +65,16 @@ func _ready() -> void:
 	$UILayer.add_child(page_turn)
 
 	# 章级过场组件(任务10.5):黑屏大字 + 眼睑,DiaryDesk 按组查找,与 UI 层零硬引用
+	# 顺序铁律(2026-08-30 修复):眼睑必须先加、黑屏大字后加——后加者画在上层;
+	# 反序时闭眼黑幕会压住黑屏大字,字在播但玩家看不见(ch1→ch2 转场文字"没做"的真相之二)
+	var eyelid := EYELID.instantiate()
+	eyelid.add_to_group("eyelid")
+	$UILayer.add_child(eyelid)
+
 	var blackscreen := BLACKSCREEN.instantiate()
 	blackscreen.visible = false  # 场景默认可见,这里先藏起来,章级过场时才亮
 	blackscreen.add_to_group("blackscreen_text")
 	$UILayer.add_child(blackscreen)
-
-	var eyelid := EYELID.instantiate()
-	eyelid.add_to_group("eyelid")
-	$UILayer.add_child(eyelid)
 
 	# 二章末关开锁演出(任务11.2~11.6),日记桌按组查找
 	var unlock := UNLOCK.instantiate()

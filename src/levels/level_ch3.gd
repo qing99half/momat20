@@ -31,6 +31,7 @@ var _scroll := 0.0
 var _scroll_vel := 0.0
 var _phase := 1
 var _push_started := false
+var _step_t := 0.0  # 脚步声步频计时(0.35s/步)
 
 # 注:_player/_mother 故意用 = (Variant 动态派发):Player.gd 无 class_name,
 # 用 := 会推断成 Node 基类,访问 chapter3_mode/door_x 等脚本属性编译报错。
@@ -60,7 +61,7 @@ func _ready() -> void:
 		_mid_tiles.append(t)
 	_ground_skin()
 	_bgm = _make_audio(BGM_M3, BGM_M3_PH, 0.0, true, true)
-	_steps = _make_audio(SFX_STEPS, "", -6.0, true, false)
+	_steps = _make_audio(SFX_STEPS, "", -6.0, false, false)  # 0.1s 单步样本,禁止循环(循环=10Hz 嗡鸣);由 _process 按步频触发
 
 
 ## 地面换皮:左半写实(母亲侧)/右半梦核(女儿侧),5w条带(100×80)各10块;缺素材则保留白盒色块
@@ -132,9 +133,15 @@ func _process(delta: float) -> void:
 		# 门前相遇:继续按←触发双人推门(12.5)——这次←同时完成"靠近她"和"推门"
 		if left and _player.global_position.x - _mother.global_position.x <= MEET_GAP + 1.0:
 			_start_push()
-	# 脚步声:任一人在走即播
+	# 脚步声:任一方在走即按步频触发(0.1s 单步样本;50px/s 慢走≈0.35s/步,循环播放会变 10Hz 嗡鸣)
 	if _steps and _steps.stream:
-		_steps.playing = left or _mother.walking
+		if left or _mother.walking:
+			_step_t -= delta
+			if _step_t <= 0.0:
+				_steps.play()
+				_step_t = 0.35
+		else:
+			_step_t = 0.0  # 停走重置,下一步立即出声
 
 
 func _start_push() -> void:

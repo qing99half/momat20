@@ -77,6 +77,11 @@ func trigger_unlock_cutscene() -> void:
 	# ---- 11.5/11.6 黑屏大字两连 + 静默 ----
 	var blackscreen := get_tree().get_first_node_in_group("blackscreen_text")
 	if blackscreen and blackscreen.has_method("show_text"):
+		# 撤掉本演出自己的遮挡层(2026-08-30 修复):Blackout/WhiteFlash/笔记本特写都画在
+		# blackscreen_text 之上,不撤会把"原来…"和"妈妈"两屏大字整个挡住——字在播但玩家看不见
+		_blackout.visible = false
+		_flash.visible = false
+		_notebook.visible = false
 		blackscreen.visible = true  # 白色画面被纯黑覆盖("白光闪,黑屏")
 		blackscreen.show_text("原来,过去的那个'我'是……", false)
 		await get_tree().create_timer(TEXT1_HOLD).timeout

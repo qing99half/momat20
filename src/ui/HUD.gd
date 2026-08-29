@@ -29,8 +29,9 @@ var _sfx: AudioStreamPlayer
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	# 章节门控:一章 HUD 整体隐藏(H24修复方案 问题1)
-	visible = GameState.current_chapter >= 2
+	# 章节门控:一章 HUD 整体隐藏(H24修复方案 问题1);
+	# 三章也隐藏(2026-08-30):演出关不要 UI,放大后的四星会盖住背景右上角
+	visible = GameState.current_chapter == 2
 
 	_sfx = AudioStreamPlayer.new()
 	_sfx.stream = load(FRAGMENT_SFX)
