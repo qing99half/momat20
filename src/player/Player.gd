@@ -106,8 +106,10 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode == KEY_W:
 			_w_just_pressed = true
-		elif event.physical_keycode == KEY_F:
-			_shift_just_pressed = true  # 冲刺(任务9,F键;原Shift被输入法中英文切换拦截);在 _tick_dash 里进缓冲
+		elif event.physical_keycode == KEY_F or event.physical_keycode == KEY_SHIFT:
+			_shift_just_pressed = true  # 冲刺(任务9):F/Shift/鼠标右键三键位;中文输入法吃字母和Shift时右键兜底
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+		_shift_just_pressed = true  # 右键冲刺:IME 永不拦截,中文输入法环境保底键位
 
 
 func _move_dir() -> float:
@@ -543,7 +545,7 @@ func _show_dash_popup() -> void:
 	var panel := PanelContainer.new()
 	panel.position = Vector2(0.0, -80.0)  # 起点:屏幕上方外(x 待布局后居中)
 	var label := Label.new()
-	label.text = "恭喜你学会冲刺\n使用shift来拯救过去的'你'吧"
+	label.text = "恭喜你学会冲刺\n按 F / Shift / 鼠标右键 来拯救过去的'你'吧"
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	panel.add_child(label)
 	_dash_popup.add_child(panel)
