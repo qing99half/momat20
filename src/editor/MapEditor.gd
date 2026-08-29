@@ -354,7 +354,6 @@ func _save_level() -> void:
 	var data := {
 		"level_id": _level_edit.text.strip_edges(),
 		"bg_far": "res://assets/placeholder/placeholder_bg_%s_far.png" % _level_edit.text.strip_edges(),
-		"bg_mid": "res://assets/placeholder/placeholder_bg_%s_mid.png" % _level_edit.text.strip_edges(),
 		"modules": modules,
 	}
 	var f := FileAccess.open(_level_path(), FileAccess.WRITE)

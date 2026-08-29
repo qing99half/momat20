@@ -123,18 +123,37 @@ static func instantiate(id: String, params: Dictionary = {}, level_id: String = 
 
 # ---- 按关美术寻址 ----
 
+# 换皮回退链(2026-08-30 用户确认):本关 → ch1同序号(ch2限定) → ch1_lv1~lv4 → 其他ch2关 → 占位
+# 跨关复用模块(如 ch2_lv2 摆一章搓衣板)也能命中真美术,不再掉色块
+const SKIN_FALLBACK_LEVELS := ["ch1_lv1", "ch1_lv2", "ch1_lv3", "ch1_lv4",
+		"ch2_lv1", "ch2_lv2", "ch2_lv3", "ch2_lv4"]
+
+
+static func _fallback_chain(level_id: String) -> Array:
+	var chain: Array = []
+	if level_id.begins_with("ch2_"):
+		chain.append("ch1_" + level_id.substr(4))
+	for lv in SKIN_FALLBACK_LEVELS:
+		if lv != level_id and lv not in chain:
+			chain.append(lv)
+	return chain
+
+
 # 平台/地面贴图:ground_<lv>_<w>w / platform_<lv>_<w>w / platform_<lv>_h<h><a|b>,双态关可带 _variant 后缀
-# 一二章复用(D-535 二章=一章破败版):ch2 缺图时回退 ch1 同序号关文件,再回退色块
+# 一二章复用(D-535 二章=一章破败版):缺图时沿回退链逐关找,再回退色块
 static func _platform_tex(level_id: String, style: String, w: int, h: int, variant: String, vsub: String) -> String:
 	if level_id == "":
 		return ""
 	if variant == "":
 		variant = PLATFORM_VARIANT_DEFAULT.get(level_id, "")
 	var found := _platform_tex_in(level_id, style, w, h, variant, vsub)
-	if found == "" and level_id.begins_with("ch2_"):
-		var fb := "ch1_" + level_id.substr(4)
+	if found != "":
+		return found
+	for fb in _fallback_chain(level_id):
 		found = _platform_tex_in(fb, style, w, h, PLATFORM_VARIANT_DEFAULT.get(fb, ""), vsub)
-	return found
+		if found != "":
+			return found
+	return ""
 
 
 static func _platform_tex_in(level_id: String, style: String, w: int, h: int, variant: String, vsub: String) -> String:
@@ -153,16 +172,15 @@ static func _platform_tex_in(level_id: String, style: String, w: int, h: int, va
 	return p if ResourceLoader.exists(p) else ""
 
 
-# 陷阱按关换皮:trap_<lv>_<后缀>.png;ch2 缺图回退 ch1 同序号关,再缺=保持 TrapConfig 占位贴图
+# 陷阱按关换皮:trap_<lv>_<后缀>.png;缺图沿回退链逐关找,再缺=保持 TrapConfig 占位贴图
 static func _trap_skin(level_id: String, id: String) -> String:
 	if level_id == "":
 		return ""
 	var suffix: String = TRAP_SKIN_SUFFIX.get(id, id)
-	var p := "res://assets/art/%s/trap_%s_%s.png" % [level_id, level_id, suffix]
-	if ResourceLoader.exists(p):
-		return p
-	if level_id.begins_with("ch2_"):
-		var fb := "ch1_" + level_id.substr(4)
-		p = "res://assets/art/%s/trap_%s_%s.png" % [fb, fb, suffix]
-		return p if ResourceLoader.exists(p) else ""
+	var chain: Array = [level_id]
+	chain.append_array(_fallback_chain(level_id))
+	for lv in chain:
+		var p := "res://assets/art/%s/trap_%s_%s.png" % [lv, lv, suffix]
+		if ResourceLoader.exists(p):
+			return p
 	return ""
