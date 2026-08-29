@@ -1,11 +1,13 @@
 class_name LevelSpecs
 extends RefCounted
 # 关卡范围规格(照抄策划案任务8.3 + 附录C,不许自改):
-#   每关约130格(2600px,相机Limit Right=2600),四段式,地面行Y=8(y=160px,Y=0为地面,视野9格高)。
+#   每关约130格(2600px,相机Limit Right随布局末端+半屏微调),四段式,地面行Y=8(y=160px,Y=0为地面,视野9格高)。
+#   关卡顶Y=-200(地面上方18格=360px≈5.1跳头部空间,对齐旧8px体系纵向预算;相机垂直跟随,Limit Top=-200)。
 # 各关差异仅在核心段/考试段分界:关1=80,关2/3=85,关4=70。
 
 const LENGTH_CELLS := 130
 const GROUND_Y_PX := 160.0
+const CEILING_Y_PX := -200.0  # 关卡顶:地面上方18格
 const DESK_CELL := 125  # 日记桌推荐位 X=125
 
 
@@ -18,6 +20,7 @@ static func get_spec(level_id: String) -> Dictionary:
 	return {
 		"length_cells": LENGTH_CELLS,
 		"ground_y": GROUND_Y_PX,
+		"ceiling_y": CEILING_Y_PX,
 		"desk_cell": DESK_CELL,
 		"sections": [
 			{"name": "教学段", "from": 0, "to": 40},

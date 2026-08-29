@@ -46,6 +46,8 @@ func _initialize() -> void:
 		var cam := player.get_node("Camera2D") as Camera2D if player else null
 		if cam and cam.limit_right < 1250:
 			failures.append("相机右边界未扩展: %d" % cam.limit_right)
+		if cam and cam.limit_top != -200:
+			failures.append("相机上边界应为关卡顶-200,实得: %d" % cam.limit_top)
 
 	if failures.is_empty():
 		print("[装载器] PASS")

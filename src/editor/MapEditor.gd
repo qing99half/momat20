@@ -418,17 +418,21 @@ class _RangeDraw:
 		var sections: Array = spec.sections
 		var length_px: float = spec.length_cells * 20.0
 		var ground_y: float = spec.ground_y
+		var ceiling_y: float = spec.ceiling_y
 
-		# 越界暗区:关卡范围之外(X<0 或 X>130格 或 Y<0画面上边界之上)罩暗红,提示不要摆东西
+		# 越界暗区:关卡范围之外(X<0 或 X>130格 或 Y<关卡顶)罩暗红,提示不要摆东西
 		draw_rect(Rect2(tl.x, tl.y, minf(0.0, br.x) - tl.x, view.y), Color(0.5, 0.1, 0.1, 0.10), true)
 		if br.x > length_px:
 			draw_rect(Rect2(length_px, tl.y, br.x - length_px, view.y), Color(0.5, 0.1, 0.1, 0.10), true)
-		if tl.y < 0.0:
-			draw_rect(Rect2(tl.x, tl.y, view.x, -tl.y), Color(0.5, 0.1, 0.1, 0.10), true)
+		if tl.y < ceiling_y:
+			draw_rect(Rect2(tl.x, tl.y, view.x, ceiling_y - tl.y), Color(0.5, 0.1, 0.1, 0.10), true)
 
-		# 画面上边界:Y=0(游戏层320×180的顶,相机limit_top=0)
-		draw_line(Vector2(tl.x, 0.0), Vector2(br.x, 0.0), Color(0.5, 0.8, 1.0, 0.8), thick)
-		draw_string(font, Vector2(tl.x + 2.0, 0.0 + fs + 2.0), "上边界 Y=0 (视野顶)", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.5, 0.8, 1.0))
+		# 关卡顶:Y=-200(地面上方18格≈5.1跳头部空间,对齐旧体系纵向预算;相机Limit Top=-200)
+		draw_line(Vector2(tl.x, ceiling_y), Vector2(br.x, ceiling_y), Color(0.5, 0.8, 1.0, 0.9), thick)
+		draw_string(font, Vector2(tl.x + 2.0, ceiling_y + fs + 2.0), "关卡顶 Y=-200 (头上18格)", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.5, 0.8, 1.0))
+		# 一屏顶参考:Y=0(初始视野顶;关卡可向上延伸至关卡顶,相机垂直跟随)
+		draw_line(Vector2(tl.x, 0.0), Vector2(br.x, 0.0), Color(0.5, 0.8, 1.0, 0.3), thin)
+		draw_string(font, Vector2(tl.x + 2.0, 0.0 + fs + 2.0), "一屏顶 Y=0 (参考)", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.5, 0.8, 1.0, 0.5))
 		# 视野底:Y=180(游戏层底,相机limit_bottom=180)
 		draw_line(Vector2(tl.x, 180.0), Vector2(br.x, 180.0), Color(0.5, 0.8, 1.0, 0.4), thick)
 		draw_string(font, Vector2(tl.x + 2.0, 180.0 - 3.0), "视野底 Y=180", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.5, 0.8, 1.0, 0.6))
