@@ -10,6 +10,6 @@ damage = 1
 texture = ExtResource("2_tex")
 hitbox_size = Vector2(8, 8)
 motion = 1
-fall_distance = 40.0
+fall_distance = 400.0
 period = 2.0
 warn_duration = 0.8

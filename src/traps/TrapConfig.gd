@@ -30,7 +30,7 @@ extends Resource
 @export_group("行为模式")
 @export var motion := 0                     # MovingHazard: 0=摆锤(正弦旋转) 1=坠落
 @export var timed_mode := 0                 # TimedHazard: 0=冲压 1=腐心平台 2=滴液 3=声波
-@export var fall_distance := 40.0           # 坠落/滴液距离(px,5格=40)
+@export var fall_distance := 40.0           # 坠落/滴液距离(px,滴液5格=40;酒瓶发射器=400贯穿全屏)
 @export var droplet_size := 8.0             # 滴液模式的液滴尺寸(px),判定体按它缩放
 @export var push := Vector2.ZERO            # ForceZone 推动速度(px/s,直接位移推动)
 @export var gust_on := 0.0                  # 阵风:吹风时长(0=恒力)
