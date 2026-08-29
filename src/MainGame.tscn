@@ -7,11 +7,7 @@
 [node name="MainGame" type="Node2D"]
 script = ExtResource("1_main")
 
-[node name="GameLayer" type="SubViewportContainer" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-stretch = true
+[node name="GameLayer" type="Node2D" parent="."]
 
 [node name="SubViewport" type="SubViewport" parent="GameLayer"]
 size = Vector2i(640, 360)
@@ -19,6 +15,9 @@ script = ExtResource("1_lut")
 
 [node name="BackBufferCopy" type="BackBufferCopy" parent="GameLayer/SubViewport"]
 copy_mode = 2
+
+[node name="GameView" type="Sprite2D" parent="."]
+centered = false
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 

@@ -58,12 +58,12 @@ static func get_entries() -> Array[Dictionary]:
 	entries.append({
 		"id": "lamp", "name": "台灯(检查点)", "category": "道具",
 		"scene": "res://src/player/Checkpoint.tscn", "params": {},
-		"fp_offset": Vector2(-10.0, -40.0), "fp_size": Vector2(20.0, 40.0),
+		"fp_offset": Vector2(-5.0, -20.0), "fp_size": Vector2(10.0, 20.0),
 	})
 	entries.append({
 		"id": "diary_desk", "name": "日记桌(关底)", "category": "道具",
 		"scene": "res://src/props/DiaryDesk.tscn", "params": {},
-		"fp_offset": Vector2(-60.0, -80.0), "fp_size": Vector2(120.0, 80.0),
+		"fp_offset": Vector2(-10.5, -14.0), "fp_size": Vector2(21.0, 14.0),
 	})
 	entries.append({
 		"id": "spawn", "name": "出生点", "category": "道具",
@@ -93,6 +93,16 @@ static func instantiate(id: String, params: Dictionary = {}) -> Node2D:
 		node = (load(entry.scene) as PackedScene).instantiate()
 	if node is PlatformModule:
 		node.configure(int(params.get("w", 3)), int(params.get("h", 1)), str(params.get("style", "platform")))
+	# 日记桌(任务10.5):编辑器摆关底桌时可配 level_id/chapter/二章的 diary_date/diary_text
+	if node is DiaryDesk:
+		if params.has("level_id"):
+			node.level_id = str(params["level_id"])
+		if params.has("chapter"):
+			node.chapter = int(params["chapter"])
+		if params.has("diary_date"):
+			node.diary_date = str(params["diary_date"])
+		if params.has("diary_text"):
+			node.diary_text = str(params["diary_text"])
 	# 可旋转模块(荆棘/传送带):params.rot=0/90/180/270,整节点旋转(贴图+判定体一起转)
 	var rot := int(params.get("rot", 0))
 	if rot != 0 and bool(entry.get("rotatable", false)):

@@ -25,12 +25,13 @@ func _ready() -> void:
 	collision_mask = 1
 	_sprite = Sprite2D.new()
 	_sprite.texture = LAMP_TEXTURE
-	_sprite.position = Vector2(0.0, -20.0)  # 20×40 贴图,底部与玩家脚底同线(原点=落地线)
+	_sprite.scale = Vector2(0.5, 0.5)      # 台灯规格 10×20(贴图20×40减半)
+	_sprite.position = Vector2(0.0, -10.0)  # 10×20,底部与玩家脚底同线(原点=落地线)
 	_sprite.modulate = COLOR_DIM
 	add_child(_sprite)
 	var hitbox := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
-	rect.size = Vector2(24.0, 24.0)  # 触发区比灯大一圈(3×3格),经过即点亮
+	rect.size = Vector2(20.0, 24.0)  # 触发区比灯大一圈,经过即点亮
 	hitbox.shape = rect
 	hitbox.position = Vector2(0.0, -10.0)
 	add_child(hitbox)

@@ -11,7 +11,9 @@ PREFIX = sys.argv[1]
 COMP_PREFIX = sys.argv[2]
 COMPS = [int(x) for x in sys.argv[3:]]
 
-spec = json.load(open("assets/art/style_spec.json", encoding="utf-8"))
+import os
+spec_path = os.environ.get("STYLE_SPEC", "assets/art/style_spec.json")
+spec = json.load(open(spec_path, encoding="utf-8"))
 PAL = np.array([p["rgb"] for p in spec["palette"]], dtype=float)
 HEAD_H = spec["proportions"]["head_height_px"]  # 9
 BODY_H = 18  # 锚帧总高

@@ -1,6 +1,8 @@
 extends Control
 # 二章HUD:右上角4枚记忆光片符号。◇=未获得(半透明),◆=已获得。
 # 日记读完(EventBus.diary_finished)时,光片从屏幕中央飞入对应符号并点亮。
+# 章节门控(任务10.5):仅 current_chapter>=2 显示并响应 diary_finished——一章无 HUD、不飞光片
+# (光片是二章专属收集物,防反转泄底)。计数存 GameState(切场景不丢),本节点每关重建只做显示。
 
 ## 光片获得音效"叮"(占位 S9;真素材 sfx_light_shard.ogg 到位后替换)。
 const FRAGMENT_SFX := "res://assets/placeholder/placeholder_S9.wav"
@@ -21,41 +23,48 @@ const FRAGMENT_TEXTURES := [
 
 @onready var _symbols: Array[Label] = [$Symbols/S0, $Symbols/S1, $Symbols/S2, $Symbols/S3]
 
-var _collected := 0
 var _sfx: AudioStreamPlayer
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
+	# 章节门控:一章 HUD 整体隐藏(H24修复方案 问题1)
+	visible = GameState.current_chapter >= 2
+
 	_sfx = AudioStreamPlayer.new()
 	_sfx.stream = load(FRAGMENT_SFX)
 	add_child(_sfx)
 
-	for s in _symbols:
-		s.text = "◇"
+	# 符号状态从 GameState 恢复(本节点随场景每关重建,计数不能放这里)
+	for i in _symbols.size():
+		var s := _symbols[i]
+		s.text = "◆" if i < GameState.collected_fragments else "◇"
 		s.modulate.a = IDLE_ALPHA
 
 	EventBus.diary_finished.connect(_on_diary_finished)
 
 
 func _on_diary_finished() -> void:
+	if GameState.current_chapter < 2:
+		return  # 一章=写入演出,不飞光片(章节门控)
 	collect_fragment()
 
 
 ## 点亮下一枚未点亮的符号,并播放光片飞行动画。
 func collect_fragment() -> void:
-	if _collected >= _symbols.size():
+	if GameState.collected_fragments >= _symbols.size():
 		return
-	var target := _symbols[_collected]
-	_collected += 1
-	_fly_fragment(target)
+	var index := GameState.collected_fragments
+	# 计数进 GameState(任务11.1 修正版);集齐4片且在 ch2_lv4 时置 unlock_pending(日记桌查)
+	GameState.add_fragment()
+	_fly_fragment(_symbols[index], index)
 
 
 ## 光片从屏幕中央飞向目标符号,0.8s ease_out,到达后点亮。
-func _fly_fragment(target: Label) -> void:
+func _fly_fragment(target: Label, index: int) -> void:
 	var shard := TextureRect.new()
-	shard.texture = load(FRAGMENT_TEXTURES[_collected - 1])
+	shard.texture = load(FRAGMENT_TEXTURES[index])
 	shard.size = Vector2(64, 64)
 	# 起点:屏幕中央(笔记本位置)。
 	shard.position = size * 0.5 - shard.size * 0.5

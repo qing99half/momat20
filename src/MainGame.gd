@@ -4,21 +4,33 @@ extends Node2D
 # 换关:改 START_LEVEL 或后续接关卡管理器。
 
 const START_LEVEL := preload("res://src/levels/level_ch1_lv1.tscn")
-const DEFAULT_LEVEL_JSON := "res://levels/ch1_lv1.json"
 const DIARY_UI := preload("res://src/ui/DiaryUI.tscn")
 const PAGE_TURN := preload("res://src/ui/PageTurn.tscn")
+const EYELID := preload("res://src/ui/EyelidTransition.tscn")
+const BLACKSCREEN := preload("res://src/ui/BlackscreenText.tscn")
+const UNLOCK := preload("res://src/ui/UnlockCutscene.tscn")
 
 
 func _ready() -> void:
-	# GameLayer 是 Control 但父节点是 Node2D,锚点不生效——显式铺满窗口并跟随窗口变化(含全屏)。
+	# GameView 精灵显示离屏 SubViewport 的纹理;尺寸/位置/缩放全由 _fit_game_layer 手动管理
+	$GameView.texture = $GameLayer/SubViewport.get_texture()
+	$GameView.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST  # 像素风最近邻放大
 	_fit_game_layer()
 	get_viewport().size_changed.connect(_fit_game_layer)
 
-	# 关卡来源:编辑器试玩 > 已保存的JSON关卡 > 默认场景
+	# 关卡来源:编辑器试玩 > 关卡链 JSON(任务10.5,按 GameState 当前索引拼路径)> 默认场景
 	var level: Node2D
 	var json_path := GameState.editor_level_path
-	if json_path == "" and FileAccess.file_exists(DEFAULT_LEVEL_JSON):
-		json_path = DEFAULT_LEVEL_JSON
+	if json_path != "":
+		# 编辑器试玩:按文件名同步章节(HUD 门控/冲刺解锁据此判定),不动关卡链进度
+		GameState.sync_chapter_from_level_id(json_path.get_file().get_basename())
+	else:
+		var chain_path := "res://levels/%s.json" % GameState.current_level_id()
+		if FileAccess.file_exists(chain_path):
+			json_path = chain_path
+		elif GameState.current_level_index > 0:
+			# 链上关卡 JSON 未搭建(如 ch3,任务12 待做):不静默回退第1关,先报警再占位
+			push_warning("[MainGame] %s 不存在,回退默认场景(该关待搭建)" % chain_path)
 	if json_path != "":
 		level = LevelLoader.build(json_path)
 	else:
@@ -44,25 +56,65 @@ func _ready() -> void:
 	page_turn.add_to_group("page_turn")
 	$UILayer.add_child(page_turn)
 
+	# 章级过场组件(任务10.5):黑屏大字 + 眼睑,DiaryDesk 按组查找,与 UI 层零硬引用
+	var blackscreen := BLACKSCREEN.instantiate()
+	blackscreen.visible = false  # 场景默认可见,这里先藏起来,章级过场时才亮
+	blackscreen.add_to_group("blackscreen_text")
+	$UILayer.add_child(blackscreen)
 
-# 游戏层恒以 640×360 渲染(20px格,单屏=32格宽×18格高=整关高度,开局即见关卡顶;16:9整数倍铺满:
-# 720p窗口×2=1280×720,1080p全屏×3=1920×1080,2K×4=2560×1440,无黑边不变形)。
-# 像素完美:游戏层尺寸=640×360×整数倍——非整数倍拉伸会让像素大小不一导致画面毛糙。
+	var eyelid := EYELID.instantiate()
+	eyelid.add_to_group("eyelid")
+	$UILayer.add_child(eyelid)
+
+	# 二章末关开锁演出(任务11.2~11.6),日记桌按组查找
+	var unlock := UNLOCK.instantiate()
+	unlock.add_to_group("unlock_cutscene")
+	$UILayer.add_child(unlock)
+
+	# 章级过场后半场:DiaryDesk 闭眼状态下切场景,这里第一眼就是闭着的,再睁开进新章
+	if GameState.chapter_intro_pending:
+		GameState.chapter_intro_pending = false
+		eyelid.set_closed()
+		eyelid.open_eyes(1.0)
+		# 二章首关:睁眼后播冲刺赠予演出(任务9 play_dash_gift_cutscene 由本处调用)
+		if GameState.current_chapter == 2:
+			_play_dash_gift_after_intro(level)
+
+
+## 等睁眼结束(1.0s)再触发赠予演出;玩家由 LevelLoader 建在关卡根下。
+func _play_dash_gift_after_intro(level: Node2D) -> void:
+	await get_tree().create_timer(1.0).timeout
+	for child in level.get_children():
+		if child is CharacterBody2D and child.has_method("play_dash_gift_cutscene"):
+			child.play_dash_gift_cutscene()
+			return
+	push_warning("[MainGame] 二章首关未找到玩家,赠予演出跳过")
+
+
+# 游戏层恒以 640×360 渲染(20px格,单屏=32格宽×18格高=整关高度,开局即见关卡顶)。
+# 方案A:保宽高比的小数缩放——窗口内最大16:9矩形铺满,黑边只剩宽高比差异(细边);
+# 整数倍分辨率(720p×2/1080p×3/2K×4)依然像素完美;F11 无边框真全屏吃满物理分辨率(见 _unhandled_input)。
+# 注意:SubViewportContainer.stretch=true 会把 SubViewport 本身改尺寸(相机视野随之变形),
+# 小数缩放必须走 stretch=false + 容器 scale(纯纹理放大,视口恒为640×360)。
 func _fit_game_layer() -> void:
 	var ws := get_viewport_rect().size
-	var shrink := maxi(mini(int(ws.x) / 640, int(ws.y) / 360), 1)
-	$GameLayer.size = Vector2(640.0 * shrink, 360.0 * shrink)
-	$GameLayer.position = (ws - $GameLayer.size) / 2.0
-	$GameLayer.stretch_shrink = shrink
+	var s := minf(ws.x / 640.0, ws.y / 360.0)
+	$GameView.scale = Vector2(s, s)
+	$GameView.position = ((ws - Vector2(640.0, 360.0) * s) / 2.0).floor()
 
 
 # F3:开关碰撞箱可视化(验收陷阱判定/美术对齐用)
+# F11:无边框真全屏切换(方案C;1080p 屏=精确3×铺满,最大化窗口的标题栏/任务栏余量也消掉)
 # Esc:编辑器试玩模式下返回编辑器
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_F3:
 			get_tree().debug_collisions_hint = not get_tree().debug_collisions_hint
 			print("[调试] 碰撞箱显示: %s" % ("开" if get_tree().debug_collisions_hint else "关"))
+		elif event.keycode == KEY_F11:
+			var w := get_window()
+			w.mode = Window.MODE_WINDOWED if w.mode == Window.MODE_FULLSCREEN else Window.MODE_FULLSCREEN
+			print("[调试] 全屏: %s" % ("开" if w.mode == Window.MODE_FULLSCREEN else "关"))
 		elif event.keycode == KEY_ESCAPE and GameState.editor_level_path != "":
 			GameState.current = GameState.State.Gameplay
 			get_tree().change_scene_to_file("res://src/editor/MapEditor.tscn")

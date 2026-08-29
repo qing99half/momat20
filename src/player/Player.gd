@@ -125,42 +125,53 @@ func _physics_process(delta: float) -> void:
 		return  # 死亡流程中冻结移动(粒子/计时走协程,不吃物理帧)
 	var was_on_floor := is_on_floor()
 
+	# ---- 冲刺状态机(任务9):计时/触发;冲刺中=水平瞬发+锁方向+无重力 ----
+	var dashing := _tick_dash(delta, was_on_floor)
+
 	# 传送带惯性:剥离上帧叠加量,下方控制器只操作裸速度(防逐帧累积)
 	if not was_on_floor:
 		velocity -= _boost_applied
 	_boost_applied = Vector2.ZERO
 
 	# ---- 竖直:重力 + 顶点滞空 ----
-	if not was_on_floor:
+	if dashing:
+		velocity.x = _dash_dir * DASH_SPEED
+		velocity.y = 0.0
+		_afterimage_t -= delta
+		if _afterimage_t <= 0.0:
+			_afterimage_t = AFTERIMAGE_INTERVAL
+			_spawn_afterimage()
+	elif not was_on_floor:
 		var g := GRAVITY
 		if absf(velocity.y) < APEX_THRESHOLD:
 			g *= APEX_GRAVITY_MULT
 		velocity.y = minf(velocity.y + g * delta, MAX_FALL_SPEED)
 
-	# ---- 水平:6帧全速/3帧刹停/转向无打滑 ----
-	var dir := _move_dir()
-	if dir != 0.0:
-		var a: float = ACCEL if was_on_floor else AIR_ACCEL
-		if velocity.x != 0.0 and signf(dir) != signf(velocity.x):
-			a = DECEL  # 反向时按刹停率,消灭打滑
-		velocity.x = move_toward(velocity.x, dir * MAX_SPEED, a * delta)
-	else:
-		var d: float = DECEL if was_on_floor else AIR_DECEL
-		velocity.x = move_toward(velocity.x, 0.0, d * delta)
+	# ---- 水平:6帧全速/3帧刹停/转向无打滑(冲刺锁方向/演出屏蔽输入时跳过) ----
+	var dir := 0.0 if (dashing or _cutscene) else _move_dir()
+	if not dashing:
+		if dir != 0.0:
+			var a: float = ACCEL if was_on_floor else AIR_ACCEL
+			if velocity.x != 0.0 and signf(dir) != signf(velocity.x):
+				a = DECEL  # 反向时按刹停率,消灭打滑
+			velocity.x = move_toward(velocity.x, dir * MAX_SPEED, a * delta)
+		else:
+			var d: float = DECEL if was_on_floor else AIR_DECEL
+			velocity.x = move_toward(velocity.x, 0.0, d * delta)
 
-	# ---- 土狼时间 / 跳跃缓冲(W/空格均可起跳) ----
+	# ---- 土狼时间 / 跳跃缓冲(W/空格均可起跳;冲刺与演出中不刷新跳跃缓冲) ----
 	if was_on_floor:
 		_coyote = COYOTE_TIME
 	else:
 		_coyote = maxf(_coyote - delta, 0.0)
-	if Input.is_action_just_pressed("ui_accept") or _w_just_pressed:
+	if not dashing and not _cutscene and (Input.is_action_just_pressed("ui_accept") or _w_just_pressed):
 		_buffer = JUMP_BUFFER
 	else:
 		_buffer = maxf(_buffer - delta, 0.0)
 	_w_just_pressed = false
 
-	# ---- 起跳(缓冲+土狼同时有效才跳) ----
-	if _buffer > 0.0 and _coyote > 0.0:
+	# ---- 起跳(缓冲+土狼同时有效才跳;冲刺/演出中禁止) ----
+	if not dashing and not _cutscene and _buffer > 0.0 and _coyote > 0.0:
 		velocity.y = JUMP_VELOCITY
 		_buffer = 0.0
 		_coyote = 0.0
@@ -175,7 +186,8 @@ func _physics_process(delta: float) -> void:
 	_jump_was_held = held
 
 	# 传送带惯性:空中叠加带速(无输入时水平裸速度衰减到0,合速度收敛=带速;有输入=跑速+带速)
-	if not was_on_floor and conveyor_boost != Vector2.ZERO:
+	# 冲刺中跳过:冲刺锁方向锁速度,带速不得叠加(D-537 冲刺只解决缺口宽度)
+	if not dashing and not was_on_floor and conveyor_boost != Vector2.ZERO:
 		velocity += conveyor_boost
 		_boost_applied = conveyor_boost
 
@@ -206,7 +218,7 @@ func _physics_process(delta: float) -> void:
 			_airborne_from_jump = false
 			var dist := position.x - _jump_start.x
 			var height := _jump_start.y - _jump_peak_y
-			print("【白盒实测】跳跃距离 %.1fpx(%.2f格) 净空 %.1fpx(%.2f格)" % [dist, dist / 8.0, height, height / 8.0])
+			print("【白盒实测】跳跃距离 %.1fpx(%.2f格) 净空 %.1fpx(%.2f格)" % [dist, dist / 20.0, height, height / 20.0])
 	if _airborne_from_jump:
 		_jump_peak_y = minf(_jump_peak_y, position.y)
 
@@ -227,6 +239,9 @@ func _corner_correct() -> void:
 
 
 func _update_sprite(dir: float, on_floor: bool) -> void:
+	if _dash_time > 0.0:
+		sprite.frame = FRAME_DASH  # 冲刺帧(锁方向,朝向在 _start_dash 已设定)
+		return
 	if dir != 0.0:
 		sprite.flip_h = dir < 0.0
 	if _land_timer > 0.0:
@@ -253,6 +268,15 @@ func _ready() -> void:
 	_checkpoint_pos = global_position
 	_checkpoint_flip = sprite.flip_h
 	_build_death_fx()
+	# 冲刺解锁(任务10.5)双保险:章级过场的 dash_unlocked 信号发出时,新章玩家尚未生成,
+	# 故以章节自查为准(编辑器试玩由 MainGame 按文件名同步章节),信号兜底编辑器内热切换。
+	dash_unlocked = GameState.current_chapter >= 2
+	EventBus.dash_unlocked.connect(_on_dash_unlocked)
+
+
+func _on_dash_unlocked() -> void:
+	dash_unlocked = true
+	print("[玩家] 冲刺已解锁(任务9)")
 
 
 func _build_death_fx() -> void:
@@ -320,6 +344,9 @@ func set_frozen(frozen: bool) -> void:
 	if frozen:
 		velocity = Vector2.ZERO
 		_w_just_pressed = false
+		_dash_time = 0.0      # 打断冲刺,防冻结结束后残留锁方向速度
+		_dash_buffer = 0.0
+		_shift_just_pressed = false
 
 
 # 陷阱统一入口(TrapBase._try_hit 调用)。knockback 在即死系统下不生效(D-537 已删受伤态)。
@@ -337,6 +364,9 @@ func _die_and_respawn() -> void:
 	velocity = Vector2.ZERO
 	conveyor_boost = Vector2.ZERO  # 死亡清惯性,重生不带旧带速
 	_boost_applied = Vector2.ZERO
+	_dash_time = 0.0       # 死亡打断冲刺;冲刺无伤害豁免(D-537),冲死同判
+	_dash_buffer = 0.0
+	_air_dash_used = false
 	_shatter.global_position = global_position + Vector2(0.0, -8.0)  # 身体中心
 	_shatter.restart()
 	_sfx_death.play()
@@ -373,3 +403,143 @@ func _set_conductor_beats(enabled: bool) -> void:
 		c.start_beats()
 	else:
 		c.stop_beats()
+
+
+# ---- 冲刺(任务9) ----
+
+# 每帧调用:计时/触发判定。返回 true=本帧处于冲刺(锁方向锁速度,常规移动跳跃跳过)。
+func _tick_dash(delta: float, on_floor: bool) -> bool:
+	_dash_cooldown = maxf(_dash_cooldown - delta, 0.0)
+	_dash_buffer = maxf(_dash_buffer - delta, 0.0)
+	if _shift_just_pressed:
+		_shift_just_pressed = false
+		_dash_buffer = DASH_BUFFER
+	if on_floor:
+		_air_dash_used = false  # 落地重置空中冲刺次数
+	if _dash_time > 0.0:
+		_dash_time = maxf(_dash_time - delta, 0.0)
+		if _dash_time <= 0.0:
+			velocity.x = _dash_dir * MAX_SPEED  # 0.15s到点,交还控制(保留跑速动量)
+		return true
+	# 触发:解锁+缓冲+冷却就绪
+	if not dash_unlocked or _dash_buffer <= 0.0 or _dash_cooldown > 0.0:
+		return false
+	if not on_floor:
+		if _air_dash_used:
+			return false  # 空中限一次
+		_start_dash(true)
+		return true
+	# 地面:有 pending 跳跃(_buffer>0=刚按跳)时不发动,等离地后转空中冲刺(输入缓冲0.1s,跳冲组合必需)
+	if _buffer > 0.0:
+		return false
+	_start_dash(false)
+	return true
+
+
+func _start_dash(air: bool) -> void:
+	_dash_buffer = 0.0
+	_dash_cooldown = DASH_COOLDOWN
+	_dash_time = DASH_DURATION
+	_air_dash_used = air
+	_afterimage_t = 0.0  # 首帧立即出残影
+	_ghost_alpha = AFTERIMAGE_ALPHA
+	var dir := 0.0 if _cutscene else _move_dir()
+	if dir == 0.0:
+		dir = -1.0 if sprite.flip_h else 1.0  # 无输入时按当前朝向冲
+	_dash_dir = dir
+	sprite.flip_h = dir < 0.0
+	sprite.frame = FRAME_DASH
+	velocity = Vector2(_dash_dir * DASH_SPEED, 0.0)
+	_hitstop()
+	_camera_shake()
+	# 冲刺照常判定死亡、无伤害豁免(D-537):can_die 全程不动,陷阱命中=即死
+
+
+# 顿帧:4帧(约0.067s)time_scale=0.1。提示词写 Time.time_scale,Godot 4.7 正确 API=Engine.time_scale。
+func _hitstop() -> void:
+	Engine.time_scale = HITSTOP_SCALE
+	await get_tree().create_timer(HITSTOP_SECONDS, true, false, true).timeout  # ignore_time_scale:按真实时间恢复
+	Engine.time_scale = 1.0
+
+
+# 微屏震:Camera2D.offset 随机抖动约0.15s后归零。
+func _camera_shake() -> void:
+	var cam := get_node_or_null("Camera2D") as Camera2D
+	if cam == null:
+		return
+	var tw := create_tween()
+	for i in 3:
+		tw.tween_property(cam, "offset", Vector2(randf_range(-SHAKE_PX, SHAKE_PX), randf_range(-SHAKE_PX, SHAKE_PX)), 0.03)
+	tw.tween_property(cam, "offset", Vector2.ZERO, 0.06)
+
+
+# 残影拖尾:复制当前 sprite 帧为独立 Sprite2D,alpha 递减淡出(4~6帧,间隔0.05s)。
+func _spawn_afterimage() -> void:
+	var ghost := Sprite2D.new()
+	ghost.texture = sprite.texture
+	ghost.hframes = sprite.hframes
+	ghost.vframes = sprite.vframes
+	ghost.frame = sprite.frame
+	ghost.flip_h = sprite.flip_h
+	ghost.top_level = true
+	ghost.global_position = sprite.global_position
+	ghost.modulate = Color(1.0, 1.0, 1.0, _ghost_alpha)
+	_ghost_alpha = maxf(_ghost_alpha * AFTERIMAGE_DECAY, 0.1)
+	add_child(ghost)
+	var tw := create_tween()
+	tw.tween_property(ghost, "modulate:a", 0.0, 0.25)
+	tw.tween_callback(ghost.queue_free)
+
+
+# ---- 二章开场赠予演出(任务9,约2s+弹窗2s) ----
+# 由章节过场(任务10.5)在二章首关睁眼后调用;白盒验收在 dash_test 场景按 G 触发。
+func play_dash_gift_cutscene() -> void:
+	if _gift_running:
+		return
+	_gift_running = true
+	_cutscene = true  # 屏蔽输入但保持物理(演示冲刺要走物理帧)
+	velocity = Vector2.ZERO
+	# 1) 女儿脚下亮起冲刺残影特效
+	for i in 4:
+		_spawn_afterimage()
+		await get_tree().create_timer(0.15).timeout
+	# 2) 身体前倾自动演示一小段冲刺位移(真实走冲刺状态机=与玩家操作手感一致)
+	dash_unlocked = true
+	_start_dash(false)
+	await get_tree().create_timer(DASH_DURATION + 0.3).timeout
+	# 3) UI弹窗(从上方弹出,占位样式;真素材 ui_popup_frame.png 到位后换皮)
+	_show_dash_popup()
+	await get_tree().create_timer(2.0).timeout
+	# 4) 弹窗消失,交还操作
+	await _hide_dash_popup()
+	_cutscene = false
+	_gift_running = false
+	EventBus.dash_unlocked.emit()  # 广播解锁(HUD/其他监听者;Player 自身已在步骤2置位,幂等)
+
+
+func _show_dash_popup() -> void:
+	_dash_popup = CanvasLayer.new()
+	_dash_popup.layer = 10
+	var panel := PanelContainer.new()
+	panel.position = Vector2(440.0, -80.0)  # 起点:屏幕上方外(窗口1280×720,占位定位)
+	var label := Label.new()
+	label.text = "恭喜你学会冲刺\n使用shift来拯救过去的'你'吧"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	panel.add_child(label)
+	_dash_popup.add_child(panel)
+	add_child(_dash_popup)
+	var tw := create_tween()
+	tw.tween_property(panel, "position:y", 32.0, 0.3)\
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+func _hide_dash_popup() -> void:
+	if _dash_popup == null:
+		return
+	var panel := _dash_popup.get_child(0) as Control
+	var tw := create_tween()
+	tw.tween_property(panel, "position:y", -80.0, 0.25)\
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	await tw.finished
+	_dash_popup.queue_free()
+	_dash_popup = null

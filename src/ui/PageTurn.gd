@@ -16,8 +16,8 @@ var _switch_timer: Timer
 
 
 func _ready() -> void:
-	# 初始:整页在屏幕右侧外,不遮挡画面。
-	_page.position.x = _screen_width()
+	# 闲置时整页隐藏:停靠在屏幕右缘外时窗口变宽会露馅(深色页片右条),直接不画最稳
+	_page.visible = false
 
 	_sfx = AudioStreamPlayer.new()
 	_sfx.stream = load(PAGE_TURN_SFX)
@@ -32,6 +32,7 @@ func _ready() -> void:
 func play_turn(next_scene_path: String) -> void:
 	_pending_scene = next_scene_path
 	_page.position.x = _screen_width()
+	_page.visible = true  # 演出开始才显示(闲置恒隐藏)
 
 	_sfx.play()
 

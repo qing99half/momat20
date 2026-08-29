@@ -1,6 +1,8 @@
 extends SceneTree
 # 编辑器冒烟测试(窗口模式):启动编辑器 → 模拟放置一个平台 → 保存 → 截图 → 退出。
 # 用法: godot --path <项目根> --script tools/smoke_editor.gd
+# 注意:ModuleRegistry 静态引用会把 DiaryDesk→GameState(autoload) 拉进入口编译链,
+# 必须运行时动态 load;空关切换用不存在的水泥关卡名(ch1_lv2 已有用户存档)。
 
 
 func _initialize() -> void:
@@ -17,9 +19,10 @@ func _run(ed: Node2D) -> void:
 	print("[编辑器] 冷启动自动载入=%s (已有模块数=%d)" % [autoloaded, ed._world.get_child_count()])
 	ed._clear_level()  # 清场后再验证放置/存档链路
 	# 程序化放置:横平台5格 + 摆锤 + 出生点,验证放置/存档链路
-	var e_plat := ModuleRegistry.get_entry("platform_h5")
-	var e_pend := ModuleRegistry.get_entry("pendulum")
-	var e_spawn := ModuleRegistry.get_entry("spawn")
+	var reg: GDScript = load("res://src/editor/ModuleRegistry.gd")
+	var e_plat: Dictionary = reg.get_entry("platform_h5")
+	var e_pend: Dictionary = reg.get_entry("pendulum")
+	var e_spawn: Dictionary = reg.get_entry("spawn")
 	ed._place_module(e_plat, Vector2(0, 320))
 	ed._place_module(e_pend, Vector2(200, 96))
 	ed._place_module(e_spawn, Vector2(16, 320))
@@ -31,11 +34,11 @@ func _run(ed: Node2D) -> void:
 	img.save_png("res://tools/smoke_editor.png")
 	var saved := FileAccess.file_exists("res://levels/_editor_smoke.json")
 	print("[编辑器] 存档写入=%s 模块数=%d" % [saved, ed._world.get_child_count()])
-	# 关卡切换验证:ch1_lv2(无存档→空关) → 切回 ch1_lv1(读回85个模块)
-	ed._level_edit.text = "ch1_lv2"
+	# 关卡切换验证:不存在的水泥关卡(→空关) → 切回 ch1_lv1(读回存档)
+	ed._level_edit.text = "_no_such_level"
 	ed._switch_level()
-	var switched_empty: bool = ed._world.get_child_count() == 0 and ed._current_level == "ch1_lv2"
-	print("[编辑器] 切换到ch1_lv2: 空关=%s 当前关卡=%s" % [switched_empty, ed._current_level])
+	var switched_empty: bool = ed._world.get_child_count() == 0 and ed._current_level == "_no_such_level"
+	print("[编辑器] 切换到不存在关卡: 空关=%s 当前关卡=%s" % [switched_empty, ed._current_level])
 	ed._level_edit.text = "ch1_lv1"
 	ed._switch_level()
 	var switched_back: bool = ed._world.get_child_count() > 0 and ed._current_level == "ch1_lv1"

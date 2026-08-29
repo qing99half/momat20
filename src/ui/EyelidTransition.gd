@@ -32,6 +32,16 @@ func close_eyes(duration: float) -> void:
 	_tween.parallel().tween_property(bottom_lid, "position:y", _lid_height, duration)
 
 
+## 瞬间闭合并保持(任务10.5:章级过场闭眼切场景后,新场景第一帧已是闭眼态,再由 open_eyes 睁开)。
+func set_closed() -> void:
+	if _tween and _tween.is_valid():
+		_tween.kill()
+	_reset_lids()
+	visible = true
+	top_lid.position.y = 0.0
+	bottom_lid.position.y = _lid_height
+
+
 func open_eyes(duration: float) -> void:
 	# 睁眼：两块黑色矩形从中间向上下边缘打开
 	if _tween and _tween.is_valid():
