@@ -56,15 +56,22 @@ func _play_cutscene(player: Node2D) -> void:
 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		await zoom_in.finished
 
+	# 章判定以 GameState.current_chapter 为准(autoload 由 MainGame/编辑器试玩同步,恒正确;
+	# 若只看 chapter 导出值,二章关卡 params 漏配 chapter=2 时会错走一章黑屏分支,日记永不展示)
+	var ch: int = GameState.current_chapter
+
 	# 2) 一章(2026-08-30 需求变更):不展示日记内容——聚焦完成后不停顿,直接黑屏覆盖→跳转下一关
-	if chapter == 1:
+	if ch == 1:
 		await _black_cover_advance()
 		return
 
 	# 3) 二章:叠化进日记UI(读取演出:日期先行逐字,打完前禁跳;正文可加速)
+	#    文案来源:编辑器 params 优先;为空时回退 assets/data/diary_texts.json(四篇正式长文案,1999/1997/1996/1993)
+	if ch >= 2 and diary_text.is_empty():
+		_load_diary_text_fallback()
 	var diary := get_tree().get_first_node_in_group("diary_ui")
 	if diary and diary.has_method("show_diary"):
-		diary.show_diary(diary_date, diary_text, chapter)
+		diary.show_diary(diary_date, diary_text, ch)
 		await EventBus.diary_finished
 
 	# 3)(仅二章)光片飞入HUD:HUD 自监听 diary_finished 播飞行动画(0.8s),等它落位
@@ -82,11 +89,28 @@ func _play_cutscene(player: Node2D) -> void:
 	GameState.current = GameState.State.Transition
 	EventBus.level_completed.emit(level_id)
 
-	# 4) 编辑器试玩:不推进关卡链,翻页回 MainGame 重新装载同一试玩关
+	# 4) 编辑器试玩(2026-08-30 变更):不再重载同一关——
+	#    试玩关在关卡链内且下一关 JSON 已搭建 → 翻页接着试玩下一关(可连试二章四关);
+	#    链尾/下一关未搭建 → 翻页回编辑器。
 	if GameState.editor_level_path != "":
-		var editor_turn := get_tree().get_first_node_in_group("page_turn")
-		if editor_turn:
-			editor_turn.play_turn("res://src/MainGame.tscn")
+		var cur_id := GameState.editor_level_path.get_file().get_basename()
+		var idx := GameState.LEVEL_CHAIN.find(cur_id)
+		var next_id := ""
+		if idx >= 0 and idx + 1 < GameState.LEVEL_CHAIN.size():
+			var candidate := "res://levels/%s.json" % GameState.LEVEL_CHAIN[idx + 1]
+			if FileAccess.file_exists(candidate):
+				next_id = GameState.LEVEL_CHAIN[idx + 1]
+		if next_id != "":
+			GameState.editor_level_path = "res://levels/%s.json" % next_id
+			GameState.sync_chapter_from_level_id(next_id)
+			print("[日记桌] 试玩推进 -> %s" % next_id)
+			var editor_turn := get_tree().get_first_node_in_group("page_turn")
+			if editor_turn:
+				editor_turn.play_turn("res://src/MainGame.tscn")
+		else:
+			print("[日记桌] 试玩已到链尾(%s),返回编辑器" % cur_id)
+			GameState.current = GameState.State.Gameplay
+			get_tree().change_scene_to_file("res://src/editor/MapEditor.tscn")
 		return
 
 	# 5) 推进关卡链:关内=翻页;章级=眼睑过场;链走完=收尾占位
@@ -164,3 +188,26 @@ func _chapter_transition() -> void:
 
 	GameState.chapter_intro_pending = true
 	get_tree().change_scene_to_file("res://src/MainGame.tscn")
+
+
+## 二章日记文案回退(2026-08-30):编辑器 params 未配 diary_text 时,按关卡 id 查
+## assets/data/diary_texts.json(四篇正式长文案;倒序:ch2_lv1=1999 … ch2_lv4=1993)。
+## 仍为空则报警占位,不静默演空白日记(防反转证据丢失)。
+func _load_diary_text_fallback() -> void:
+	const TEXTS_PATH := "res://assets/data/diary_texts.json"
+	if not FileAccess.file_exists(TEXTS_PATH):
+		push_warning("[日记桌] %s 不存在,二章日记无文案回退" % TEXTS_PATH)
+		return
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(TEXTS_PATH))
+	if not (data is Dictionary):
+		push_warning("[日记桌] diary_texts.json 解析失败")
+		return
+	# 依次试:导出 level_id → GameState 当前关(编辑器试玩旁路时导出值可能是默认 ch1_lv1)
+	for key in [level_id, GameState.current_level_id()]:
+		var entry: Variant = data.get(key)
+		if entry is Dictionary:
+			diary_date = str(entry.get("date", ""))
+			diary_text = str(entry.get("text", ""))
+			print("[日记桌] 文案回退命中 %s(%s)" % [key, diary_date])
+			return
+	push_warning("[日记桌] 未找到 %s 的二章日记文案,演出将只有日期" % level_id)

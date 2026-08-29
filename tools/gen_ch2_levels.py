@@ -89,7 +89,7 @@ def validate(mods, label, quiet=False):
             for src, dst in ((i, j), (j, i)):
                 s, d = surfs[src], surfs[dst]
                 climb = d[2] - s[2]  # 负=向上
-                bonus = 60.0 if s[3] else 0.0  # 带速惯性
+                bonus = 0.0  # 2026-08-30 惯性已回滚:传送带不再提供离带加成(陈洒指令)
                 # 下坠补偿:落点更低时跳跃横距随落差增加(95px纯跳+落差延程),封顶+40
                 drop_bonus = min(max(climb, 0.0) * 0.5, 40.0)
                 if g <= JUMP_X + drop_bonus + bonus and climb >= -JUMP_UP:
@@ -130,7 +130,7 @@ def validate(mods, label, quiet=False):
                 s, d = surfs[u], surfs[v]
                 g = max(0.0, max(s[0] - d[1], d[0] - s[1]))
                 climb = d[2] - s[2]
-                bonus = 60.0 if s[3] else 0.0
+                bonus = 0.0  # 惯性已回滚(2026-08-30)
                 drop_bonus = min(max(climb, 0.0) * 0.5, 40.0)
                 if g <= JUMP_X + drop_bonus + bonus and climb >= -JUMP_UP:
                     cls = "惯性跳" if s[3] else "跳"

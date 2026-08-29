@@ -108,6 +108,10 @@ static func instantiate(id: String, params: Dictionary = {}, level_id: String = 
 	if node is DiaryDesk:
 		if params.has("level_id"):
 			node.level_id = str(params["level_id"])
+		elif level_id != "":
+			# 缺省=当前加载关(2026-08-30 修复):否则导出值恒为 ch1_lv1,
+			# 二章日记文案回退查 diary_texts.json 全 miss,日记只剩日期秒收场
+			node.level_id = level_id
 		if params.has("chapter"):
 			node.chapter = int(params["chapter"])
 		if params.has("diary_date"):

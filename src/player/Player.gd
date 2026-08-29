@@ -64,11 +64,7 @@ var _cutscene := false         # 赠予演出中:屏蔽输入但保持物理运�
 var _gift_running := false
 var _dash_popup: CanvasLayer
 
-# ---- 传送带惯性 ----
-# 带面推力区每帧写入 conveyor_boost;离地后按"保持带速直到下次触碰"叠加,
-# 落地或碰墙即清零。_boost_applied 记录上帧实际叠加量,帧初剥离防逐帧累积。
-var conveyor_boost := Vector2.ZERO
-var _boost_applied := Vector2.ZERO
+# 传送带惯性已回滚(2026-08-30 陈洒指令):离带不保持带速,带上推动=纯位移,无加速无惯性。
 
 # 白盒实测记录(跳跃距离/净空)
 var _airborne_from_jump := false
@@ -151,11 +147,6 @@ func _physics_process(delta: float) -> void:
 	# ---- 冲刺状态机(任务9):计时/触发;冲刺中=水平瞬发+锁方向+无重力 ----
 	var dashing := _tick_dash(delta, was_on_floor)
 
-	# 传送带惯性:剥离上帧叠加量,下方控制器只操作裸速度(防逐帧累积)
-	if not was_on_floor:
-		velocity -= _boost_applied
-	_boost_applied = Vector2.ZERO
-
 	# ---- 竖直:重力 + 顶点滞空 ----
 	if dashing:
 		velocity.x = _dash_dir * DASH_SPEED
@@ -209,20 +200,8 @@ func _physics_process(delta: float) -> void:
 		velocity.y *= JUMP_CUT_MULT
 	_jump_was_held = held
 
-	# 传送带惯性:空中叠加带速(无输入时水平裸速度衰减到0,合速度收敛=带速;有输入=跑速+带速)
-	# 冲刺中跳过:冲刺锁方向锁速度,带速不得叠加(D-537 冲刺只解决缺口宽度)
-	if not dashing and not was_on_floor and conveyor_boost != Vector2.ZERO:
-		velocity += conveyor_boost
-		_boost_applied = conveyor_boost
-
 	var ascending := velocity.y < 0.0
 	move_and_slide()
-
-	# 传送带惯性:落地或碰墙=下次触碰,惯性清零(同步剥离裸速度,落地无残留)
-	if conveyor_boost != Vector2.ZERO and ((is_on_floor() and not was_on_floor) or is_on_wall()):
-		conveyor_boost = Vector2.ZERO
-		velocity -= _boost_applied
-		_boost_applied = Vector2.ZERO
 
 	# ---- 坠落死亡:掉出世界(坑底)即死,回最近台灯;世界外无地板,不死会无限下坠卡死 ----
 	if can_die and position.y > KILL_Y:
@@ -401,8 +380,6 @@ func _die_and_respawn() -> void:
 	# 步骤2:冻结输入,播放碎裂粒子
 	_frozen = true
 	velocity = Vector2.ZERO
-	conveyor_boost = Vector2.ZERO  # 死亡清惯性,重生不带旧带速
-	_boost_applied = Vector2.ZERO
 	_dash_time = 0.0       # 死亡打断冲刺;冲刺无伤害豁免(D-537),冲死同判
 	_dash_buffer = 0.0
 	_air_dash_used = false
