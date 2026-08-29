@@ -44,8 +44,8 @@ func _initialize() -> void:
 		if traps != 3:
 			failures.append("Area2D模块数=%d,期望3" % traps)
 		var cam := player.get_node("Camera2D") as Camera2D if player else null
-		if cam and cam.limit_right < 1250:
-			failures.append("相机右边界未扩展: %d" % cam.limit_right)
+		if cam and cam.limit_right != 2600:
+			failures.append("相机右边界应全局固定2600,实得: %d" % cam.limit_right)
 
 	if failures.is_empty():
 		print("[装载器] PASS")

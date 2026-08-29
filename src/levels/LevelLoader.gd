@@ -25,12 +25,10 @@ static func build(json_path: String) -> Node2D:
 		root.add_child(_make_parallax(bg_far, bg_mid))
 
 	var spawn := DEFAULT_SPAWN
-	var max_x := 400.0  # 相机右边界=最右模块+余量(半屏200px)
 
 	for m in data.get("modules", []):
 		var id: String = m.get("id", "")
 		var pos := Vector2(m.get("px", 0.0), m.get("py", 0.0))
-		max_x = maxf(max_x, pos.x + 200.0)
 		if id == "spawn":
 			spawn = pos
 			continue
@@ -41,13 +39,13 @@ static func build(json_path: String) -> Node2D:
 		node.name = "%s_%d_%d" % [id, int(pos.x), int(pos.y)]
 		root.add_child(node)
 
-	# 玩家
+	# 玩家;相机右边界全局固定=关卡规格130格×20px(阻-02:所有关同一基准,不随内容多少变化)
 	var player := (load(PLAYER_SCENE) as PackedScene).instantiate()
 	player.position = spawn
 	root.add_child(player)
 	var cam := player.get_node_or_null("Camera2D") as Camera2D
 	if cam:
-		cam.limit_right = int(max_x)
+		cam.limit_right = 2600
 
 	# Conductor 节拍器(任务3):挂关卡根,MainGame 进场后播 M1,全关陷阱按 120BPM 对拍
 	# 动态加载:静态引用会把 Conductor 拉进启动编译链,看不到 autoload(EventBus)
@@ -74,6 +72,9 @@ static func _make_layer(tex_path: String, scale: float, layer_name: String) -> P
 	var layer := ParallaxLayer.new()
 	layer.name = layer_name
 	layer.motion_scale = Vector2(scale, scale)
+	# 素材未到位(如二章bg_ch2_*)时跳过该层,不报错不挡路
+	if not ResourceLoader.exists(tex_path):
+		return layer
 	var sprite := Sprite2D.new()
 	sprite.texture = load(tex_path)
 	sprite.centered = false
