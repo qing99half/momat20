@@ -33,7 +33,7 @@ const DASH_DISTANCE := 60.0      # 冲刺距离:精确3格=60px
 const DASH_DURATION := 0.15      # 锁方向时间(秒)
 const DASH_SPEED := DASH_DISTANCE / DASH_DURATION  # =400px/s
 const DASH_COOLDOWN := 1.0       # 冷却(秒)
-const DASH_BUFFER := 0.1         # 输入缓冲:离地前几帧按Shift转空中冲刺(跳冲组合必需)
+const DASH_BUFFER := 0.1         # 输入缓冲:离地前几帧按F转空中冲刺(跳冲组合必需)
 const HITSTOP_SCALE := 0.1       # 顿帧强度(提示词写 Time.time_scale,Godot 4.7 正确 API=Engine.time_scale)
 const HITSTOP_SECONDS := 0.067   # 顿帧时长:4帧@60fps
 const AFTERIMAGE_INTERVAL := 0.05  # 残影间隔(秒)
@@ -106,8 +106,8 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode == KEY_W:
 			_w_just_pressed = true
-		elif event.physical_keycode == KEY_SHIFT:
-			_shift_just_pressed = true  # 冲刺(任务9);在 _tick_dash 里进缓冲
+		elif event.physical_keycode == KEY_F:
+			_shift_just_pressed = true  # 冲刺(任务9,F键;原Shift被输入法中英文切换拦截);在 _tick_dash 里进缓冲
 
 
 func _move_dir() -> float:
@@ -273,9 +273,9 @@ func _ready() -> void:
 	_checkpoint_pos = global_position
 	_checkpoint_flip = sprite.flip_h
 	_build_death_fx()
-	# 冲刺解锁(任务10.5)双保险:章级过场的 dash_unlocked 信号发出时,新章玩家尚未生成,
-	# 故以章节自查为准(编辑器试玩由 MainGame 按文件名同步章节),信号兜底编辑器内热切换。
-	dash_unlocked = GameState.current_chapter >= 2
+	# 冲刺开局即解锁(2026-08-30 用户反馈:按 Shift 无反应——原设计为二章赠予,但二章关卡未建,
+	# 能力前置;章级过场的 dash_unlocked 信号保留兜底,赠予演出仍在二章首关播放)
+	dash_unlocked = true
 	EventBus.dash_unlocked.connect(_on_dash_unlocked)
 
 
@@ -541,13 +541,16 @@ func _show_dash_popup() -> void:
 	_dash_popup = CanvasLayer.new()
 	_dash_popup.layer = 10
 	var panel := PanelContainer.new()
-	panel.position = Vector2(440.0, -80.0)  # 起点:屏幕上方外(窗口1280×720,占位定位)
+	panel.position = Vector2(0.0, -80.0)  # 起点:屏幕上方外(x 待布局后居中)
 	var label := Label.new()
 	label.text = "恭喜你学会冲刺\n使用shift来拯救过去的'你'吧"
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	panel.add_child(label)
 	_dash_popup.add_child(panel)
 	add_child(_dash_popup)
+	# 等一帧拿真实尺寸,水平居中(视口 1280 宽)
+	await get_tree().process_frame
+	panel.position.x = (get_viewport().get_visible_rect().size.x - panel.size.x) / 2.0
 	var tw := create_tween()
 	tw.tween_property(panel, "position:y", 32.0, 0.3)\
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
@@ -563,3 +566,12 @@ func _hide_dash_popup() -> void:
 	await tw.finished
 	_dash_popup.queue_free()
 	_dash_popup = null
+
+
+# 进关提示(轻量版):不冻结不演示,弹窗 2s 自动收起;复用赠予弹窗样式
+func show_dash_hint() -> void:
+	if _dash_popup != null:
+		return
+	_show_dash_popup()
+	await get_tree().create_timer(2.0).timeout
+	await _hide_dash_popup()

@@ -80,6 +80,34 @@ func _ready() -> void:
 		if GameState.current_chapter == 2:
 			_play_dash_gift_after_intro(level)
 
+	# 一章关底黑屏直转的后半场(2026-08-30):新场景第一眼全黑,0.5s 淡入关卡
+	if GameState.fade_from_black_pending:
+		GameState.fade_from_black_pending = false
+		var fade_layer := CanvasLayer.new()
+		fade_layer.layer = 100
+		var black := ColorRect.new()
+		black.color = Color.BLACK
+		black.set_anchors_preset(Control.PRESET_FULL_RECT)
+		black.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		fade_layer.add_child(black)
+		add_child(fade_layer)
+		var fade_in := create_tween()
+		fade_in.tween_property(black, "modulate:a", 0.0, 0.5)
+		fade_in.tween_callback(fade_layer.queue_free)
+
+	# 开局首关:冲刺已前置解锁(2026-08-30),弹窗提示按键;轻量版不冻结不演示
+	if GameState.current_chapter == 1 and GameState.current_level_index == 0:
+		_show_dash_hint_after_intro(level)
+
+
+## 首关进场 0.5s 后弹冲刺提示;玩家由 LevelLoader 建在关卡根下。
+func _show_dash_hint_after_intro(level: Node2D) -> void:
+	await get_tree().create_timer(0.5).timeout
+	for child in level.get_children():
+		if child is CharacterBody2D and child.has_method("show_dash_hint"):
+			child.show_dash_hint()
+			return
+
 
 ## 等睁眼结束(1.0s)再触发赠予演出;玩家由 LevelLoader 建在关卡根下。
 func _play_dash_gift_after_intro(level: Node2D) -> void:

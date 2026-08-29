@@ -1,9 +1,10 @@
 class_name DiaryDesk
 extends Area2D
 # 关底日记桌(步骤8.4 + 任务10.5):玩家进入触发区 → GameState切Cutscene → 镜头推近笔记本
-# (Camera2D.zoom缓动1s)→ 叠化进日记UI(DiaryUI.show_diary) →(仅二章)光片飞入HUD
-# (HUD自监听diary_finished,有章节门控) → GameState.advance_level():
-#   关内推进=翻页(PageTurn,目标恒定 MainGame.tscn);章级推进=眼睑过场(闭眼→黑屏大字→换场景睁眼)。
+# (Camera2D.zoom缓动1s)→ 一章:不展示日记,聚焦完成不停顿直接黑屏覆盖→跳转下一关(2026-08-30 变更);
+# 二章:叠化进日记UI(DiaryUI.show_diary)→光片飞入HUD(HUD自监听diary_finished,有章节门控)。
+# 推进=GameState.advance_level():一章关内=黑屏直转(新场景淡入);二章关内=翻页(PageTurn);
+# 章级推进=眼睑过场(闭眼→黑屏大字→换场景睁眼)。
 # 每关1张,一局只触发一次;UI按组查找(diary_ui/page_turn/eyelid/blackscreen_text),与UI层零硬引用。
 
 const DESK_TEXTURE := preload("res://assets/art/shared/prop_diarydesk.png")  # 真素材 21×14 终尺寸
@@ -55,7 +56,12 @@ func _play_cutscene(player: Node2D) -> void:
 			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 		await zoom_in.finished
 
-	# 2) 叠化进日记UI(淡入在 DiaryUI.show_diary 内部;一章=写入演出,二章=读取演出)
+	# 2) 一章(2026-08-30 需求变更):不展示日记内容——聚焦完成后不停顿,直接黑屏覆盖→跳转下一关
+	if chapter == 1:
+		await _black_cover_advance()
+		return
+
+	# 3) 二章:叠化进日记UI(读取演出:日期先行逐字,打完前禁跳;正文可加速)
 	var diary := get_tree().get_first_node_in_group("diary_ui")
 	if diary and diary.has_method("show_diary"):
 		diary.show_diary(diary_date, diary_text, chapter)
@@ -89,6 +95,47 @@ func _play_cutscene(player: Node2D) -> void:
 			var page_turn := get_tree().get_first_node_in_group("page_turn")
 			if page_turn:
 				page_turn.play_turn("res://src/MainGame.tscn")
+		"chapter":
+			await _chapter_transition()
+		"end":
+			print("[日记桌] 关卡链已走完(三章推门→ED 为任务12,待做)")
+
+
+## 一章关底新流程(2026-08-30):不展示日记内容,聚焦完成后不停顿——
+## 黑屏全覆盖(0.4s)→ 推进关卡链 → 直接切场景;新场景第一眼全黑,由 MainGame 淡入(0.5s)。
+## 章末(ch1_lv4)黑屏后继续走原章级过场(黑屏大字"我一定要拯救过去的'我'。"→眼睑睁眼进二章)。
+func _black_cover_advance() -> void:
+	var layer := CanvasLayer.new()
+	layer.layer = 100  # 压过游戏层与 UI 层
+	var black := ColorRect.new()
+	black.color = Color.BLACK
+	black.set_anchors_preset(Control.PRESET_FULL_RECT)
+	black.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	black.modulate.a = 0.0
+	layer.add_child(black)
+	var host: Node = get_tree().current_scene
+	if host == null:
+		host = owner  # 无头测试/试玩旁路(current_scene 为空):挂关卡根,随关卡销毁
+	if host == null:
+		host = get_tree().root
+	host.add_child(layer)
+	var fade := create_tween()
+	fade.tween_property(black, "modulate:a", 1.0, 0.4)
+	await fade.finished
+
+	GameState.current = GameState.State.Transition
+	EventBus.level_completed.emit(level_id)
+
+	# 编辑器试玩:不推进关卡链,黑屏后回 MainGame 重载同一试玩关
+	if GameState.editor_level_path != "":
+		GameState.fade_from_black_pending = true
+		get_tree().change_scene_to_file("res://src/MainGame.tscn")
+		return
+
+	match GameState.advance_level():
+		"level":
+			GameState.fade_from_black_pending = true
+			get_tree().change_scene_to_file("res://src/MainGame.tscn")
 		"chapter":
 			await _chapter_transition()
 		"end":

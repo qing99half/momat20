@@ -30,13 +30,10 @@ static func build(json_path: String) -> Node2D:
 	var root := Node2D.new()
 	root.name = "LevelRoot"
 
-	# 背景(可选):远/中景视差,与关卡模板同约定;中景支持 a/b 两段在 mid_switch_x 处切换(D-531)
+	# 背景(可选):只保留远景视差;中景层已全部删除(2026-08-30 决定,太丑)
 	var bg_far: String = data.get("bg_far", "")
-	var bg_mid: String = data.get("bg_mid", "")
-	var bg_mid_b: String = data.get("bg_mid_b", "")
-	var mid_switch_x := float(data.get("mid_switch_x", -1.0))
-	if bg_far != "" or bg_mid != "" or bg_mid_b != "":
-		root.add_child(_make_parallax(bg_far, bg_mid, bg_mid_b, mid_switch_x))
+	if bg_far != "":
+		root.add_child(_make_parallax(bg_far))
 
 	var spawn := DEFAULT_SPAWN
 	var max_x := 640.0  # 相机右边界=最右模块+余量(半屏320px@视野640宽),随布局扩展不设硬顶
@@ -93,31 +90,16 @@ static func build(json_path: String) -> Node2D:
 
 
 const BG_SHADER := "res://assets/shaders/bg_dim_blur.gdshader"
-const MID_TEX_SCALE := 0.55  # 中景贴图缩放到 55%(规格 50%~60%)
 
-static func _make_parallax(far_path: String, mid_path: String, mid_b_path: String, mid_switch_x: float) -> Node2D:
+static func _make_parallax(far_path: String) -> Node2D:
 	# 不用 ParallaxBackground(CanvasLayer layer=-100):游戏画面在 SubViewport 里走
 	# BackBufferCopy→LUT 后处理,负层画布内容与后处理采样顺序相冲,背景会被丢掉。
 	# 改为普通 Node2D 视差精灵:默认画布、树顺序在关卡内容之前,后处理能采到。
+	# 中景层已全部删除(2026-08-30):只留远景,调暗+轻模糊(景深),视差系数 0.15(美术案规格)
 	var bg := Node2D.new()
 	bg.name = "ParallaxBackground"
 	if far_path != "" and ResourceLoader.exists(far_path):
-		# 远景:调暗+轻模糊(景深),原生尺寸平铺;视差系数 0.15(美术案规格)
 		bg.add_child(_make_layer(far_path, 0.15, "Far", 1.0, false, true))
-	if mid_path != "" and ResourceLoader.exists(mid_path):
-		# 中景 a 段:缩小到 55% 平铺滚动,底对齐(地平线剪影惯例),不模糊
-		# 有 b 段时 a 段只在切换点之前显示(D-531 门框接缝)
-		var ma := _make_layer(mid_path, 0.5, "MidA", MID_TEX_SCALE, true, false)
-		if mid_b_path != "" and mid_switch_x >= 0.0:
-			ma.gate_x = mid_switch_x
-			ma.gate_after = false
-		bg.add_child(ma)
-	if mid_b_path != "" and ResourceLoader.exists(mid_b_path):
-		var mb := _make_layer(mid_b_path, 0.5, "MidB", MID_TEX_SCALE, true, false)
-		if mid_switch_x >= 0.0:
-			mb.gate_x = mid_switch_x
-			mb.gate_after = true
-		bg.add_child(mb)
 	return bg
 
 

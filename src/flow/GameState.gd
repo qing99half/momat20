@@ -21,6 +21,7 @@ var current_chapter := 1
 var collected_fragments := 0       # 记忆光片计数(二章专属收集物,任务10/11.1)
 var unlock_pending := false        # 集齐4片且位于 ch2_lv4:关底不翻页,改播开锁演出(任务11.2+ 接管)
 var chapter_intro_pending := false # 章级过场后,新场景第一眼保持闭眼再睁开(MainGame._ready 消费)
+var fade_from_black_pending := false # 一章关底黑屏直转后,新场景从黑淡入(MainGame._ready 消费;2026-08-30)
 
 
 func current_level_id() -> String:

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://kekthwsqoynu"
-path="res://.godot/imported/placeholder_bg_ch1_lv3_mid_b.png-a1f78f81e5762d411ff78a6d6209b854.ctex"
+uid="uid://oradug8m6sgt"
+path="res://.godot/imported/_raw_ui_notebook_close.png-44da56c385f2e237cfc9f0713ad411ff.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/placeholder/placeholder_bg_ch1_lv3_mid_b.png"
-dest_files=["res://.godot/imported/placeholder_bg_ch1_lv3_mid_b.png-a1f78f81e5762d411ff78a6d6209b854.ctex"]
+source_file="res://assets/art/_raw_ui_notebook_close.png"
+dest_files=["res://.godot/imported/_raw_ui_notebook_close.png-44da56c385f2e237cfc9f0713ad411ff.ctex"]
 
 [params]
 

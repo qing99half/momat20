@@ -1,6 +1,5 @@
 {
   "bg_far": "res://assets/placeholder/placeholder_bg_ch1_lv2_far.png",
-  "bg_mid": "res://assets/placeholder/placeholder_bg_ch1_lv2_mid.png",
   "level_id": "ch1_lv2",
   "modules": [
     {

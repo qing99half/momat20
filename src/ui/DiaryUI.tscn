@@ -22,22 +22,26 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="DateLabel" type="Label" parent="."]
+# 日期落在摊开日记右页顶部(真素材 ui_diary_open:右页 x940~1555,字迹区 y307 起)
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -360.0
-offset_top = 72.0
-offset_right = -72.0
-offset_bottom = 108.0
+offset_left = -920.0
+offset_top = 160.0
+offset_right = -420.0
+offset_bottom = 205.0
+theme_override_colors/font_color = Color(0.23, 0.16, 0.09, 1)
 theme_override_font_sizes/font_size = 24
 horizontal_alignment = 2
 
 [node name="BodyText" type="RichTextLabel" parent="."]
+# 正文落在左页空白区(真素材:左页 x326~940)
 anchor_bottom = 1.0
-offset_left = 80.0
+offset_left = 380.0
 offset_top = 180.0
-offset_right = -80.0
-offset_bottom = -140.0
+offset_right = -1020.0
+offset_bottom = -130.0
 bbcode_enabled = true
+theme_override_colors/default_color = Color(0.23, 0.16, 0.09, 1)
 
 [node name="SkipHint" type="Label" parent="."]
 visible = false

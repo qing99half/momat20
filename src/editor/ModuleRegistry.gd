@@ -124,11 +124,20 @@ static func instantiate(id: String, params: Dictionary = {}, level_id: String = 
 # ---- 按关美术寻址 ----
 
 # 平台/地面贴图:ground_<lv>_<w>w / platform_<lv>_<w>w / platform_<lv>_h<h><a|b>,双态关可带 _variant 后缀
+# 一二章复用(D-535 二章=一章破败版):ch2 缺图时回退 ch1 同序号关文件,再回退色块
 static func _platform_tex(level_id: String, style: String, w: int, h: int, variant: String, vsub: String) -> String:
 	if level_id == "":
 		return ""
 	if variant == "":
 		variant = PLATFORM_VARIANT_DEFAULT.get(level_id, "")
+	var found := _platform_tex_in(level_id, style, w, h, variant, vsub)
+	if found == "" and level_id.begins_with("ch2_"):
+		var fb := "ch1_" + level_id.substr(4)
+		found = _platform_tex_in(fb, style, w, h, PLATFORM_VARIANT_DEFAULT.get(fb, ""), vsub)
+	return found
+
+
+static func _platform_tex_in(level_id: String, style: String, w: int, h: int, variant: String, vsub: String) -> String:
 	var base := ""
 	if style == "ground":
 		base = "res://assets/art/%s/ground_%s_%dw" % [level_id, level_id, w]
@@ -144,10 +153,16 @@ static func _platform_tex(level_id: String, style: String, w: int, h: int, varia
 	return p if ResourceLoader.exists(p) else ""
 
 
-# 陷阱按关换皮:trap_<lv>_<后缀>.png;缺文件=保持 TrapConfig 占位贴图
+# 陷阱按关换皮:trap_<lv>_<后缀>.png;ch2 缺图回退 ch1 同序号关,再缺=保持 TrapConfig 占位贴图
 static func _trap_skin(level_id: String, id: String) -> String:
 	if level_id == "":
 		return ""
 	var suffix: String = TRAP_SKIN_SUFFIX.get(id, id)
 	var p := "res://assets/art/%s/trap_%s_%s.png" % [level_id, level_id, suffix]
-	return p if ResourceLoader.exists(p) else ""
+	if ResourceLoader.exists(p):
+		return p
+	if level_id.begins_with("ch2_"):
+		var fb := "ch1_" + level_id.substr(4)
+		p = "res://assets/art/%s/trap_%s_%s.png" % [fb, fb, suffix]
+		return p if ResourceLoader.exists(p) else ""
+	return ""
