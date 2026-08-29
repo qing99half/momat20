@@ -26,6 +26,20 @@ const CORNER_CORRECT_MAX := 15  # 撞角修正:斜角碰撞最大横移(px)
 
 # ---- 动画帧号(占位spritesheet 24帧,帧序见策划案-美术音乐附录) ----
 const FRAME_LAND := 20
+const FRAME_DASH := 21  # 冲刺帧
+
+# ---- 冲刺(任务9,20px格体系:3格=60px;旧8px提示词的24px/48px作废) ----
+const DASH_DISTANCE := 60.0      # 冲刺距离:精确3格=60px
+const DASH_DURATION := 0.15      # 锁方向时间(秒)
+const DASH_SPEED := DASH_DISTANCE / DASH_DURATION  # =400px/s
+const DASH_COOLDOWN := 1.0       # 冷却(秒)
+const DASH_BUFFER := 0.1         # 输入缓冲:离地前几帧按Shift转空中冲刺(跳冲组合必需)
+const HITSTOP_SCALE := 0.1       # 顿帧强度(提示词写 Time.time_scale,Godot 4.7 正确 API=Engine.time_scale)
+const HITSTOP_SECONDS := 0.067   # 顿帧时长:4帧@60fps
+const AFTERIMAGE_INTERVAL := 0.05  # 残影间隔(秒)
+const AFTERIMAGE_ALPHA := 0.5    # 残影初始透明度
+const AFTERIMAGE_DECAY := 0.75   # 残影 alpha 逐帧递减系数
+const SHAKE_PX := 2.0            # 微屏震幅度(px)
 
 var _coyote := 0.0
 var _buffer := 0.0
@@ -33,6 +47,26 @@ var _anim_t := 0.0
 var _land_timer := 0.0
 var _w_just_pressed := false  # _input 捕获的 W 键按下(跳跃)
 var _jump_was_held := false   # 上一帧跳跃键按住状态(可变跳高用)
+
+# ---- 冲刺状态 ----
+@export var dash_unlocked := false  # 二章赠予演出解锁(EventBus.dash_unlocked);白盒测试可在编辑器勾选
+var _dash_time := 0.0          # 剩余锁方向时间
+var _dash_dir := 1.0
+var _dash_cooldown := 0.0
+var _dash_buffer := 0.0
+var _air_dash_used := false    # 空中限一次,落地重置
+var _shift_just_pressed := false
+var _afterimage_t := 0.0
+var _ghost_alpha := AFTERIMAGE_ALPHA
+var _cutscene := false         # 赠予演出中:屏蔽输入但保持物理运行(演示冲刺)
+var _gift_running := false
+var _dash_popup: CanvasLayer
+
+# ---- 传送带惯性 ----
+# 带面推力区每帧写入 conveyor_boost;离地后按"保持带速直到下次触碰"叠加,
+# 落地或碰墙即清零。_boost_applied 记录上帧实际叠加量,帧初剥离防逐帧累积。
+var conveyor_boost := Vector2.ZERO
+var _boost_applied := Vector2.ZERO
 
 # 白盒实测记录(跳跃距离/净空)
 var _airborne_from_jump := false
@@ -69,6 +103,8 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode == KEY_W:
 			_w_just_pressed = true
+		elif event.physical_keycode == KEY_SHIFT:
+			_shift_just_pressed = true  # 冲刺(任务9);在 _tick_dash 里进缓冲
 
 
 func _move_dir() -> float:
@@ -88,6 +124,11 @@ func _physics_process(delta: float) -> void:
 	if _frozen:
 		return  # 死亡流程中冻结移动(粒子/计时走协程,不吃物理帧)
 	var was_on_floor := is_on_floor()
+
+	# 传送带惯性:剥离上帧叠加量,下方控制器只操作裸速度(防逐帧累积)
+	if not was_on_floor:
+		velocity -= _boost_applied
+	_boost_applied = Vector2.ZERO
 
 	# ---- 竖直:重力 + 顶点滞空 ----
 	if not was_on_floor:
@@ -133,8 +174,19 @@ func _physics_process(delta: float) -> void:
 		velocity.y *= JUMP_CUT_MULT
 	_jump_was_held = held
 
+	# 传送带惯性:空中叠加带速(无输入时水平裸速度衰减到0,合速度收敛=带速;有输入=跑速+带速)
+	if not was_on_floor and conveyor_boost != Vector2.ZERO:
+		velocity += conveyor_boost
+		_boost_applied = conveyor_boost
+
 	var ascending := velocity.y < 0.0
 	move_and_slide()
+
+	# 传送带惯性:落地或碰墙=下次触碰,惯性清零(同步剥离裸速度,落地无残留)
+	if conveyor_boost != Vector2.ZERO and ((is_on_floor() and not was_on_floor) or is_on_wall()):
+		conveyor_boost = Vector2.ZERO
+		velocity -= _boost_applied
+		_boost_applied = Vector2.ZERO
 
 	# ---- 坠落死亡:掉出世界(坑底)即死,回最近台灯;世界外无地板,不死会无限下坠卡死 ----
 	if can_die and position.y > KILL_Y:
@@ -283,6 +335,8 @@ func _die_and_respawn() -> void:
 	# 步骤2:冻结输入,播放碎裂粒子
 	_frozen = true
 	velocity = Vector2.ZERO
+	conveyor_boost = Vector2.ZERO  # 死亡清惯性,重生不带旧带速
+	_boost_applied = Vector2.ZERO
 	_shatter.global_position = global_position + Vector2(0.0, -8.0)  # 身体中心
 	_shatter.restart()
 	_sfx_death.play()

@@ -75,6 +75,8 @@ func _physics_process(delta: float) -> void:
 			# 直接位移推动:玩家控制器每帧重写 velocity,加速度叠加会被吃掉/失控,
 			# 传送带的正确语义是"载着你走",用位置推动;方向随节点旋转(竖放=升降带)。
 			body.position += config.push.rotated(rotation) * delta
+			# 惯性规则:把带速写给玩家,离带后保持到下次触碰(落地/碰墙清零,见 Player)
+			body.set("conveyor_boost", config.push.rotated(rotation))
 
 
 func reset_trap() -> void:
