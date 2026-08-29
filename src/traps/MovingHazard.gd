@@ -69,7 +69,7 @@ func _fire_activate() -> void:
 	if config.motion != 1:
 		return
 	var bottle := BottleProjectile.new()
-	bottle.setup(config)
+	bottle.setup(config, str(get_meta("skin_texture", "")))  # 弹体继承按关换皮(附录E)
 	add_child(bottle)  # 挂发射器下,随发射器一起被关卡管理;死亡时由 player_died 自清
 	bottle.launch(config.fall_distance, FALL_SPEED, BOTTLE_LIFETIME)
 
@@ -91,12 +91,16 @@ class BottleProjectile:
 	var _config: TrapConfig
 	var _hit_cd := 0.0
 
-	func setup(cfg: TrapConfig) -> void:
+	func setup(cfg: TrapConfig, skin := "") -> void:
 		_config = cfg
 		collision_layer = 2  # 约定:角色Layer=1,陷阱Layer=2
 		collision_mask = 1
 		var sprite := Sprite2D.new()
-		sprite.texture = cfg.texture
+		# 按关换皮:发射器本体有真素材则弹体同源;缺图回退 config 占位(与 TrapBase._build_visual 同约定)
+		if skin != "" and ResourceLoader.exists(skin):
+			sprite.texture = load(skin)
+		else:
+			sprite.texture = cfg.texture
 		add_child(sprite)
 		var shape := CollisionShape2D.new()
 		var rect := RectangleShape2D.new()

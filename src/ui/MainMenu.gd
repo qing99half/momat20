@@ -11,7 +11,7 @@ func _ready() -> void:
 	if stream is AudioStreamOggVorbis:
 		stream.loop = true
 	amb.stream = stream
-	amb.volume_db = -10.0
+	amb.volume_db = -6.0  # 音效层=BGM 的一半(-6dB)
 	add_child(amb)
 	amb.play()
 

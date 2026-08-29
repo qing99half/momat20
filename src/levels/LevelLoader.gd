@@ -12,6 +12,12 @@ const AMBIENT_SFX := {
 	"lv2": "res://assets/audio/sfx_machine_hum.ogg",
 	"lv4": "res://assets/audio/sfx_baby_cry.ogg",
 }
+# 章节 BGM(真素材):ch1→M1 压抑的记忆 / ch2→M2 决意拯救 / ch3→M3_A 相向奔赴;M3_B/V1 留给结局
+const BGM_TRACKS := {
+	"ch1": "res://assets/audio/bgm_m1.ogg",
+	"ch2": "res://assets/audio/bgm_m2.ogg",
+	"ch3": "res://assets/audio/bgm_m3_a.ogg",
+}
 
 
 static func build(json_path: String) -> Node2D:
@@ -24,11 +30,13 @@ static func build(json_path: String) -> Node2D:
 	var root := Node2D.new()
 	root.name = "LevelRoot"
 
-	# 背景(可选):远/中景视差,与关卡模板同约定
+	# 背景(可选):远/中景视差,与关卡模板同约定;中景支持 a/b 两段在 mid_switch_x 处切换(D-531)
 	var bg_far: String = data.get("bg_far", "")
 	var bg_mid: String = data.get("bg_mid", "")
-	if bg_far != "" or bg_mid != "":
-		root.add_child(_make_parallax(bg_far, bg_mid))
+	var bg_mid_b: String = data.get("bg_mid_b", "")
+	var mid_switch_x := float(data.get("mid_switch_x", -1.0))
+	if bg_far != "" or bg_mid != "" or bg_mid_b != "":
+		root.add_child(_make_parallax(bg_far, bg_mid, bg_mid_b, mid_switch_x))
 
 	var spawn := DEFAULT_SPAWN
 	var max_x := 640.0  # 相机右边界=最右模块+余量(半屏320px@视野640宽),随布局扩展不设硬顶
@@ -55,11 +63,15 @@ static func build(json_path: String) -> Node2D:
 	if cam:
 		cam.limit_right = int(max_x)
 
-	# Conductor 节拍器(任务3):挂关卡根,MainGame 进场后播 M1,全关陷阱按 120BPM 对拍
+	# Conductor 节拍器(任务3):挂关卡根,MainGame 进场后播章节 BGM,全关陷阱按 120BPM 对拍
 	# 动态加载:静态引用会把 Conductor 拉进启动编译链,看不到 autoload(EventBus)
 	var conductor: Node = (load("res://src/flow/Conductor.gd") as GDScript).new()
 	conductor.name = "Conductor"
-	conductor.set_meta("autoplay_track", "res://assets/placeholder/placeholder_M1.wav")
+	# 按章配轨;真素材缺失时不挂打点占位(已废弃),节拍随音乐缺失而停——交付即恢复
+	var ch_key := str(data.get("level_id", "")).get_slice("_", 0)
+	var bgm_path: String = BGM_TRACKS.get(ch_key, "")
+	if bgm_path != "" and ResourceLoader.exists(bgm_path):
+		conductor.set_meta("autoplay_track", bgm_path)
 	root.add_child(conductor)
 
 	# 关卡环境底噪(循环):按 lv 序号取素材,缺文件则静默跳过不挡路
@@ -72,7 +84,7 @@ static func build(json_path: String) -> Node2D:
 		if amb_stream is AudioStreamOggVorbis:
 			amb_stream.loop = true
 		amb.stream = amb_stream
-		amb.volume_db = -12.0
+		amb.volume_db = -6.0  # 音效层=BGM 的一半(-6dB)
 		amb.autoplay = true
 		root.add_child(amb)
 
@@ -83,22 +95,33 @@ static func build(json_path: String) -> Node2D:
 const BG_SHADER := "res://assets/shaders/bg_dim_blur.gdshader"
 const MID_TEX_SCALE := 0.55  # 中景贴图缩放到 55%(规格 50%~60%)
 
-static func _make_parallax(far_path: String, mid_path: String) -> Node2D:
+static func _make_parallax(far_path: String, mid_path: String, mid_b_path: String, mid_switch_x: float) -> Node2D:
 	# 不用 ParallaxBackground(CanvasLayer layer=-100):游戏画面在 SubViewport 里走
 	# BackBufferCopy→LUT 后处理,负层画布内容与后处理采样顺序相冲,背景会被丢掉。
 	# 改为普通 Node2D 视差精灵:默认画布、树顺序在关卡内容之前,后处理能采到。
 	var bg := Node2D.new()
 	bg.name = "ParallaxBackground"
 	if far_path != "" and ResourceLoader.exists(far_path):
-		# 远景:调暗+轻模糊(景深),原生尺寸平铺
-		bg.add_child(_make_layer(far_path, 0.2, "Far", 1.0, false, true))
+		# 远景:调暗+轻模糊(景深),原生尺寸平铺;视差系数 0.15(美术案规格)
+		bg.add_child(_make_layer(far_path, 0.15, "Far", 1.0, false, true))
 	if mid_path != "" and ResourceLoader.exists(mid_path):
-		# 中景:缩小到 55% 平铺滚动,底对齐(地平线剪影惯例),不模糊
-		bg.add_child(_make_layer(mid_path, 0.5, "Mid", MID_TEX_SCALE, true, false))
+		# 中景 a 段:缩小到 55% 平铺滚动,底对齐(地平线剪影惯例),不模糊
+		# 有 b 段时 a 段只在切换点之前显示(D-531 门框接缝)
+		var ma := _make_layer(mid_path, 0.5, "MidA", MID_TEX_SCALE, true, false)
+		if mid_b_path != "" and mid_switch_x >= 0.0:
+			ma.gate_x = mid_switch_x
+			ma.gate_after = false
+		bg.add_child(ma)
+	if mid_b_path != "" and ResourceLoader.exists(mid_b_path):
+		var mb := _make_layer(mid_b_path, 0.5, "MidB", MID_TEX_SCALE, true, false)
+		if mid_switch_x >= 0.0:
+			mb.gate_x = mid_switch_x
+			mb.gate_after = true
+		bg.add_child(mb)
 	return bg
 
 
-static func _make_layer(tex_path: String, scale: float, layer_name: String, tex_scale: float, bottom_align: bool, dim_blur: bool) -> Node2D:
+static func _make_layer(tex_path: String, scale: float, layer_name: String, tex_scale: float, bottom_align: bool, dim_blur: bool) -> _ParallaxSprite:
 	# 素材未到位(如二章bg_ch2_*)时跳过该层,不报错不挡路
 	var layer := _ParallaxSprite.new()
 	layer.name = layer_name
@@ -121,6 +144,8 @@ class _ParallaxSprite:
 	var tex_scale := 1.0        # 贴图缩放(中景 0.55)
 	var bottom_align := false   # true=底边对齐 360(地平线剪影),false=顶对齐
 	var overlay_material: Material  # 远景调暗+模糊
+	var gate_x := -1.0          # >=0 时按相机中心 x 门槛显隐(中景 a/b 分段切换)
+	var gate_after := true      # true=过门槛才显示;false=过门槛隐藏
 	var _sprites: Array[Sprite2D] = []
 
 	func _ready() -> void:
@@ -138,6 +163,9 @@ class _ParallaxSprite:
 		var cam := get_viewport().get_camera_2d()
 		if cam == null or tex == null:
 			return
+		var center_x: float = cam.get_screen_center_position().x
+		if gate_x >= 0.0:
+			visible = (center_x >= gate_x) == gate_after
 		var w := float(tex.get_width()) * tex_scale
 		var tl: Vector2 = cam.get_screen_center_position() - get_viewport().get_visible_rect().size / 2.0 / cam.zoom.x
 		var off := fmod(tl.x * scroll_scale, w)

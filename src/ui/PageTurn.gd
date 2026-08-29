@@ -21,6 +21,7 @@ func _ready() -> void:
 
 	_sfx = AudioStreamPlayer.new()
 	_sfx.stream = load(PAGE_TURN_SFX)
+	_sfx.volume_db = -6.0
 	add_child(_sfx)
 
 	_switch_timer = Timer.new()

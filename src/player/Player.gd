@@ -322,21 +322,26 @@ func _build_death_fx() -> void:
 	gather_mat.damping_max = 120.0
 	_gather.process_material = gather_mat
 	add_child(_gather)
-	# 音效(S1=跳跃,S2=落地,S3=冲刺,S4=死亡碎裂,S13=重生上行单音)
+	# 音效(S1=跳跃,S2=落地,S3=冲刺,S4=死亡碎裂,S13=重生上行单音;统一 -6dB=BGM 的一半)
 	_sfx_death = AudioStreamPlayer.new()
 	_sfx_death.stream = load("res://assets/audio/sfx_death.ogg")
+	_sfx_death.volume_db = -6.0
 	add_child(_sfx_death)
 	_sfx_rebirth = AudioStreamPlayer.new()
 	_sfx_rebirth.stream = load("res://assets/audio/sfx_rebirth.ogg")
+	_sfx_rebirth.volume_db = -6.0
 	add_child(_sfx_rebirth)
 	_sfx_jump = AudioStreamPlayer.new()
 	_sfx_jump.stream = load("res://assets/audio/sfx_jump.ogg")
+	_sfx_jump.volume_db = -6.0
 	add_child(_sfx_jump)
 	_sfx_land = AudioStreamPlayer.new()
 	_sfx_land.stream = load("res://assets/audio/sfx_land.ogg")
+	_sfx_land.volume_db = -6.0
 	add_child(_sfx_land)
 	_sfx_dash = AudioStreamPlayer.new()
 	_sfx_dash.stream = load("res://assets/audio/sfx_dash.ogg")
+	_sfx_dash.volume_db = -6.0
 	add_child(_sfx_dash)
 
 

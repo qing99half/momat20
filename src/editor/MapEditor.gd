@@ -304,7 +304,9 @@ func _place_module(e: Dictionary, pos: Vector2) -> Node2D:
 		var p: Dictionary = (e.params as Dictionary).duplicate()
 		if e.get("rotatable", false) and _rot != 0:
 			p["rot"] = _rot
-		node = ModuleRegistry.instantiate(e.id, p)
+		# 按当前关卡名寻址真美术(与游戏内 LevelLoader 同一约定):编辑器预览=游戏实貌,
+		# 摆二章关时预览即二章素材,不会错绑/错看成一章占位
+		node = ModuleRegistry.instantiate(e.id, p, _level_edit.text.strip_edges())
 		if node != null:
 			node.set_meta("params", p)
 	if node == null:

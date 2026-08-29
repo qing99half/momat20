@@ -32,6 +32,7 @@ var _sfx: AudioStreamPlayer
 func _ready() -> void:
 	add_to_group("diary_ui")  # 日记桌(DiaryDesk)按组查找,零硬引用
 	_sfx = AudioStreamPlayer.new()
+	_sfx.volume_db = -6.0
 	add_child(_sfx)
 
 

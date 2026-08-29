@@ -1,6 +1,8 @@
 {
   "bg_far": "res://assets/placeholder/placeholder_bg_ch1_lv4_far.png",
-  "bg_mid": "res://assets/placeholder/placeholder_bg_ch1_lv4_mid.png",
+  "bg_mid": "res://assets/placeholder/placeholder_bg_ch1_lv4_mid_a.png",
+  "bg_mid_b": "res://assets/placeholder/placeholder_bg_ch1_lv4_mid_b.png",
+  "mid_switch_x": 1400.0,
   "level_id": "ch1_lv4",
   "modules": [
     {
@@ -234,12 +236,6 @@
       "py": 360.0
     },
     {
-      "id": "glass",
-      "params": {},
-      "px": 1080.0,
-      "py": 360.0
-    },
-    {
       "id": "platform_h3",
       "params": {
         "h": 1.0,
@@ -248,6 +244,12 @@
       },
       "px": 1080.0,
       "py": 240.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 1080.0,
+      "py": 360.0
     },
     {
       "id": "glass",
@@ -320,6 +322,12 @@
       "py": 360.0
     },
     {
+      "id": "glass",
+      "params": {},
+      "px": 1380.0,
+      "py": 360.0
+    },
+    {
       "id": "ground_h5",
       "params": {
         "h": 4.0,
@@ -328,12 +336,6 @@
       },
       "px": 1380.0,
       "py": 300.0
-    },
-    {
-      "id": "glass",
-      "params": {},
-      "px": 1380.0,
-      "py": 360.0
     },
     {
       "id": "lamp",
@@ -562,12 +564,6 @@
       "py": 180.0
     },
     {
-      "id": "glass",
-      "params": {},
-      "px": 2160.0,
-      "py": 360.0
-    },
-    {
       "id": "platform_h1",
       "params": {
         "h": 1.0,
@@ -576,6 +572,12 @@
       },
       "px": 2160.0,
       "py": 220.0
+    },
+    {
+      "id": "glass",
+      "params": {},
+      "px": 2160.0,
+      "py": 360.0
     },
     {
       "id": "platform_h2",

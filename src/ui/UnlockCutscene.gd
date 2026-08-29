@@ -161,6 +161,7 @@ func _spawn_lock_burst(at: Vector2) -> void:
 func _play_sfx(path: String) -> void:
 	var p := AudioStreamPlayer.new()
 	p.stream = load(path)
+	p.volume_db = -6.0
 	p.finished.connect(p.queue_free)
 	add_child(p)
 	p.play()

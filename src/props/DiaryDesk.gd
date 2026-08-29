@@ -6,7 +6,7 @@ extends Area2D
 #   关内推进=翻页(PageTurn,目标恒定 MainGame.tscn);章级推进=眼睑过场(闭眼→黑屏大字→换场景睁眼)。
 # 每关1张,一局只触发一次;UI按组查找(diary_ui/page_turn/eyelid/blackscreen_text),与UI层零硬引用。
 
-const DESK_TEXTURE := preload("res://assets/placeholder/placeholder_prop_diary_desk.png")
+const DESK_TEXTURE := preload("res://assets/art/shared/prop_diarydesk.png")  # 真素材 21×14 终尺寸
 
 @export var level_id := "ch1_lv1"
 @export var chapter := 1
@@ -22,7 +22,6 @@ func _ready() -> void:
 	collision_mask = 1
 	var sprite := Sprite2D.new()
 	sprite.texture = DESK_TEXTURE
-	sprite.scale = Vector2(0.175, 0.175)    # 日记桌规格 21×14(贴图120×80等比缩)
 	sprite.position = Vector2(0.0, -7.0)   # 21×14,原点=桌底落地线(底部居中)
 	add_child(sprite)
 	var hitbox := CollisionShape2D.new()

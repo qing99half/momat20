@@ -34,6 +34,7 @@ func _ready() -> void:
 
 	_sfx = AudioStreamPlayer.new()
 	_sfx.stream = load(FRAGMENT_SFX)
+	_sfx.volume_db = -6.0
 	add_child(_sfx)
 
 	# 符号状态从 GameState 恢复(本节点随场景每关重建,计数不能放这里)
