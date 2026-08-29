@@ -77,8 +77,10 @@ func _build_hitbox() -> void:
 		size = Vector2(maxf(size.x - HITBOX_INSET * 2.0, 2.0), maxf(size.y - HITBOX_INSET * 2.0, 2.0))
 	rect.size = size
 	hitbox.shape = rect
+	# 判定体与贴图解耦:尺寸/偏移只看 config,美术换图不影响判定
+	hitbox.position = config.hitbox_offset
 	if config.anchor_top:
-		hitbox.position = Vector2(0.0, config.hitbox_size.y / 2.0)
+		hitbox.position += Vector2(0.0, config.hitbox_size.y / 2.0)
 	add_child(hitbox)
 	_hitbox_base_pos = hitbox.position
 

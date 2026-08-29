@@ -44,6 +44,7 @@ var _jump_peak_y := 0.0
 # 无无敌帧系统(D-537):仅重生后 0.5s 内 can_die=false,防"重生瞬间与陷阱相位重叠即死"连死循环。
 const RESPAWN_DELAY := 1.0       # 死亡→重生等待(秒)
 const RESPAWN_PROTECT := 0.5     # 重生保护窗(秒,防连死,非无敌帧)
+const KILL_Y := 220.0            # 坠落死亡线:掉出世界(坑底)即死,回最近台灯
 const SHATTER_LIFETIME := 0.8    # 碎裂粒子寿命(秒)
 const SHATTER_GRAVITY := 300.0   # 碎裂粒子重力(px/s²)
 const SHATTER_SPEED_MIN := 200.0 # 碎裂粒子初速下限(px/s)
@@ -134,6 +135,12 @@ func _physics_process(delta: float) -> void:
 
 	var ascending := velocity.y < 0.0
 	move_and_slide()
+
+	# ---- 坠落死亡:掉出世界(坑底)即死,回最近台灯;世界外无地板,不死会无限下坠卡死 ----
+	if can_die and position.y > KILL_Y:
+		print("[玩家] 坠入深渊 -> player_died")
+		receive_hazard(Vector2.ZERO, &"pit")
+		return
 
 	# ---- 撞角修正:上升撞天花板时尝试横向挪动到可通行位置 ----
 	if ascending and is_on_ceiling():

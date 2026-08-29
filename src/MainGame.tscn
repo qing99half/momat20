@@ -8,6 +8,9 @@
 script = ExtResource("1_main")
 
 [node name="GameLayer" type="SubViewportContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="GameLayer"]

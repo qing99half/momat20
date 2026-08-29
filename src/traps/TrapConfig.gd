@@ -8,7 +8,8 @@ extends Resource
 @export var knockback := Vector2.ZERO       # 传给 player.receive_hazard 的击退
 @export var texture: Texture2D              # 贴图(占位期=placeholder_trap_*)
 @export var droplet_texture: Texture2D      # 滴液模式的液滴贴图
-@export var hitbox_size := Vector2(8.0, 8.0)  # 贴图尺寸(px);致死判定体由基类四边各内缩2px
+@export var hitbox_size := Vector2(8.0, 8.0)  # 判定体尺寸(px),独立配置不随贴图;致死判定体由基类四边各内缩2px
+@export var hitbox_offset := Vector2.ZERO     # 判定体中心相对贴图注册点的偏移(px);美术换图只换贴图,判定只调这里
 @export var anchor_top := false             # true=锚点在顶部中点(摆锤悬挂)
 
 @export_group("预警(两层)")

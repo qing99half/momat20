@@ -6,8 +6,9 @@ extends SubViewport
 		lut_texture = value
 		_apply_lut()
 
-## 验证用：反色测试 LUT（256×16），确认 shader 生效后换成真正的情绪 LUT。
-const TEST_INVERT_LUT := "res://assets/placeholder/placeholder_lut_test_invert.png"
+## 默认中性 LUT(附录E:6个关卡先都挂中性,画面无变化);
+## 反色测试 LUT 仅验证 shader 生效时使用,由测试显式设置。
+const NEUTRAL_LUT := "res://assets/placeholder/placeholder_lut_neutral.png"
 
 var _post_mat: ShaderMaterial
 
@@ -16,9 +17,9 @@ func _ready() -> void:
 	_post_mat = ShaderMaterial.new()
 	_post_mat.shader = load("res://assets/shaders/lut_color_grading.gdshader")
 	_setup_post_process()
-	# 验证用：未在 Inspector 手动设置时，默认加载反色测试 LUT 验证 shader 生效
+	# 默认挂中性 LUT(画面无变化);换情绪 LUT 时给 lut_texture 赋值即可
 	if lut_texture == null:
-		lut_texture = load(TEST_INVERT_LUT) as Texture2D
+		lut_texture = load(NEUTRAL_LUT) as Texture2D
 
 
 func _setup_post_process() -> void:
