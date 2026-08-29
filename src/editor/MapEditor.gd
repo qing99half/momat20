@@ -8,6 +8,7 @@ const LEVEL_DIR := "res://levels/"
 
 var _entries: Array[Dictionary] = []
 var _placing: Dictionary = {}      # 正在放置的模块条目(空=未处于放置模式)
+var _rot := 0                      # 放置旋转角(0/90/180/270,R键切换,仅rotatable模块生效)
 var _eraser := false               # 橡皮擦模式:左键点谁删谁
 var _dragging: Node2D = null       # 正在拖动的已放置模块
 var _panning := false
@@ -44,8 +45,8 @@ func _ready() -> void:
 	add_child(_range)
 
 	_camera = Camera2D.new()
-	_camera.position = Vector2(160.0, 90.0)
-	_camera.zoom = Vector2(3.2, 3.2)  # 20px格:等效旧8px格zoom4的视野
+	_camera.position = Vector2(200.0, 180.0)
+	_camera.zoom = Vector2(2.0, 2.0)  # 默认看满整关高度(360px=18格)×32格宽
 	add_child(_camera)
 	_camera.make_current()
 
@@ -133,6 +134,7 @@ func _build_ui() -> void:
 
 func _on_palette_pressed(id: String) -> void:
 	_eraser = false
+	_rot = 0
 	for e in _entries:
 		if e.id == id:
 			_placing = e
@@ -182,6 +184,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		var k := event as InputEventKey
 		if k.keycode == KEY_DELETE or k.keycode == KEY_BACKSPACE:
 			_delete_hovered()
+		elif k.keycode == KEY_R and not _placing.is_empty() and _placing.get("rotatable", false):
+			_rot = (_rot + 90) % 360  # 荆棘/传送带:90°步进旋转(贴墙/倒挂)
 		elif k.keycode == KEY_ESCAPE:
 			_cancel_placing()
 		elif k.keycode == KEY_S and k.ctrl_pressed:
@@ -200,6 +204,8 @@ func _process(_delta: float) -> void:
 	# 状态栏
 	var mp := get_global_mouse_position()
 	var mode := "放置:%s" % _placing.name if not _placing.is_empty() else ("橡皮擦:点谁删谁" if _eraser else ("拖动中" if _dragging else "选择模块"))
+	if not _placing.is_empty() and _placing.get("rotatable", false):
+		mode += " 旋转%d°(R键转)" % _rot
 	_status.text = "%s | 格(%d,%d) px(%d,%d) | 模块数 %d | 左键放/拖 右键删 中键平移 滚轮缩放 Ctrl+S保存" % [
 		mode, floori(mp.x / CELL), floori(mp.y / CELL), int(mp.x), int(mp.y), _world.get_child_count()]
 
@@ -235,7 +241,9 @@ func _pick(p: Vector2) -> Node2D:
 		var e := ModuleRegistry.get_entry(node.get_meta("module_id"))
 		if e.is_empty():
 			continue
-		var rect := Rect2(node.position + e.fp_offset, e.fp_size)
+		var rot := int((node.get_meta("params", {}) as Dictionary).get("rot", 0))
+		var r := _fp_rect(e, rot)
+		var rect := Rect2(node.position + r.position, r.size)
 		if rect.has_point(p):
 			return node
 	return null
@@ -250,8 +258,19 @@ func _delete_hovered() -> void:
 func _cancel_placing() -> void:
 	_placing = {}
 	_eraser = false
+	_rot = 0
 	for bid in _palette_buttons:
 		_palette_buttons[bid].button_pressed = false
+
+
+# 脚印矩形(本地坐标,未加节点位置):rot=90/270 时绕原点(中心)旋转,包围盒宽高互换
+func _fp_rect(e: Dictionary, rot: int) -> Rect2:
+	var off: Vector2 = e.fp_offset
+	var size: Vector2 = e.fp_size
+	if rot % 180 != 0:
+		var c := off + size / 2.0
+		return Rect2(Vector2(c.x - size.y / 2.0, c.y - size.x / 2.0), Vector2(size.y, size.x))
+	return Rect2(off, size)
 
 
 # ---- 放置 ----
@@ -265,12 +284,18 @@ func _place_module(e: Dictionary, pos: Vector2) -> Node2D:
 				c.free()
 		node = _SpawnMarker.new()
 	else:
-		node = ModuleRegistry.instantiate(e.id, e.params)
+		var p: Dictionary = (e.params as Dictionary).duplicate()
+		if e.get("rotatable", false) and _rot != 0:
+			p["rot"] = _rot
+		node = ModuleRegistry.instantiate(e.id, p)
+		if node != null:
+			node.set_meta("params", p)
 	if node == null:
 		return null
 	node.position = pos
 	node.set_meta("module_id", e.id)
-	node.set_meta("params", e.params.duplicate())
+	if not node.has_meta("params"):
+		node.set_meta("params", {})
 	_world.add_child(node)
 	return node
 
@@ -317,9 +342,18 @@ func _load_level() -> void:
 		if e.is_empty():
 			continue
 		var node := _place_module(e, Vector2(m.get("px", 0.0), m.get("py", 0.0)))
-		if node and m.get("params", {}) is Dictionary and node is PlatformModule:
-			node.set_meta("params", m.params)
-			node.configure(int(m.params.get("w", 3)), int(m.params.get("h", 1)), str(m.params.get("style", "platform")))
+		if node and m.get("params", {}) is Dictionary:
+			if node is PlatformModule:
+				node.set_meta("params", m.params)
+				node.configure(int(m.params.get("w", 3)), int(m.params.get("h", 1)), str(m.params.get("style", "platform")))
+			elif e.get("rotatable", false):
+				# 可旋转陷阱(荆棘/传送带):读档恢复旋转角
+				var r := int(m.params.get("rot", 0))
+				node.rotation_degrees = float(r)
+				var p2: Dictionary = (node.get_meta("params", {}) as Dictionary).duplicate()
+				if r != 0:
+					p2["rot"] = r
+				node.set_meta("params", p2)
 	print("[编辑器] 已读取 %s" % _level_path())
 
 
@@ -370,14 +404,18 @@ class _GhostDraw:
 			if hovered:
 				var he := ModuleRegistry.get_entry(hovered.get_meta("module_id"))
 				if not he.is_empty():
-					draw_rect(Rect2(hovered.position + he.fp_offset, he.fp_size), Color(1.0, 0.2, 0.2, 0.25), true)
-					draw_rect(Rect2(hovered.position + he.fp_offset, he.fp_size), Color(1.0, 0.2, 0.2, 0.9), false, thin)
+					var hrot := int((hovered.get_meta("params", {}) as Dictionary).get("rot", 0))
+					var hr: Rect2 = editor._fp_rect(he, hrot)
+					draw_rect(Rect2(hovered.position + hr.position, hr.size), Color(1.0, 0.2, 0.2, 0.25), true)
+					draw_rect(Rect2(hovered.position + hr.position, hr.size), Color(1.0, 0.2, 0.2, 0.9), false, thin)
 			return
 		if editor._placing.is_empty():
 			return
 		var e: Dictionary = editor._placing
 		var pos: Vector2 = editor._snap(editor.get_global_mouse_position())
-		var rect := Rect2(pos + e.fp_offset, e.fp_size)
+		var rot: int = editor._rot if e.get("rotatable", false) else 0
+		var r: Rect2 = editor._fp_rect(e, rot)
+		var rect := Rect2(pos + r.position, r.size)
 		var color := Color(0.4, 1.0, 0.6, 0.35) if e.category != "陷阱" else Color(1.0, 0.4, 0.3, 0.35)
 		draw_rect(rect, color, true)
 		draw_rect(rect, Color(color, 0.9), false, thin)
@@ -427,15 +465,12 @@ class _RangeDraw:
 		if tl.y < ceiling_y:
 			draw_rect(Rect2(tl.x, tl.y, view.x, ceiling_y - tl.y), Color(0.5, 0.1, 0.1, 0.10), true)
 
-		# 关卡顶:Y=-200(地面上方18格≈5.1跳头部空间,对齐旧体系纵向预算;相机Limit Top=-200)
+		# 关卡顶:Y=0(视野顶=关卡顶,地面上方16格;相机只横移,开局即见最大高度)
 		draw_line(Vector2(tl.x, ceiling_y), Vector2(br.x, ceiling_y), Color(0.5, 0.8, 1.0, 0.9), thick)
-		draw_string(font, Vector2(tl.x + 2.0, ceiling_y + fs + 2.0), "关卡顶 Y=-200 (头上18格)", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.5, 0.8, 1.0))
-		# 一屏顶参考:Y=0(初始视野顶;关卡可向上延伸至关卡顶,相机垂直跟随)
-		draw_line(Vector2(tl.x, 0.0), Vector2(br.x, 0.0), Color(0.5, 0.8, 1.0, 0.3), thin)
-		draw_string(font, Vector2(tl.x + 2.0, 0.0 + fs + 2.0), "一屏顶 Y=0 (参考)", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.5, 0.8, 1.0, 0.5))
-		# 视野底:Y=180(游戏层底,相机limit_bottom=180)
-		draw_line(Vector2(tl.x, 180.0), Vector2(br.x, 180.0), Color(0.5, 0.8, 1.0, 0.4), thick)
-		draw_string(font, Vector2(tl.x + 2.0, 180.0 - 3.0), "视野底 Y=180", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.5, 0.8, 1.0, 0.6))
+		draw_string(font, Vector2(tl.x + 2.0, ceiling_y + fs + 2.0), "关卡顶 Y=0 (头上16格)", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.5, 0.8, 1.0))
+		# 视野底:Y=360(游戏层底,相机limit_bottom=360)
+		draw_line(Vector2(tl.x, 360.0), Vector2(br.x, 360.0), Color(0.5, 0.8, 1.0, 0.4), thick)
+		draw_string(font, Vector2(tl.x + 2.0, 360.0 - 3.0), "视野底 Y=360", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.5, 0.8, 1.0, 0.6))
 
 		# 段落分带底色(交替极淡) + 分界线 + 段名标签
 		for i in sections.size():
@@ -456,7 +491,7 @@ class _RangeDraw:
 		var ew := font.get_string_size(end_label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 		draw_string(font, Vector2(length_px - ew - 2.0, tl.y + 2.0 * (fs + 2.0)), end_label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1.0, 0.3, 0.3))
 
-		# 地面参考线:Y=0(地面)=y144px,策划案坐标系的基准
+		# 地面参考线:Y=0(地面)=y320px,策划案坐标系的基准
 		draw_line(Vector2(tl.x, ground_y), Vector2(br.x, ground_y), Color(0.7, 0.6, 0.35, 0.8), thick)
 		draw_string(font, Vector2(tl.x + 2.0, ground_y - 2.0), "地面 Y=0", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.7, 0.6, 0.35))
 

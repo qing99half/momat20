@@ -11,6 +11,7 @@ extends Resource
 @export var hitbox_size := Vector2(8.0, 8.0)  # 判定体尺寸(px),独立配置不随贴图;致死判定体由基类四边各内缩2px
 @export var hitbox_offset := Vector2.ZERO     # 判定体中心相对贴图注册点的偏移(px);美术换图只换贴图,判定只调这里
 @export var anchor_top := false             # true=锚点在顶部中点(摆锤悬挂)
+@export var rotatable := false              # true=编辑器允许R键90°旋转(荆棘/传送带);判定体随节点一起转
 
 @export_group("不规则判定体(美术接入后)")
 # 不规则图形的死亡判定:多边形优先于矩形。顶点坐标相对贴图注册点(中心;anchor_top=顶部中点)。

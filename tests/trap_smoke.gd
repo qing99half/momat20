@@ -1,10 +1,10 @@
 extends Node2D
-# 12种陷阱全量冒烟测试:全部实例化铺开,跑6秒,任何脚本/资源错误都会打到控制台。
+# 11种陷阱全量冒烟测试(账单风已删):全部实例化铺开,跑6秒,任何脚本/资源错误都会打到控制台。
 # 运行: godot --headless --path <proj> res://tests/trap_smoke.tscn -- --quit-flag
 
 const TRAP_SCENES := [
 	"washboard", "part", "thorns", "glass",
-	"conveyor", "billwind",
+	"conveyor",
 	"pendulum", "bottle",
 	"press", "rotten", "heart_big", "soundwave",
 ]
@@ -29,7 +29,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_t += delta
 	if _t > 6.0:
-		print("SMOKE PASS: 12种陷阱运行6秒无脚本错误")
+		print("SMOKE PASS: 11种陷阱运行6秒无脚本错误")
 		get_tree().quit(0)
 
 

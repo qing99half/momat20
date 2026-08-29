@@ -2,10 +2,10 @@ class_name LevelLoader
 extends RefCounted
 # 关卡装载器:从 JSON 数据构建关卡(地图编辑器的存档格式)。
 # JSON: { "level_id", "bg_far"?, "bg_mid"?, "modules":[{id, px, py, params?}] }
-# spawn 模块不实例化,只决定玩家出生位置;无 spawn 时默认 (24, 144)。
+# spawn 模块不实例化,只决定玩家出生位置;无 spawn 时默认 (60, 320)。
 
 const PLAYER_SCENE := "res://src/player/Player.tscn"
-const DEFAULT_SPAWN := Vector2(60.0, 160.0)
+const DEFAULT_SPAWN := Vector2(60.0, 320.0)
 
 
 static func build(json_path: String) -> Node2D:

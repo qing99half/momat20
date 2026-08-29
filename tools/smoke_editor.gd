@@ -16,9 +16,9 @@ func _run(ed: Node2D) -> void:
 	var e_plat := ModuleRegistry.get_entry("platform_h5")
 	var e_pend := ModuleRegistry.get_entry("pendulum")
 	var e_spawn := ModuleRegistry.get_entry("spawn")
-	ed._place_module(e_plat, Vector2(0, 144))
+	ed._place_module(e_plat, Vector2(0, 320))
 	ed._place_module(e_pend, Vector2(200, 96))
-	ed._place_module(e_spawn, Vector2(16, 144))
+	ed._place_module(e_spawn, Vector2(16, 320))
 	ed._level_edit.text = "_editor_smoke"
 	ed._save_level()
 	for i in range(30):

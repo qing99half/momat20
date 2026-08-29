@@ -7,12 +7,12 @@ func _initialize() -> void:
 	var data := {
 		"level_id": "_test",
 		"modules": [
-			{"id": "platform_h5", "px": 0, "py": 160, "params": {"w": 5, "h": 1}},
-			{"id": "platform_v2", "px": 1000, "py": 120, "params": {"w": 1, "h": 2}},
+			{"id": "platform_h5", "px": 0, "py": 320, "params": {"w": 5, "h": 1}},
+			{"id": "platform_v2", "px": 1000, "py": 280, "params": {"w": 1, "h": 2}},
 			{"id": "pendulum", "px": 500, "py": 40, "params": {}},
-			{"id": "lamp", "px": 60, "py": 160, "params": {}},
-			{"id": "diary_desk", "px": 1250, "py": 160, "params": {}},
-			{"id": "spawn", "px": 80, "py": 160, "params": {}},
+			{"id": "lamp", "px": 60, "py": 320, "params": {}},
+			{"id": "diary_desk", "px": 1250, "py": 320, "params": {}},
+			{"id": "spawn", "px": 80, "py": 320, "params": {}},
 		],
 	}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://levels/"))
@@ -30,7 +30,7 @@ func _initialize() -> void:
 		var player := level.find_child("Player", true, false)
 		if player == null:
 			failures.append("未生成玩家")
-		elif player.position != Vector2(80, 160):
+		elif player.position != Vector2(80, 320):
 			failures.append("玩家出生点错误: %s" % player.position)
 		var platforms := 0
 		var traps := 0
@@ -46,8 +46,10 @@ func _initialize() -> void:
 		var cam := player.get_node("Camera2D") as Camera2D if player else null
 		if cam and cam.limit_right < 1250:
 			failures.append("相机右边界未扩展: %d" % cam.limit_right)
-		if cam and cam.limit_top != -200:
-			failures.append("相机上边界应为关卡顶-200,实得: %d" % cam.limit_top)
+		if cam and cam.limit_top != 0:
+			failures.append("相机上边界应为关卡顶0(单屏=整关高),实得: %d" % cam.limit_top)
+		if cam and cam.limit_bottom != 360:
+			failures.append("相机下边界应为视野底360,实得: %d" % cam.limit_bottom)
 
 	if failures.is_empty():
 		print("[装载器] PASS")

@@ -1,11 +1,10 @@
 extends Node
 # 任务3 机关绑拍自动验收(自跑约24s,无需操作,结束打印报表自动退出):
 #   Conductor 120BPM,短循环 [0,18) 拍(9s;故意取非各机关周期倍数,验循环边界不漏/不重)
-#   5 个周期机关:摆锤(4拍)/冲压机(5拍)/酒瓶(4拍)/声波(4拍)/账单风(吹3拍+停4拍)
+#   4 个周期机关:摆锤(4拍)/冲压机(5拍)/酒瓶(4拍)/声波(4拍)(账单风已随陷阱删除)
 # 判据(全部自动断言):
 #   ① trap_activated 距最近整数拍偏差 ≤ 0.05拍(epsilon)+1帧(0.033拍)= 0.084拍
 #   ② 摆锤在每 4 拍过中点:拍点时刻 |rotation| ≤ 10°(自由漂移则会持续增大越界)
-#   ③ 账单风吹/停与拍相位一致:每拍比对 _gust_active == (连续拍%7 < 3)
 #   ④ t=7s 对冲压机调 reset_trap()(模拟死亡重生),当周期作废,后续击发仍在拍点上
 #   ⑤ 两次循环回卷(t≈9s/18s)后各机关继续按周期击发,不漏/不重
 
@@ -14,7 +13,6 @@ const TRAP_SCENES := [
 	"res://src/traps/scenes/trap_press.tscn",
 	"res://src/traps/scenes/trap_bottle.tscn",
 	"res://src/traps/scenes/trap_soundwave.tscn",
-	"res://src/traps/scenes/trap_billwind.tscn",
 ]
 const M1 := "res://assets/placeholder/placeholder_M1.wav"
 const LOOP_BEATS := 18.0
@@ -28,11 +26,9 @@ var _elapsed := 0.0
 var _abs := -1                # 连续拍计数(与 TrapBase 同规则)
 var _fires := {}              # 机关名 -> [{beat, off}]
 var _pend_errs: Array[float] = []
-var _wind_errs := 0
 var _reset_done := false
 var _pendulum: Node2D
 var _press: Node2D
-var _wind: Node2D
 
 
 func _ready() -> void:
@@ -51,7 +47,6 @@ func _ready() -> void:
 		match nm:
 			&"pendulum": _pendulum = trap
 			&"press": _press = trap
-			&"billwind": _wind = trap
 	EventBus.beat.connect(_on_beat)
 	_conductor.play(M1)
 	_conductor.set_loop(0.0, LOOP_BEATS)
@@ -73,10 +68,6 @@ func _on_beat(_n: int) -> void:
 	# 判据②:摆锤每 4 拍过中点
 	if _abs % 4 == 0:
 		_pend_errs.append(absf(rad_to_deg(_pendulum.rotation)))
-	# 判据③:账单风相位(吹3拍停4拍,周期7拍)
-	var expect_wind: bool = _abs % 7 < 3
-	if _wind._gust_active != expect_wind:
-		_wind_errs += 1
 
 
 func _on_trap_fired(nm: StringName) -> void:
@@ -111,9 +102,6 @@ func _report() -> void:
 	var pend_ok: bool = pend_max <= PASS_PEND_DEG
 	all_pass = all_pass and pend_ok
 	print("[验收] ② 摆锤: 每4拍中点误差 最大%.2f° -> %s" % [pend_max, "PASS" if pend_ok else "FAIL"])
-	var wind_ok: bool = _wind_errs == 0
-	all_pass = all_pass and wind_ok
-	print("[验收] ③ 账单风: 相位错位 %d 拍 -> %s" % [_wind_errs, "PASS" if wind_ok else "FAIL"])
 	var press_fires: Array = _fires[&"press"]
 	var reset_ok: bool = press_fires.size() >= 7  # 重置吞掉1次,其余全在拍点上(①已断言)
 	print("[验收] ④ 重置: 冲压机重置后击发 %d 次且偏差见① -> %s" % [press_fires.size(), "PASS" if reset_ok else "FAIL"])

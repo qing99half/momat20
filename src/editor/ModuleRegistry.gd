@@ -35,12 +35,12 @@ static func get_entries() -> Array[Dictionary]:
 			"params": {"w": w, "h": 4, "style": "ground"},
 			"fp_offset": Vector2.ZERO, "fp_size": Vector2(w * CELL, 4 * CELL),
 		})
-	# ---- 陷阱:12种,脚印从各自 TrapConfig 读取(单一事实源) ----
+	# ---- 陷阱:11种(账单纸风已删,实现难度太高),脚印从各自 TrapConfig 读取(单一事实源) ----
 	var trap_names := {
 		"pendulum": "摆锤(鸡毛掸子)", "washboard": "尖刺带(搓衣板)", "bottle": "酒瓶坠落",
 		"glass": "碎玻璃", "thorns": "荆棘", "heart_big": "心脏(大)",
 		"part": "零件飞溅", "press": "冲压机", "soundwave": "声波",
-		"billwind": "阵风(无伤)", "conveyor": "传送带(无伤)", "rotten": "腐板(无伤)",
+		"conveyor": "传送带(无伤)", "rotten": "腐板(无伤)",
 	}
 	for id in trap_names:
 		var cfg: TrapConfig = load("res://src/traps/configs/%s.tres" % id)
@@ -52,6 +52,7 @@ static func get_entries() -> Array[Dictionary]:
 			"id": id, "name": trap_names[id], "category": "陷阱",
 			"scene": "res://src/traps/scenes/trap_%s.tscn" % id,
 			"params": {}, "fp_offset": off, "fp_size": size,
+			"rotatable": cfg.rotatable,  # 荆棘/传送带:编辑器内R键90°旋转
 		})
 	# ---- 道具与标记 ----
 	entries.append({
@@ -92,4 +93,8 @@ static func instantiate(id: String, params: Dictionary = {}) -> Node2D:
 		node = (load(entry.scene) as PackedScene).instantiate()
 	if node is PlatformModule:
 		node.configure(int(params.get("w", 3)), int(params.get("h", 1)), str(params.get("style", "platform")))
+	# 可旋转模块(荆棘/传送带):params.rot=0/90/180/270,整节点旋转(贴图+判定体一起转)
+	var rot := int(params.get("rot", 0))
+	if rot != 0 and bool(entry.get("rotatable", false)):
+		node.rotation_degrees = float(rot)
 	return node

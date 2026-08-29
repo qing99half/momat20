@@ -1,7 +1,7 @@
 extends TrapBase
-# ForceZone 外力区域:传送带(+x)/账单风(-x),damage=0 不致死。
-# 对区域内的 CharacterBody2D 持续施加 config.force 加速度。
-# 阵风模式:gust_on>0 时按 吹gust_on秒/停gust_off秒 循环(关4账单风=1.5s吹/2.0s停)。
+# ForceZone 外力区域:传送带(顺风向推动),damage=0 不致死。
+# 对区域内的 CharacterBody2D 持续施加 config.push 位移推动(方向随节点旋转,支持竖放)。
+# 阵风模式(已随账单纸风删除,保留机制):gust_on>0 时按 吹gust_on秒/停gust_off秒 循环。
 
 var _gust_active := true
 var _loop_gen := -1  # 自由阵风循环已启动的代际标记(-1=未启动/节拍驱动)
@@ -56,8 +56,8 @@ func _physics_process(delta: float) -> void:
 	for body in get_overlapping_bodies():
 		if body is CharacterBody2D:
 			# 直接位移推动:玩家控制器每帧重写 velocity,加速度叠加会被吃掉/失控,
-			# 传送带/风的正确语义是"载着你走",用位置推动。
-			body.position += config.push * delta
+			# 传送带的正确语义是"载着你走",用位置推动;方向随节点旋转(竖放=升降带)。
+			body.position += config.push.rotated(rotation) * delta
 
 
 func reset_trap() -> void:

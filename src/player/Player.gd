@@ -44,7 +44,7 @@ var _jump_peak_y := 0.0
 # 无无敌帧系统(D-537):仅重生后 0.5s 内 can_die=false,防"重生瞬间与陷阱相位重叠即死"连死循环。
 const RESPAWN_DELAY := 1.0       # 死亡→重生等待(秒)
 const RESPAWN_PROTECT := 0.5     # 重生保护窗(秒,防连死,非无敌帧)
-const KILL_Y := 220.0  # 锚视野底180+40,与格体系无关(视野高不变)            # 坠落死亡线:掉出世界(坑底)即死,回最近台灯
+const KILL_Y := 400.0  # 锚视野底360+40(单屏=整关高18格)                        # 坠落死亡线:掉出世界(坑底)即死,回最近台灯
 const SHATTER_LIFETIME := 0.8    # 碎裂粒子寿命(秒)
 const SHATTER_GRAVITY := 750.0   # 碎裂粒子重力(px/s²)
 const SHATTER_SPEED_MIN := 500.0 # 碎裂粒子初速下限(px/s)
