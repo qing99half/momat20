@@ -15,6 +15,7 @@ var _panning := false
 var _world: Node2D                 # 已放置模块的父节点
 var _grid: Node2D
 var _ghost: Node2D
+var _range: Node2D                 # 关卡范围叠加层(策划案四段式)
 var _camera: Camera2D
 var _level_edit: LineEdit
 var _status: Label
@@ -36,6 +37,11 @@ func _ready() -> void:
 	_ghost = _GhostDraw.new()
 	_ghost.editor = self
 	add_child(_ghost)
+
+	# 关卡范围叠加层(策划案四段式:教学/核心/考试/关底 + 关底线 + 地面线)
+	_range = _RangeDraw.new()
+	_range.editor = self
+	add_child(_range)
 
 	_camera = Camera2D.new()
 	_camera.position = Vector2(160.0, 90.0)
@@ -68,12 +74,20 @@ func _build_ui() -> void:
 	_level_edit = LineEdit.new()
 	_level_edit.text = "ch1_lv1"
 	_level_edit.custom_minimum_size = Vector2(110.0, 0.0)
+	_level_edit.text_changed.connect(func(_t): _range.queue_redraw())
 	top.add_child(_level_edit)
 	for spec in [["保存", _save_level], ["读取", _load_level], ["清空", _clear_level], ["试玩", _playtest], ["退出", func(): get_tree().quit()]]:
 		var b := Button.new()
 		b.text = spec[0]
 		b.pressed.connect(spec[1])
 		top.add_child(b)
+	# 关卡范围叠加层开关(默认开)
+	var range_btn := Button.new()
+	range_btn.text = "关卡范围"
+	range_btn.toggle_mode = true
+	range_btn.button_pressed = true
+	range_btn.pressed.connect(func(): _range.visible = range_btn.button_pressed)
+	top.add_child(range_btn)
 
 	# 左侧模块面板
 	var panel := PanelContainer.new()
@@ -161,6 +175,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if _panning:
 			_camera.position -= mm.relative / _camera.zoom.x
 			_grid.queue_redraw()
+			_range.queue_redraw()
 		elif _dragging:
 			_dragging.position = _snap(get_global_mouse_position())
 	elif event is InputEventKey and event.pressed and not event.echo:
@@ -179,6 +194,7 @@ func _process(_delta: float) -> void:
 	if dir != Vector2.ZERO:
 		_camera.position += dir * 240.0 * _delta / _camera.zoom.x
 		_grid.queue_redraw()
+		_range.queue_redraw()
 	# 幽灵跟随
 	_ghost.queue_redraw()
 	# 状态栏
@@ -194,6 +210,7 @@ func _zoom_at_mouse(factor: float) -> void:
 	_camera.zoom = Vector2(z, z)
 	_camera.position += before - get_global_mouse_position()
 	_grid.queue_redraw()
+	_range.queue_redraw()
 
 
 func _snap(p: Vector2) -> Vector2:
@@ -373,3 +390,64 @@ class _SpawnMarker:
 		# 小旗子:杆+三角旗,底部=出生落地线
 		draw_line(Vector2.ZERO, Vector2(0, -16), Color(0.5, 0.9, 1.0), 1.5)
 		draw_colored_polygon(PackedVector2Array([Vector2(0, -16), Vector2(10, -13), Vector2(0, -10)]), Color(0.5, 0.9, 1.0, 0.8))
+
+
+class _RangeDraw:
+	extends Node2D
+	# 关卡范围叠加层:照策划案四段式画分区界线/段名/关底红线/地面参考线/越界暗区
+	var editor: Node2D
+
+	const SECTION_COLORS := [
+		Color(0.4, 0.8, 1.0, 0.7),   # 教学段 蓝
+		Color(1.0, 0.8, 0.3, 0.7),   # 核心段 黄
+		Color(1.0, 0.5, 0.3, 0.7),   # 组合考试段 橙
+		Color(0.6, 1.0, 0.6, 0.7),   # 关底段 绿
+	]
+
+	func _draw() -> void:
+		var cam: Camera2D = editor._camera
+		var view: Vector2 = editor.get_viewport_rect().size / cam.zoom.x
+		var tl: Vector2 = cam.position - view / 2.0
+		var br: Vector2 = cam.position + view / 2.0
+		var thin: float = 1.0 / cam.zoom.x
+		var thick: float = 2.0 / cam.zoom.x
+		var font := ThemeDB.fallback_font
+		var fs := 5  # 世界px字号(zoom4时=20px屏幕)
+
+		var spec: Dictionary = LevelSpecs.get_spec(editor._level_edit.text.strip_edges())
+		var sections: Array = spec.sections
+		var length_px: float = spec.length_cells * 8.0
+		var ground_y: float = spec.ground_y
+
+		# 越界暗区:关卡范围之外(X<0 或 X>130格)罩暗红,提示不要摆东西
+		draw_rect(Rect2(tl.x, tl.y, minf(0.0, br.x) - tl.x, view.y), Color(0.5, 0.1, 0.1, 0.10), true)
+		if br.x > length_px:
+			draw_rect(Rect2(length_px, tl.y, br.x - length_px, view.y), Color(0.5, 0.1, 0.1, 0.10), true)
+
+		# 段落分带底色(交替极淡) + 分界线 + 段名标签
+		for i in sections.size():
+			var s: Dictionary = sections[i]
+			var x0: float = s.from * 8.0
+			var x1: float = s.to * 8.0
+			var color: Color = SECTION_COLORS[i % SECTION_COLORS.size()]
+			draw_rect(Rect2(x0, tl.y, x1 - x0, view.y), Color(color, 0.04), true)
+			if s.from > 0:
+				draw_line(Vector2(x0, tl.y), Vector2(x0, br.y), color, thick)
+			var label := "%s X%d~%d" % [s.name, s.from, s.to]
+			var lw := font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+			draw_string(font, Vector2((x0 + x1) / 2.0 - lw / 2.0, tl.y + fs + 2.0), label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, color)
+
+		# 关底红线:X=130格=1040px(策划案:每关约130格,Limit Right=1040)
+		draw_line(Vector2(length_px, tl.y), Vector2(length_px, br.y), Color(1.0, 0.2, 0.2, 0.9), thick * 1.5)
+		var end_label := "关底 X=130 (1040px)"
+		var ew := font.get_string_size(end_label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		draw_string(font, Vector2(length_px - ew - 2.0, tl.y + 2.0 * (fs + 2.0)), end_label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1.0, 0.3, 0.3))
+
+		# 地面参考线:Y=0(地面)=y144px,策划案坐标系的基准
+		draw_line(Vector2(tl.x, ground_y), Vector2(br.x, ground_y), Color(0.7, 0.6, 0.35, 0.8), thick)
+		draw_string(font, Vector2(tl.x + 2.0, ground_y - 2.0), "地面 Y=0", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.7, 0.6, 0.35))
+
+		# 日记桌推荐位:X=125
+		var desk_x: float = spec.desk_cell * 8.0
+		draw_line(Vector2(desk_x, ground_y - 8.0), Vector2(desk_x, ground_y), Color(0.6, 1.0, 0.6, 0.9), thick)
+		draw_string(font, Vector2(desk_x + 2.0, ground_y - 10.0), "日记桌 X=125", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.6, 1.0, 0.6))
