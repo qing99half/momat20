@@ -29,7 +29,13 @@ func _ready() -> void:
 	# Conductor 已随关卡入树(_ready 已跑完),启动音乐+节拍
 	var conductor := level.find_child("Conductor", false, false) as Conductor
 	if conductor and conductor.has_meta("autoplay_track"):
-		conductor.play(conductor.get_meta("autoplay_track"))
+		var track: String = conductor.get_meta("autoplay_track")
+		conductor.play(track)
+		# 音乐循环:按音频实际时长设循环点(120BPM=0.5s/拍),播完自动回卷重放——
+		# 节拍信号因此不断供,对拍陷阱(酒瓶/摆锤/冲压/声波)不会随音乐结束停摆
+		var stream: AudioStream = load(track)
+		if stream and stream.get_length() > 0.0:
+			conductor.set_loop(0.0, stream.get_length() / Conductor.SEC_PER_BEAT)
 
 	var diary := DIARY_UI.instantiate()  # _ready 内自加组 diary_ui
 	$UILayer.add_child(diary)

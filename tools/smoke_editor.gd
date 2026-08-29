@@ -12,6 +12,10 @@ func _initialize() -> void:
 func _run(ed: Node2D) -> void:
 	for i in range(60):
 		await process_frame
+	# 冷启动自动载入验证:默认关卡 ch1_lv1 有存档,启动后世界应非空
+	var autoloaded: bool = ed._world.get_child_count() > 0
+	print("[编辑器] 冷启动自动载入=%s (已有模块数=%d)" % [autoloaded, ed._world.get_child_count()])
+	ed._clear_level()  # 清场后再验证放置/存档链路
 	# 程序化放置:横平台5格 + 摆锤 + 出生点,验证放置/存档链路
 	var e_plat := ModuleRegistry.get_entry("platform_h5")
 	var e_pend := ModuleRegistry.get_entry("pendulum")
@@ -27,5 +31,6 @@ func _run(ed: Node2D) -> void:
 	img.save_png("res://tools/smoke_editor.png")
 	var saved := FileAccess.file_exists("res://levels/_editor_smoke.json")
 	print("[编辑器] 存档写入=%s 模块数=%d" % [saved, ed._world.get_child_count()])
-	print("[编辑器] %s" % ("PASS" if saved and ed._world.get_child_count() == 3 else "FAIL"))
-	quit(0 if saved else 1)
+	var ok: bool = saved and ed._world.get_child_count() == 3 and autoloaded
+	print("[编辑器] %s" % ("PASS" if ok else "FAIL"))
+	quit(0 if ok else 1)

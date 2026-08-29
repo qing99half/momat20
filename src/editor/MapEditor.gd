@@ -55,6 +55,8 @@ func _ready() -> void:
 	if GameState.editor_level_path != "" and FileAccess.file_exists(GameState.editor_level_path):
 		_level_edit.text = GameState.editor_level_path.get_file().get_basename()
 		_load_level()
+	elif FileAccess.file_exists(_level_path()):
+		_load_level()  # 冷启动:当前关卡名有存档则自动载入(修"保存后重开是空的")
 
 
 # ---- UI 构建 ----
