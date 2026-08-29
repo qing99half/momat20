@@ -346,7 +346,7 @@ class _GhostDraw:
 	var editor: Node2D
 
 	func _draw() -> void:
-		var thin := 2.0 / editor._camera.zoom.x
+		var thin: float = 2.0 / editor._camera.zoom.x
 		# 橡皮擦模式:红框标出"将被删除"的悬停模块
 		if editor._eraser:
 			var hovered: Node2D = editor._pick(editor.get_global_mouse_position())
