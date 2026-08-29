@@ -1,11 +1,12 @@
 class_name PlatformModule
 extends StaticBody2D
 # 平台/地面模块(地图编辑器):
-#   平台 platform = 横向1~5格×1格高 / 纵向1格宽×2~3格高(悬浮,可站)
+#   平台 platform = 横向1~5格×¼格厚(20×5) / 纵向¼格厚×2~3格高(5×h格)(悬浮薄板,可站)
 #   地面 ground   = 横向1~5格×4格高(实心方块,从落脚点一直填到画面底)
-# 原点=左上角,按格吸附(1格=8px)。白盒期为色块;换美术时只换 _rebuild 视觉部分。
+# 原点=左上角,按格吸附(1格=20px)。白盒期为色块;换美术时只换 _rebuild 视觉部分。
 
 const CELL := 20.0
+const PLAT_THICK := 5.0  # 平台厚度=¼格(策划定:20×5薄板,地面不受影响)
 # 平台:冷灰,顶面高光(读得出"悬浮可站")
 const PLAT_FILL := Color(0.34, 0.36, 0.44)
 const PLAT_TOP := Color(0.55, 0.58, 0.68)
@@ -40,6 +41,11 @@ func _rebuild() -> void:
 	for c in get_children():
 		c.queue_free()
 	var size := Vector2(w_cells * CELL, h_cells * CELL)
+	if style == "platform":
+		if h_cells == 1:
+			size.y = PLAT_THICK  # 横平台:半格厚薄板
+		elif w_cells == 1:
+			size.x = PLAT_THICK  # 竖平台:半格厚薄板
 	# 碰撞:整矩形(白盒期美术即碰撞,换美术后按附录E再收)
 	var shape := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
@@ -54,7 +60,8 @@ func _rebuild() -> void:
 	body.polygon = PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), size, Vector2(0, size.y)])
 	body.color = fill
 	add_child(body)
+	var top_h := 5.0 if style == "ground" else 2.0  # 薄板高光条2px(板才5px厚,5px条会铺满)
 	var top := Polygon2D.new()
-	top.polygon = PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), Vector2(size.x, 5.0), Vector2(0, 5.0)])
+	top.polygon = PackedVector2Array([Vector2.ZERO, Vector2(size.x, 0), Vector2(size.x, top_h), Vector2(0, top_h)])
 	top.color = top_color
 	add_child(top)
