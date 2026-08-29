@@ -4,6 +4,7 @@ extends Node2D
 # 换关:改 START_LEVEL 或后续接关卡管理器。
 
 const START_LEVEL := preload("res://src/levels/level_ch1_lv1.tscn")
+const DEFAULT_LEVEL_JSON := "res://levels/ch1_lv1.json"
 const DIARY_UI := preload("res://src/ui/DiaryUI.tscn")
 const PAGE_TURN := preload("res://src/ui/PageTurn.tscn")
 
@@ -13,7 +14,15 @@ func _ready() -> void:
 	_fit_game_layer()
 	get_viewport().size_changed.connect(_fit_game_layer)
 
-	var level := START_LEVEL.instantiate()
+	# 关卡来源:编辑器试玩 > 已保存的JSON关卡 > 默认场景
+	var level: Node2D
+	var json_path := GameState.editor_level_path
+	if json_path == "" and FileAccess.file_exists(DEFAULT_LEVEL_JSON):
+		json_path = DEFAULT_LEVEL_JSON
+	if json_path != "":
+		level = LevelLoader.build(json_path)
+	else:
+		level = START_LEVEL.instantiate()
 	$GameLayer/SubViewport.add_child(level)
 	# 关卡必须画在 BackBufferCopy 之前,LUT 才采得到画面
 	$GameLayer/SubViewport.move_child(level, 0)
@@ -35,7 +44,12 @@ func _fit_game_layer() -> void:
 
 
 # F3:开关碰撞箱可视化(验收陷阱判定/美术对齐用)
+# Esc:编辑器试玩模式下返回编辑器
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F3:
-		get_tree().debug_collisions_hint = not get_tree().debug_collisions_hint
-		print("[调试] 碰撞箱显示: %s" % ("开" if get_tree().debug_collisions_hint else "关"))
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_F3:
+			get_tree().debug_collisions_hint = not get_tree().debug_collisions_hint
+			print("[调试] 碰撞箱显示: %s" % ("开" if get_tree().debug_collisions_hint else "关"))
+		elif event.keycode == KEY_ESCAPE and GameState.editor_level_path != "":
+			GameState.current = GameState.State.Gameplay
+			get_tree().change_scene_to_file("res://src/editor/MapEditor.tscn")

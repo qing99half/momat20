@@ -12,6 +12,12 @@ extends Resource
 @export var hitbox_offset := Vector2.ZERO     # 判定体中心相对贴图注册点的偏移(px);美术换图只换贴图,判定只调这里
 @export var anchor_top := false             # true=锚点在顶部中点(摆锤悬挂)
 
+@export_group("不规则判定体(美术接入后)")
+# 不规则图形的死亡判定:多边形优先于矩形。顶点坐标相对贴图注册点(中心;anchor_top=顶部中点)。
+# 由 tools/autotrace_hitbox.gd 从贴图 alpha 自动描边生成,再按"判定体<视觉2~4px"原则内缩。
+@export var hitbox_polygon: PackedVector2Array  # 非空则用它代替矩形
+@export var polygon_inset := 2.0              # 自动描边时的内缩量(px);致死陷阱建议2,宽容型4
+
 @export_group("预警(两层)")
 @export var warn_duration := 0.8            # 持续态预警≥0.5s(摇晃/收缩/阴影动效)
 @export var flash_frames := 2               # 击发前白闪帧数(强调,非预警本体)

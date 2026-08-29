@@ -3,3 +3,6 @@ extends Node
 enum State { Gameplay, Cutscene, Transition, Menu }
 
 var current: State = State.Gameplay
+
+# 地图编辑器试玩链路:非空时 MainGame 装载该 JSON 关卡而非默认场景,Esc 返回编辑器
+var editor_level_path := ""

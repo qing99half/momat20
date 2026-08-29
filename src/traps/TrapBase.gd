@@ -19,7 +19,7 @@ void fragment() {
 @export var config: TrapConfig
 
 var sprite: Sprite2D
-var hitbox: CollisionShape2D
+var hitbox: Node2D  # CollisionShape2D(矩形)或 CollisionPolygon2D(不规则)
 var _flash_material: ShaderMaterial
 var _sprite_base_pos := Vector2.ZERO
 var _hitbox_base_pos := Vector2.ZERO
@@ -70,19 +70,29 @@ func _build_visual() -> void:
 
 
 func _build_hitbox() -> void:
-	hitbox = CollisionShape2D.new()
-	var rect := RectangleShape2D.new()
-	var size: Vector2 = config.hitbox_size
-	if config.damage > 0:
-		size = Vector2(maxf(size.x - HITBOX_INSET * 2.0, 2.0), maxf(size.y - HITBOX_INSET * 2.0, 2.0))
-	rect.size = size
-	hitbox.shape = rect
-	# 判定体与贴图解耦:尺寸/偏移只看 config,美术换图不影响判定
-	hitbox.position = config.hitbox_offset
-	if config.anchor_top:
-		hitbox.position += Vector2(0.0, config.hitbox_size.y / 2.0)
+	# 判定体与贴图解耦:形状/尺寸/偏移只看 config,美术换图不影响判定
+	if not config.hitbox_polygon.is_empty():
+		# 不规则判定体:多边形(顶点已含内缩,由 autotrace_hitbox.gd 生成)
+		var poly := CollisionPolygon2D.new()
+		poly.polygon = config.hitbox_polygon
+		poly.position = config.hitbox_offset
+		if config.anchor_top:
+			poly.position += Vector2(0.0, config.hitbox_size.y / 2.0)
+		hitbox = poly
+	else:
+		var shape := CollisionShape2D.new()
+		var rect := RectangleShape2D.new()
+		var size: Vector2 = config.hitbox_size
+		if config.damage > 0:
+			size = Vector2(maxf(size.x - HITBOX_INSET * 2.0, 2.0), maxf(size.y - HITBOX_INSET * 2.0, 2.0))
+		rect.size = size
+		shape.shape = rect
+		shape.position = config.hitbox_offset
+		if config.anchor_top:
+			shape.position += Vector2(0.0, config.hitbox_size.y / 2.0)
+		hitbox = shape
 	add_child(hitbox)
-	_hitbox_base_pos = hitbox.position
+	_hitbox_base_pos = (hitbox as Node2D).position
 
 
 # ---- 伤害判定 ----
