@@ -1,9 +1,13 @@
 extends Control
 
-## 硬性约束：整段文字(日期+正文)总计 5 秒打完。
+## 打字节奏(2026-08-30 文案方案):5 秒均分仍是基准,但间隔钳制在 [0.035, 0.12] 秒——
+## 短文案(约47字)仍按 5 秒打完;长文案(200+字)触底 0.035 秒/字保可读性(约 6.7~7.4 秒)。
 const TOTAL_TYPE_SECONDS := 5.0
+const MIN_CHAR_INTERVAL := 0.035  # 可读性下限:低于此值文字变滚屏,无法阅读
+const MAX_CHAR_INTERVAL := 0.12   # 超短文案不慢于原有节奏
 
 ## 一章:字迹模糊(正文压半透明模拟)+笔尖沙沙(S7);二章:逐字清晰+纸页摩挲(S6)。
+## 音效约定:打字期间循环、打完即停(0.035s/字的逐字触发会连成蜂鸣,故用循环音,文案方案第三节认可此口径)。
 const PEN_SFX := "res://assets/audio/sfx_pen_writing.ogg"
 const PAPER_SFX := "res://assets/audio/sfx_diary_open.ogg"
 const BLUR_ALPHA := 0.45
@@ -55,7 +59,7 @@ func show_diary(date: String, text: String, chapter: int) -> void:
 	body_text.text = text
 	date_label.visible_ratio = 0.0
 	body_text.visible_ratio = 0.0
-	skip_hint.visible = true
+	skip_hint.visible = false  # 日期阶段不可跳过(D-505),不显示提示;进正文阶段才亮"按任意键加速"
 
 	# 章节差异:一章字迹模糊+笔尖沙沙;二章逐字清晰+纸页摩挲(日期先行=日期阶段恒在最前)
 	if chapter >= 2:
@@ -68,8 +72,9 @@ func show_diary(date: String, text: String, chapter: int) -> void:
 	_phase = PHASE_DATE
 	_char_index = 0
 	_elapsed = 0.0
-	# 每字间隔 = 总时长 / 总字数，保证「日期 + 正文」合计恰好 5 秒
-	_char_interval = TOTAL_TYPE_SECONDS / float(max(_date_text.length() + _body_text.length(), 1))
+	# 每字间隔 = 总时长 / 总字数,钳制在 [MIN, MAX]:短文案仍 5 秒打完,长文案触底 0.035s/字
+	_char_interval = clampf(TOTAL_TYPE_SECONDS / float(max(_date_text.length() + _body_text.length(), 1)),
+			MIN_CHAR_INTERVAL, MAX_CHAR_INTERVAL)
 	visible = true
 	# 叠化进入(步骤8.4:黑场→日记,约0.5s淡入)
 	modulate.a = 0.0
@@ -98,6 +103,9 @@ func _reveal_one_char() -> void:
 		if _char_index >= _date_text.length():
 			_phase = PHASE_BODY
 			_char_index = 0
+			# 日期打完的瞬间亮出加速提示(文案方案:此时才允许按键,提示呼吸闪烁维持原逻辑)
+			skip_hint.text = "按任意键加速"
+			skip_hint.visible = true
 	elif _phase == PHASE_BODY:
 		_char_index += 1
 		body_text.visible_ratio = float(_char_index) / float(max(_body_text.length(), 1))

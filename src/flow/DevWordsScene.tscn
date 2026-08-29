@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/flow/DevWordsScene.gd" id="1_dev"]
+
+[node name="DevWordsScene" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_dev")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Title" type="Label" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 200.0
+grow_horizontal = 2
+text = "开发者的话"
+horizontal_alignment = 1
+
+[node name="Body" type="Label" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 260.0
+grow_horizontal = 2
+text = "（文案占位,定稿后替换）
+谨以此游戏,献给每一位把痛苦咽进肚子里、把温柔留给孩子的母亲。
+—— 《母亲二十岁》开发组"
+horizontal_alignment = 1

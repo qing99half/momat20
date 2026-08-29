@@ -47,6 +47,18 @@ func _chapter_of(index: int) -> int:
 	return 3
 
 
+## 开新一局(OP 播完/跳过进游戏前由 OPScene 调用):清零关卡链进度与收集物。
+## autoload 跨场景存活——通关回主菜单后再进游戏,进度不重置会直接读档到 ch3。
+func reset_run() -> void:
+	current_level_index = 0
+	current_chapter = 1
+	collected_fragments = 0
+	unlock_pending = false
+	chapter_intro_pending = false
+	fade_from_black_pending = false
+	editor_level_path = ""
+
+
 ## 编辑器试玩等旁路进关时按关卡 id 同步章节(HUD 门控/冲刺解锁据此判定),不动链进度。
 func sync_chapter_from_level_id(level_id: String) -> void:
 	if level_id.begins_with("ch3"):
@@ -64,6 +76,6 @@ func add_fragment() -> bool:
 	print("[GameState] 记忆光片 %d/4" % collected_fragments)
 	if collected_fragments >= 4 and current_level_id() == "ch2_lv4":
 		unlock_pending = true
-		print("[GameState] 集齐四片,应播开锁演出 trigger_unlock_cutscene()(任务11.2+ 待做)")
+		print("[GameState] 集齐四片,关底改播开锁演出 trigger_unlock_cutscene()")
 		return true
 	return false

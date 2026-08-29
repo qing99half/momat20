@@ -2,4 +2,10 @@
 .godot/
 
 # macOS 系统文件
-.DS_Storetools/_*
+.DS_Store
+
+# 不适合打包/上传的杂项（本地保留，不入库）
+rubbish/
+
+# Python 缓存
+__pycache__/

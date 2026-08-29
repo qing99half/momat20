@@ -1,6 +1,5 @@
 {
   "bg_far": "res://assets/placeholder/placeholder_bg_ch1_lv1_far.png",
-  "bg_mid": "res://assets/placeholder/placeholder_bg_ch1_lv1_mid.png",
   "level_id": "ch1_lv1",
   "modules": [
     {
@@ -147,12 +146,6 @@
       "py": 360.0
     },
     {
-      "id": "bottle",
-      "params": {},
-      "px": 680.0,
-      "py": -580.0
-    },
-    {
       "id": "platform_h1",
       "params": {
         "h": 1.0,
@@ -160,6 +153,12 @@
       },
       "px": 680.0,
       "py": 220.0
+    },
+    {
+      "id": "bottle",
+      "params": {},
+      "px": 680.0,
+      "py": -580.0
     },
     {
       "id": "washboard",
@@ -306,16 +305,16 @@
       "py": 240.0
     },
     {
-      "id": "bottle",
-      "params": {},
-      "px": 1260.0,
-      "py": -60.0
-    },
-    {
       "id": "washboard",
       "params": {},
       "px": 1260.0,
       "py": 360.0
+    },
+    {
+      "id": "bottle",
+      "params": {},
+      "px": 1260.0,
+      "py": -60.0
     },
     {
       "id": "ground_h2",
@@ -456,10 +455,13 @@
       "py": 360.0
     },
     {
-      "id": "pendulum",
-      "params": {},
+      "id": "platform_h5",
+      "params": {
+        "h": 1.0,
+        "w": 5.0
+      },
       "px": 1900.0,
-      "py": 100.0
+      "py": 300.0
     },
     {
       "id": "washboard",
@@ -470,13 +472,10 @@
       "py": 280.0
     },
     {
-      "id": "platform_h5",
-      "params": {
-        "h": 1.0,
-        "w": 5.0
-      },
+      "id": "pendulum",
+      "params": {},
       "px": 1900.0,
-      "py": 300.0
+      "py": 100.0
     },
     {
       "id": "washboard",

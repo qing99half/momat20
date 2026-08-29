@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://src/flow/OPScene.gd" id="1_opscene"]
+[ext_resource type="VideoStream" path="res://assets/op.ogv" id="2_op"]
 
 [node name="OPScene" type="Control"]
 anchors_preset = 15
@@ -10,7 +11,22 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_opscene")
 
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
 [node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stream = ExtResource("2_op")
+expand = true
 autoplay = true
 
 [node name="HoldTimer" type="Timer" parent="."]

@@ -2,6 +2,22 @@
 
 Godot 4.7.2(.NET 构建)+ GDScript 横版平台跳跃游戏。
 
+## 目录结构
+
+| 路径 | 说明 |
+| ---- | ---- |
+| `project.godot` | Godot 工程入口（autoload 在此登记） |
+| `src/` | 游戏源码（GDScript 场景与脚本） |
+| `assets/` | 美术 / 音乐 / 视频 / 数据资源 |
+| `levels/` | 关卡 JSON（ch1_lv1 ~ ch2_lv4） |
+| `tests/` | 机关与关卡链测试场景 |
+| `tools/` | 开发脚本与冒烟测试（不参与打包） |
+| `production/` | 资产生成 / 校验管线脚本 |
+| `docs/` | 引擎参考文档 |
+| `地图编辑器.bat` / `开始游戏.bat` | 本地开发快捷入口 |
+
+> 本地 `rubbish/` 目录存放策划稿、备份、调试截图等杂项，已加入 `.gitignore`，不入库、不参与打包。
+
 ## Autoload 登记
 
 本项目 autoload 集中在 `project.godot` 的 `[autoload]` 段。**新增 autoload 必须在此登记。**

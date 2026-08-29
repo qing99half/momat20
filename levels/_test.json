@@ -1,0 +1,1 @@
+{"level_id":"_test","modules":[{"id":"platform_h5","params":{"h":1,"w":5},"px":0,"py":320},{"id":"platform_v2","params":{"h":2,"w":1},"px":1000,"py":280},{"id":"pendulum","params":{},"px":500,"py":40},{"id":"lamp","params":{},"px":60,"py":320},{"id":"diary_desk","params":{},"px":1250,"py":320},{"id":"spawn","params":{},"px":80,"py":320}]}
