@@ -122,7 +122,7 @@ func _play_cutscene(player: Node2D) -> void:
 		"chapter":
 			await _chapter_transition()
 		"end":
-			print("[日记桌] 关卡链已走完(三章推门→ED 为任务12,待做)")
+			print("[日记桌] 关卡链已走完(三章无日记桌,正常不会到这里)")
 
 
 ## 一章关底新流程(2026-08-30):不展示日记内容,聚焦完成后不停顿——
@@ -161,9 +161,12 @@ func _black_cover_advance() -> void:
 			GameState.fade_from_black_pending = true
 			get_tree().change_scene_to_file("res://src/MainGame.tscn")
 		"chapter":
+			# 章级推进前必须撤掉 layer=100 黑罩:它压在 UILayer 之上,不撤会把
+			# 章级过场的黑屏大字(BlackscreenText)整个挡住——字在播但玩家看不见(2026-08-30 修复)
+			layer.queue_free()
 			await _chapter_transition()
 		"end":
-			print("[日记桌] 关卡链已走完(三章推门→ED 为任务12,待做)")
+			print("[日记桌] 关卡链已走完(三章无日记桌,正常不会到这里)")
 
 
 ## 章级过场(任务10.5):眼睑闭眼 → 黑屏大字 → 闭眼态切场景(新场景睁眼开场)。
@@ -175,16 +178,22 @@ func _chapter_transition() -> void:
 		await get_tree().create_timer(1.0).timeout
 
 	if GameState.current_chapter == 2:
-		# 一章末:黑屏大字(剧情.md 二章开场原文),逐字浮现+停留共约3.5s
+		# 一章末:黑屏大字(剧情.md 二章开场原文),逐字浮现+停留共约12s
+		# (2026-08-30 陈洒指令:原 3.5s 太短,约扩大 3.5 倍)
 		if blackscreen and blackscreen.has_method("show_text"):
 			blackscreen.visible = true
 			blackscreen.show_text("我一定要拯救过去的'我'。", false)
-			await get_tree().create_timer(3.5).timeout
+			await get_tree().create_timer(12.0).timeout
 		# 冲刺解锁:信号发给当前玩家(即将随场景销毁),新章玩家 _ready 按章节自查——双保险
 		EventBus.dash_unlocked.emit()
 	else:
-		# 二章末→三章:正常路径由任务11开锁演出接管(集齐4片走 unlock_pending,到不了这里),保底过场
+		# 二章末→三章:正常路径由任务11开锁演出接管(集齐4片走 unlock_pending,到不了这里);
+		# 保底过场也补黑屏大字(2026-08-30 陈洒指令:ch2→ch3 转场文字不能空)
 		print("[日记桌] 章级过场 ch2->ch3(保底路径;正常应走任务11开锁演出)")
+		if blackscreen and blackscreen.has_method("show_text"):
+			blackscreen.visible = true
+			blackscreen.show_text("原来,过去的那个'我'是……", false)
+			await get_tree().create_timer(12.0).timeout
 
 	GameState.chapter_intro_pending = true
 	get_tree().change_scene_to_file("res://src/MainGame.tscn")

@@ -23,7 +23,7 @@ const NOTEBOOK_ZOOM := 0.5     # 11.3 笔记本特写 scale 0.5→1.0
 const SHARD_FLIGHT := 0.8      # 11.3 单枚光片飞行时长
 const SHARD_STAGGER := 0.2     # 11.3 光片依次起飞间隔
 const FLASH_SECONDS := 0.5     # 11.4 白光铺满
-const TEXT1_HOLD := 3.5        # 11.5 文案14字×0.1s逐字 + 停留2s
+const TEXT1_HOLD := 12.0       # 11.5 文案14字×0.1s逐字 + 停留(2026-08-30 陈洒指令:原3.5s太短,约扩大3.5倍)
 const SILENCE_SECONDS := 4.0   # 11.6 "妈妈"黑屏静默(D-533)
 
 @onready var _blackout: ColorRect = $Blackout
@@ -89,7 +89,7 @@ func trigger_unlock_cutscene() -> void:
 		await get_tree().create_timer(TEXT1_HOLD + SILENCE_SECONDS).timeout
 
 	# ---- 眼睑睁眼过场 → 三章 ----
-	# ch3 关卡未搭建前,MainGame 会 push_warning 回退占位场景(任务12 待做)
+	# ch3 由 MainGame 特判加载独立场景 level_ch3.tscn(任务12)
 	GameState.advance_level()  # ch2_lv4 → ch3,返回 "chapter"
 	GameState.chapter_intro_pending = true
 	get_tree().change_scene_to_file("res://src/MainGame.tscn")

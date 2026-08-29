@@ -28,6 +28,15 @@ const CORNER_CORRECT_MAX := 15  # 撞角修正:斜角碰撞最大横移(px)
 const FRAME_LAND := 20
 const FRAME_DASH := 21  # 冲刺帧
 
+# ---- 三章演出模式(任务12.2):只许←走,→播"回头看"1帧不位移;无跳跃/冲刺/死亡 ----
+const CH3_SPEED := 50.0        # 三章慢走速度(px/s,固定偏慢)
+const FRAME_WALK_SLOW := 10    # 慢走6帧:10~15(美术案帧序列明细表)
+const FRAME_PUSH := 22         # 推门1帧
+const FRAME_LOOK_BACK := 23    # 回头看1帧(扭头向右,身体不动)
+
+var chapter3_mode := false     # 三章场景脚本置 true
+var ch3_walk_locked := true    # 阶段一原地走(12.4 二段式);场景脚本阶段二置 false
+
 # ---- 冲刺(任务9,20px格体系:3格=60px;旧8px提示词的24px/48px作废) ----
 const DASH_DISTANCE := 60.0      # 冲刺距离:精确3格=60px
 const DASH_DURATION := 0.15      # 锁方向时间(秒)
@@ -142,6 +151,9 @@ func _physics_process(delta: float) -> void:
 	_poll_input_edges()
 	if _frozen:
 		return  # 死亡流程中冻结移动(粒子/计时走协程,不吃物理帧)
+	if chapter3_mode:
+		_physics_ch3(delta)
+		return  # 三章演出模式:独立移动律,不跑跳跃/冲刺/死亡逻辑
 	var was_on_floor := is_on_floor()
 
 	# ---- 冲刺状态机(任务9):计时/触发;冲刺中=水平瞬发+锁方向+无重力 ----
@@ -265,6 +277,38 @@ func _update_sprite(dir: float, on_floor: bool) -> void:
 		sprite.frame = int(_anim_t * 4.0) % 4  # 待机4帧
 
 
+# ---- 三章演出模式(任务12.2/12.5) ----
+
+# 三章独立移动律:只监听←/A;→播"回头看"1帧但零位移(阻-09必做反馈,防被判死机);
+# 无跳跃、无冲刺、无死亡;速度固定50px/s,慢走6帧~10fps。阶段一位置锁定(原地走)。
+func _physics_ch3(delta: float) -> void:
+	var left := Input.is_action_pressed("ui_left") or Input.is_physical_key_pressed(KEY_A)
+	var right := Input.is_action_pressed("ui_right") or Input.is_physical_key_pressed(KEY_D)
+	if not is_on_floor():
+		velocity.y = minf(velocity.y + GRAVITY * delta, MAX_FALL_SPEED)
+	else:
+		velocity.y = 0.0
+	if left:
+		velocity.x = 0.0 if ch3_walk_locked else -CH3_SPEED
+		sprite.flip_h = true
+		sprite.frame = FRAME_WALK_SLOW + int(_anim_t * 10.0) % 6  # 慢走6帧 ~10fps
+	elif right:
+		velocity.x = 0.0
+		sprite.frame = FRAME_LOOK_BACK
+	else:
+		velocity.x = 0.0
+		sprite.frame = int(_anim_t * 4.0) % 4  # 待机4帧
+	_anim_t += delta
+	move_and_slide()
+
+
+## 12.5 推门:冻结输入并定格推门帧(三章场景脚本调用;母女并肩,手在同一位置)
+func ch3_push_pose() -> void:
+	set_frozen(true)
+	sprite.flip_h = true
+	sprite.frame = FRAME_PUSH
+
+
 # ---- 死亡与重生(任务4) ----
 
 func _ready() -> void:
@@ -272,9 +316,10 @@ func _ready() -> void:
 	_checkpoint_pos = global_position
 	_checkpoint_flip = sprite.flip_h
 	_build_death_fx()
-	# 冲刺开局即解锁(2026-08-30 用户反馈:按 Shift 无反应——原设计为二章赠予,但二章关卡未建,
-	# 能力前置;章级过场的 dash_unlocked 信号保留兜底,赠予演出仍在二章首关播放)
-	dash_unlocked = true
+	# 冲刺=二章专属能力(2026-08-30 陈洒指令):一章禁用无弹窗——按 GameState 章节判定
+	# (编辑器试玩 ch2 关卡时 sync_chapter_from_level_id 已同步,试玩也有冲刺);
+	# 章级过场的 dash_unlocked 信号保留兜底,赠予演出仍在二章首关播放。
+	dash_unlocked = GameState.current_chapter >= 2
 	EventBus.dash_unlocked.connect(_on_dash_unlocked)
 
 

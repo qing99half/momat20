@@ -4,6 +4,7 @@ extends Node2D
 # 换关:改 START_LEVEL 或后续接关卡管理器。
 
 const START_LEVEL := preload("res://src/levels/level_ch1_lv1.tscn")
+const LEVEL_CH3 := preload("res://src/levels/level_ch3.tscn")  # 三章=演出关(任务12),独立场景不走 JSON
 const DIARY_UI := preload("res://src/ui/DiaryUI.tscn")
 const PAGE_TURN := preload("res://src/ui/PageTurn.tscn")
 const EYELID := preload("res://src/ui/EyelidTransition.tscn")
@@ -25,16 +26,23 @@ func _ready() -> void:
 		# 编辑器试玩:按文件名同步章节(HUD 门控/冲刺解锁据此判定),不动关卡链进度
 		GameState.sync_chapter_from_level_id(json_path.get_file().get_basename())
 	else:
-		var chain_path := "res://levels/%s.json" % GameState.current_level_id()
-		if FileAccess.file_exists(chain_path):
-			json_path = chain_path
-		elif GameState.current_level_index > 0:
-			# 链上关卡 JSON 未搭建(如 ch3,任务12 待做):不静默回退第1关,先报警再占位
-			push_warning("[MainGame] %s 不存在,回退默认场景(该关待搭建)" % chain_path)
-	if json_path != "":
-		level = LevelLoader.build(json_path)
-	else:
-		level = START_LEVEL.instantiate()
+		var chain_id := GameState.current_level_id()
+		if chain_id == "ch3":
+			# 三章相遇(任务12):演出关,独立场景特判加载,不走地图编辑器 JSON
+			GameState.current_chapter = 3
+			level = LEVEL_CH3.instantiate()
+		else:
+			var chain_path := "res://levels/%s.json" % chain_id
+			if FileAccess.file_exists(chain_path):
+				json_path = chain_path
+			elif GameState.current_level_index > 0:
+				# 链上关卡 JSON 未搭建:不静默回退第1关,先报警再占位
+				push_warning("[MainGame] %s 不存在,回退默认场景(该关待搭建)" % chain_path)
+	if level == null:
+		if json_path != "":
+			level = LevelLoader.build(json_path)
+		else:
+			level = START_LEVEL.instantiate()
 	$GameLayer/SubViewport.add_child(level)
 	# 关卡必须画在 BackBufferCopy 之前,LUT 才采得到画面
 	$GameLayer/SubViewport.move_child(level, 0)
@@ -95,18 +103,8 @@ func _ready() -> void:
 		fade_in.tween_property(black, "modulate:a", 0.0, 0.5)
 		fade_in.tween_callback(fade_layer.queue_free)
 
-	# 开局首关:冲刺已前置解锁(2026-08-30),弹窗提示按键;轻量版不冻结不演示
-	if GameState.current_chapter == 1 and GameState.current_level_index == 0:
-		_show_dash_hint_after_intro(level)
-
-
-## 首关进场 0.5s 后弹冲刺提示;玩家由 LevelLoader 建在关卡根下。
-func _show_dash_hint_after_intro(level: Node2D) -> void:
-	await get_tree().create_timer(0.5).timeout
-	for child in level.get_children():
-		if child is CharacterBody2D and child.has_method("show_dash_hint"):
-			child.show_dash_hint()
-			return
+	# 冲刺=二章专属(2026-08-30 陈洒指令):一章不解锁不弹提示;
+	# 唯一弹窗=二章首关赠予演出(上方 chapter_intro_pending 分支)。
 
 
 ## 等睁眼结束(1.0s)再触发赠予演出;玩家由 LevelLoader 建在关卡根下。
