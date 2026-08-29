@@ -25,10 +25,12 @@ static func build(json_path: String) -> Node2D:
 		root.add_child(_make_parallax(bg_far, bg_mid))
 
 	var spawn := DEFAULT_SPAWN
+	var max_x := 400.0  # 相机右边界=最右模块+余量(半屏200px),随布局扩展不设硬顶
 
 	for m in data.get("modules", []):
 		var id: String = m.get("id", "")
 		var pos := Vector2(m.get("px", 0.0), m.get("py", 0.0))
+		max_x = maxf(max_x, pos.x + 200.0)
 		if id == "spawn":
 			spawn = pos
 			continue
@@ -39,13 +41,13 @@ static func build(json_path: String) -> Node2D:
 		node.name = "%s_%d_%d" % [id, int(pos.x), int(pos.y)]
 		root.add_child(node)
 
-	# 玩家;相机右边界全局固定=关卡规格130格×20px(阻-02:所有关同一基准,不随内容多少变化)
+	# 玩家;相机右边界跟随布局末端(阻-02:按实际布局+半屏微调,不留地图外空白,也不设上限)
 	var player := (load(PLAYER_SCENE) as PackedScene).instantiate()
 	player.position = spawn
 	root.add_child(player)
 	var cam := player.get_node_or_null("Camera2D") as Camera2D
 	if cam:
-		cam.limit_right = 2600
+		cam.limit_right = int(max_x)
 
 	# Conductor 节拍器(任务3):挂关卡根,MainGame 进场后播 M1,全关陷阱按 120BPM 对拍
 	# 动态加载:静态引用会把 Conductor 拉进启动编译链,看不到 autoload(EventBus)

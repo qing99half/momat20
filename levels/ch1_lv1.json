@@ -4,64 +4,28 @@
   "level_id": "ch1_lv1",
   "modules": [
     {
-      "id": "ground_h5",
+      "id": "ground_h4",
       "params": {
-        "h": 4.0,
+        "h": 4,
         "style": "ground",
-        "w": 5.0
+        "w": 4
       },
       "px": 0.0,
-      "py": 80.0
+      "py": 120.0
     },
     {
       "id": "spawn",
       "params": {},
-      "px": 20.0,
-      "py": 80.0
-    },
-    {
-      "id": "bottle",
-      "params": {},
       "px": 40.0,
-      "py": -160.0
+      "py": 120.0
     },
     {
       "id": "platform_h5",
       "params": {
-        "h": 1.0,
-        "w": 5.0
+        "h": 1,
+        "w": 5
       },
       "px": 100.0,
-      "py": 60.0
-    },
-    {
-      "id": "platform_h5",
-      "params": {
-        "h": 1.0,
-        "w": 5.0
-      },
-      "px": 200.0,
-      "py": 80.0
-    },
-    {
-      "id": "washboard",
-      "params": {},
-      "px": 340.0,
-      "py": 100.0
-    },
-    {
-      "id": "pendulum",
-      "params": {},
-      "px": 340.0,
-      "py": -80.0
-    },
-    {
-      "id": "platform_h5",
-      "params": {
-        "h": 1.0,
-        "w": 5.0
-      },
-      "px": 380.0,
       "py": 80.0
     }
   ]
