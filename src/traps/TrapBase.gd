@@ -277,16 +277,20 @@ func _process(_delta: float) -> void:
 
 
 # 击发序列:预警+白闪 → 逐帧等钟精准落拍 → trap_activated → 激活窗口。
-# fire_beat < 0 = 自由定时(无 Conductor 回退),不做落拍等待。
+# fire_beat < 0 = 自由定时(无 Conductor 回退),不做落拍等待,也不要求 Conductor 存在。
 func _run_fire_sequence(fire_beat := -1.0) -> void:
 	var gen := _gen
 	_firing = true
 	_fire_beat = -1.0
 	await _fire_warn_flash()
-	if gen != _gen or Conductor.instance == null:
+	if gen != _gen:
 		_firing = false
 		return
 	if fire_beat >= 0.0:
+		# 节拍模式才需要 Conductor;自由定时跳过落拍等待直接击发
+		if Conductor.instance == null:
+			_firing = false
+			return
 		while Conductor.instance != null and Conductor.instance.get_abs_beat() < fire_beat - Conductor.EPSILON:
 			await get_tree().process_frame  # 暂停时时钟冻结,恢复后仍落在原拍
 		if gen != _gen or Conductor.instance == null:

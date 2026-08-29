@@ -49,6 +49,12 @@ static func build(json_path: String) -> Node2D:
 	if cam:
 		cam.limit_right = int(max_x)
 
+	# Conductor 节拍器(任务3):挂关卡根,MainGame 进场后播 M1,全关陷阱按 120BPM 对拍
+	var conductor := Conductor.new()
+	conductor.name = "Conductor"
+	conductor.set_meta("autoplay_track", "res://assets/placeholder/placeholder_M1.wav")
+	root.add_child(conductor)
+
 	print("[LevelLoader] %s: %d 个模块, 出生点 %s" % [json_path, data.get("modules", []).size(), spawn])
 	return root
 

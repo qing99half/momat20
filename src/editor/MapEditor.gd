@@ -419,10 +419,19 @@ class _RangeDraw:
 		var length_px: float = spec.length_cells * 8.0
 		var ground_y: float = spec.ground_y
 
-		# 越界暗区:关卡范围之外(X<0 或 X>130格)罩暗红,提示不要摆东西
+		# 越界暗区:关卡范围之外(X<0 或 X>130格 或 Y<0画面上边界之上)罩暗红,提示不要摆东西
 		draw_rect(Rect2(tl.x, tl.y, minf(0.0, br.x) - tl.x, view.y), Color(0.5, 0.1, 0.1, 0.10), true)
 		if br.x > length_px:
 			draw_rect(Rect2(length_px, tl.y, br.x - length_px, view.y), Color(0.5, 0.1, 0.1, 0.10), true)
+		if tl.y < 0.0:
+			draw_rect(Rect2(tl.x, tl.y, view.x, -tl.y), Color(0.5, 0.1, 0.1, 0.10), true)
+
+		# 画面上边界:Y=0(游戏层320×180的顶,相机limit_top=0)
+		draw_line(Vector2(tl.x, 0.0), Vector2(br.x, 0.0), Color(0.5, 0.8, 1.0, 0.8), thick)
+		draw_string(font, Vector2(tl.x + 2.0, 0.0 + fs + 2.0), "上边界 Y=0 (视野顶)", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.5, 0.8, 1.0))
+		# 视野底:Y=180(游戏层底,相机limit_bottom=180)
+		draw_line(Vector2(tl.x, 180.0), Vector2(br.x, 180.0), Color(0.5, 0.8, 1.0, 0.4), thick)
+		draw_string(font, Vector2(tl.x + 2.0, 180.0 - 3.0), "视野底 Y=180", HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0.5, 0.8, 1.0, 0.6))
 
 		# 段落分带底色(交替极淡) + 分界线 + 段名标签
 		for i in sections.size():

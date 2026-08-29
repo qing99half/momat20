@@ -26,6 +26,10 @@ func _ready() -> void:
 	$GameLayer/SubViewport.add_child(level)
 	# 关卡必须画在 BackBufferCopy 之前,LUT 才采得到画面
 	$GameLayer/SubViewport.move_child(level, 0)
+	# Conductor 已随关卡入树(_ready 已跑完),启动音乐+节拍
+	var conductor := level.find_child("Conductor", false, false) as Conductor
+	if conductor and conductor.has_meta("autoplay_track"):
+		conductor.play(conductor.get_meta("autoplay_track"))
 
 	var diary := DIARY_UI.instantiate()  # _ready 内自加组 diary_ui
 	$UILayer.add_child(diary)
