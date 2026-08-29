@@ -12,20 +12,20 @@ const CELL := 20.0
 
 static func get_entries() -> Array[Dictionary]:
 	var entries: Array[Dictionary] = []
-	# ---- 平台:横向1~5格×¼格厚(20×5);纵向¼格厚(5)×2~3格 ----
+	# ---- 平台:横向1~5格×半格厚(20×10);纵向半格厚(10)×2~3格 ----
 	for w in range(1, 6):
 		entries.append({
 			"id": "platform_h%d" % w, "name": "横平台 %d格" % w, "category": "平台",
 			"scene": "res://src/modules/PlatformModule.gd",
 			"params": {"w": w, "h": 1},
-			"fp_offset": Vector2.ZERO, "fp_size": Vector2(w * CELL, CELL / 4.0),
+			"fp_offset": Vector2.ZERO, "fp_size": Vector2(w * CELL, CELL / 2.0),
 		})
 	for h in range(2, 4):
 		entries.append({
 			"id": "platform_v%d" % h, "name": "竖平台 %d格" % h, "category": "平台",
 			"scene": "res://src/modules/PlatformModule.gd",
 			"params": {"w": 1, "h": h, "style": "platform"},
-			"fp_offset": Vector2.ZERO, "fp_size": Vector2(CELL / 4.0, h * CELL),
+			"fp_offset": Vector2.ZERO, "fp_size": Vector2(CELL / 2.0, h * CELL),
 		})
 	# ---- 地面:实心方块,横向1~5格 × 4格高(顶面对齐落脚线,向下填实) ----
 	for w in range(1, 6):

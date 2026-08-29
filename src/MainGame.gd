@@ -39,13 +39,13 @@ func _ready() -> void:
 	$UILayer.add_child(page_turn)
 
 
-# 游戏层恒以 400×360 渲染(20px格,单屏=20格宽×18格高=整关高度,开局即见关卡顶)、整数倍缩放(720p窗口×2,1080p全屏×3)。
-# 像素完美:游戏层尺寸=400×360×整数倍,窗口多出来的边留黑边居中——
-# 若铺满窗口,SubViewport 会被拉伸成非整数倍(如405×365),像素大小不一导致画面毛糙。
+# 游戏层恒以 640×360 渲染(20px格,单屏=32格宽×18格高=整关高度,开局即见关卡顶;16:9整数倍铺满:
+# 720p窗口×2=1280×720,1080p全屏×3=1920×1080,2K×4=2560×1440,无黑边不变形)。
+# 像素完美:游戏层尺寸=640×360×整数倍——非整数倍拉伸会让像素大小不一导致画面毛糙。
 func _fit_game_layer() -> void:
 	var ws := get_viewport_rect().size
-	var shrink := maxi(mini(int(ws.x) / 400, int(ws.y) / 360), 1)
-	$GameLayer.size = Vector2(400.0 * shrink, 360.0 * shrink)
+	var shrink := maxi(mini(int(ws.x) / 640, int(ws.y) / 360), 1)
+	$GameLayer.size = Vector2(640.0 * shrink, 360.0 * shrink)
 	$GameLayer.position = (ws - $GameLayer.size) / 2.0
 	$GameLayer.stretch_shrink = shrink
 

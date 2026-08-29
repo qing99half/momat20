@@ -25,12 +25,12 @@ static func build(json_path: String) -> Node2D:
 		root.add_child(_make_parallax(bg_far, bg_mid))
 
 	var spawn := DEFAULT_SPAWN
-	var max_x := 400.0  # 相机右边界=最右模块+余量(半屏200px),随布局扩展不设硬顶
+	var max_x := 640.0  # 相机右边界=最右模块+余量(半屏320px@视野640宽),随布局扩展不设硬顶
 
 	for m in data.get("modules", []):
 		var id: String = m.get("id", "")
 		var pos := Vector2(m.get("px", 0.0), m.get("py", 0.0))
-		max_x = maxf(max_x, pos.x + 200.0)
+		max_x = maxf(max_x, pos.x + 320.0)
 		if id == "spawn":
 			spawn = pos
 			continue

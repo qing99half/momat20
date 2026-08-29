@@ -1,12 +1,12 @@
 class_name PlatformModule
 extends StaticBody2D
 # 平台/地面模块(地图编辑器):
-#   平台 platform = 横向1~5格×¼格厚(20×5) / 纵向¼格厚×2~3格高(5×h格)(悬浮薄板,可站)
+#   平台 platform = 横向1~5格×半格厚(20×10) / 纵向半格厚×2~3格高(10×h格)(悬浮薄板,可站)
 #   地面 ground   = 横向1~5格×4格高(实心方块,从落脚点一直填到画面底)
 # 原点=左上角,按格吸附(1格=20px)。白盒期为色块;换美术时只换 _rebuild 视觉部分。
 
 const CELL := 20.0
-const PLAT_THICK := 5.0  # 平台厚度=¼格(策划定:20×5薄板,地面不受影响)
+const PLAT_THICK := 10.0  # 平台厚度=半格(策划定:20×10薄板,地面不受影响)
 # 平台:冷灰,顶面高光(读得出"悬浮可站")
 const PLAT_FILL := Color(0.34, 0.36, 0.44)
 const PLAT_TOP := Color(0.55, 0.58, 0.68)

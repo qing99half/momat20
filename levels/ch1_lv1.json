@@ -6,94 +6,324 @@
     {
       "id": "ground_h5",
       "params": {
-        "h": 4.0,
-        "style": "ground",
-        "w": 5.0
-      },
-      "px": 20.0,
-      "py": 240.0
-    },
-    {
-      "id": "spawn",
-      "params": {},
-      "px": 40.0,
-      "py": 240.0
-    },
-    {
-      "id": "pendulum",
-      "params": {},
-      "px": 100.0,
-      "py": 100.0
-    },
-    {
-      "id": "ground_h5",
-      "params": {
         "h": 4,
         "style": "ground",
         "w": 5
+      },
+      "px": 0.0,
+      "py": 280.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 120.0,
+      "py": 360.0
+    },
+    {
+      "id": "platform_h3",
+      "params": {
+        "h": 1,
+        "w": 3
       },
       "px": 120.0,
+      "py": 280.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 180.0,
+      "py": 360.0
+    },
+    {
+      "id": "platform_h3",
+      "params": {
+        "h": 1,
+        "w": 3
+      },
+      "px": 200.0,
+      "py": 260.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 240.0,
+      "py": 360.0
+    },
+    {
+      "id": "platform_h3",
+      "params": {
+        "h": 1,
+        "w": 3
+      },
+      "px": 280.0,
       "py": 240.0
     },
     {
-      "id": "ground_h5",
-      "params": {
-        "h": 4,
-        "style": "ground",
-        "w": 5
-      },
-      "px": 220.0,
-      "py": 240.0
+      "id": "washboard",
+      "params": {},
+      "px": 300.0,
+      "py": 360.0
     },
     {
-      "id": "ground_h5",
-      "params": {
-        "h": 4,
-        "style": "ground",
-        "w": 5
-      },
-      "px": 320.0,
-      "py": 240.0
+      "id": "washboard",
+      "params": {},
+      "px": 360.0,
+      "py": 360.0
     },
     {
-      "id": "ground_h5",
+      "id": "platform_h3",
       "params": {
-        "h": 4,
-        "style": "ground",
-        "w": 5
+        "h": 1,
+        "w": 3
       },
+      "px": 380.0,
+      "py": 300.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
       "px": 420.0,
-      "py": 240.0
+      "py": 360.0
     },
     {
-      "id": "ground_h5",
-      "params": {
-        "h": 4,
-        "style": "ground",
-        "w": 5
-      },
-      "px": 520.0,
-      "py": 240.0
+      "id": "washboard",
+      "params": {},
+      "px": 480.0,
+      "py": 360.0
     },
     {
-      "id": "ground_h5",
-      "params": {
-        "h": 4,
-        "style": "ground",
-        "w": 5
-      },
-      "px": 620.0,
-      "py": 240.0
+      "id": "washboard",
+      "params": {},
+      "px": 540.0,
+      "py": 360.0
     },
     {
-      "id": "ground_h5",
-      "params": {
-        "h": 4,
-        "style": "ground",
-        "w": 5
-      },
+      "id": "washboard",
+      "params": {},
+      "px": 600.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 660.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
       "px": 720.0,
-      "py": 240.0
+      "py": 360.0
+    },
+    {
+      "id": "ground_h4",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 4
+      },
+      "px": 760.0,
+      "py": 280.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 780.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 840.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 900.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 960.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1020.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1080.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1140.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1200.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1260.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1320.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1380.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1440.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1500.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1560.0,
+      "py": 360.0
+    },
+    {
+      "id": "ground_h4",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 4
+      },
+      "px": 1560.0,
+      "py": 280.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1620.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1680.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1740.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1800.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1860.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1920.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 1980.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 2040.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 2100.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 2160.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 2220.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 2280.0,
+      "py": 360.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 2340.0,
+      "py": 360.0
+    },
+    {
+      "id": "ground_h4",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 4
+      },
+      "px": 2380.0,
+      "py": 300.0
+    },
+    {
+      "id": "washboard",
+      "params": {
+        "rot": 90
+      },
+      "px": 2380.0,
+      "py": 340.0
+    },
+    {
+      "id": "ground_h4",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 4
+      },
+      "px": 2460.0,
+      "py": 320.0
     }
   ]
 }
