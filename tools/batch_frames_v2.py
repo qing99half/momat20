@@ -60,6 +60,18 @@ for i, f in enumerate(frames_src):
         canvas = np.roll(canvas, shift, axis=0)
         if shift > 0:
             canvas[:shift] = 0
+    # 阴影残留检测:底行宽度显著超过其上一行 -> 剔除超出的列(地面阴影线规则)
+    for _ in range(2):  # 最多清两层
+        rowy = 19 if _ == 0 else 18
+        above_y = rowy - 1
+        cur = np.where(canvas[rowy, :, 3] > 0)[0]
+        abv = np.where(canvas[above_y, :, 3] > 0)[0]
+        if len(cur) >= 6 and len(abv) and len(cur) > len(abv) + 3:
+            lo, hi = abv.min(), abv.max()
+            for x in cur:
+                if not (lo <= x <= hi):
+                    canvas[rowy, x] = [0, 0, 0, 0]
+            print(f"  frame {i}: shadow residue cleaned at y={rowy}")
     # 11 色吸附(先记吸附距离: 原色到最近板色的平均距离, 越小=AI用色越贴板)
     op = canvas[..., 3] > 0
     snap_dist = 0.0

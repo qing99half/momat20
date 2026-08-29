@@ -189,6 +189,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_camera.position -= mm.relative / _camera.zoom.x
 			_grid.queue_redraw()
 			_range.queue_redraw()
+			_bg.queue_redraw()
 		elif _dragging:
 			_dragging.position = _snap(get_global_mouse_position())
 	elif event is InputEventKey and event.pressed and not event.echo:
@@ -210,6 +211,7 @@ func _process(_delta: float) -> void:
 		_camera.position += dir * 240.0 * _delta / _camera.zoom.x
 		_grid.queue_redraw()
 		_range.queue_redraw()
+		_bg.queue_redraw()
 	# 幽灵跟随
 	_ghost.queue_redraw()
 	# 状态栏
@@ -231,6 +233,7 @@ func _zoom_at_mouse(factor: float) -> void:
 	_camera.position += before - get_global_mouse_position()
 	_grid.queue_redraw()
 	_range.queue_redraw()
+	_bg.queue_redraw()
 
 
 func _snap(p: Vector2) -> Vector2:
@@ -417,9 +420,17 @@ class _BgDraw:
 			_tex = load(p) if ResourceLoader.exists(p) else null
 		if _tex == null:
 			return
-		var spec: Dictionary = LevelSpecs.get_spec(id)
-		var length_px: float = spec.length_cells * 20.0
-		draw_texture_rect(_tex, Rect2(0.0, 0.0, length_px, 360.0), false, Color(1, 1, 1, 0.35))
+		# 与游戏一致:贴图按原始尺寸横向平铺(游戏内为视差层镜像),不拉伸
+		var cam: Camera2D = editor._camera
+		var view: Vector2 = editor.get_viewport_rect().size / cam.zoom.x
+		var tl: Vector2 = cam.position - view / 2.0
+		var br: Vector2 = cam.position + view / 2.0
+		var w := float(_tex.get_width())
+		var mod := Color(1, 1, 1, 0.35)
+		var x := floorf(tl.x / w) * w
+		while x < br.x:
+			draw_texture(_tex, Vector2(x, 0.0), mod)
+			x += w
 
 
 class _GridDraw:
