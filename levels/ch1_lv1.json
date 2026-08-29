@@ -4,25 +4,95 @@
   "level_id": "ch1_lv1",
   "modules": [
     {
-      "id": "ground_h3",
+      "id": "ground_h5",
       "params": {
-        "h": 4,
+        "h": 4.0,
         "style": "ground",
-        "w": 3
+        "w": 5.0
       },
-      "px": 100.0,
-      "py": 280.0
+      "px": 20.0,
+      "py": 240.0
     },
     {
       "id": "spawn",
       "params": {},
-      "px": 100.0,
-      "py": 280.0
+      "px": 40.0,
+      "py": 240.0
     },
     {
-      "id": "heart_big",
+      "id": "pendulum",
       "params": {},
-      "px": 160.0,
+      "px": 100.0,
+      "py": 100.0
+    },
+    {
+      "id": "ground_h5",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 5
+      },
+      "px": 120.0,
+      "py": 240.0
+    },
+    {
+      "id": "ground_h5",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 5
+      },
+      "px": 220.0,
+      "py": 240.0
+    },
+    {
+      "id": "ground_h5",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 5
+      },
+      "px": 320.0,
+      "py": 240.0
+    },
+    {
+      "id": "ground_h5",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 5
+      },
+      "px": 420.0,
+      "py": 240.0
+    },
+    {
+      "id": "ground_h5",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 5
+      },
+      "px": 520.0,
+      "py": 240.0
+    },
+    {
+      "id": "ground_h5",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 5
+      },
+      "px": 620.0,
+      "py": 240.0
+    },
+    {
+      "id": "ground_h5",
+      "params": {
+        "h": 4,
+        "style": "ground",
+        "w": 5
+      },
+      "px": 720.0,
       "py": 240.0
     }
   ]
