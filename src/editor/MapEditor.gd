@@ -14,6 +14,7 @@ var _dragging: Node2D = null       # 正在拖动的已放置模块
 var _panning := false
 
 var _world: Node2D                 # 已放置模块的父节点
+var _bg: Node2D                    # 背景预览层(读占位图,与游戏同视野高)
 var _grid: Node2D
 var _ghost: Node2D
 var _range: Node2D                 # 关卡范围叠加层(策划案四段式)
@@ -21,11 +22,16 @@ var _camera: Camera2D
 var _level_edit: LineEdit
 var _status: Label
 var _palette_buttons := {}         # id -> Button(高亮当前放置项)
+var _current_level := "ch1_lv1"    # 世界内容当前所属关卡(切换前自动存档用)
 
 
 func _ready() -> void:
 	get_window().title = "momat20 地图编辑器"
 	_entries = ModuleRegistry.get_entries()
+
+	_bg = _BgDraw.new()
+	_bg.editor = self
+	add_child(_bg)  # 最底层:背景预览
 
 	_world = Node2D.new()
 	_world.name = "World"
@@ -57,6 +63,8 @@ func _ready() -> void:
 		_load_level()
 	elif FileAccess.file_exists(_level_path()):
 		_load_level()  # 冷启动:当前关卡名有存档则自动载入(修"保存后重开是空的")
+	_current_level = _level_edit.text.strip_edges()
+	get_window().title = "momat20 地图编辑器 — %s" % _current_level
 
 
 # ---- UI 构建 ----
@@ -77,7 +85,8 @@ func _build_ui() -> void:
 	_level_edit = LineEdit.new()
 	_level_edit.text = "ch1_lv1"
 	_level_edit.custom_minimum_size = Vector2(110.0, 0.0)
-	_level_edit.text_changed.connect(func(_t): _range.queue_redraw())
+	_level_edit.text_changed.connect(func(_t): _range.queue_redraw(); _bg.queue_redraw())
+	_level_edit.text_submitted.connect(func(_t): _switch_level())  # 回车=切换关卡
 	top.add_child(_level_edit)
 	for spec in [["保存", _save_level], ["读取", _load_level], ["清空", _clear_level], ["试玩", _playtest], ["退出", func(): get_tree().quit()]]:
 		var b := Button.new()
@@ -208,8 +217,11 @@ func _process(_delta: float) -> void:
 	var mode := "放置:%s" % _placing.name if not _placing.is_empty() else ("橡皮擦:点谁删谁" if _eraser else ("拖动中" if _dragging else "选择模块"))
 	if not _placing.is_empty() and _placing.get("rotatable", false):
 		mode += " 旋转%d°(R键转)" % _rot
-	_status.text = "%s | 格(%d,%d) px(%d,%d) | 模块数 %d | 左键放/拖 右键删 中键平移 滚轮缩放 Ctrl+S保存" % [
-		mode, floori(mp.x / CELL), floori(mp.y / CELL), int(mp.x), int(mp.y), _world.get_child_count()]
+	var pending := ""
+	if _level_edit.text.strip_edges() != _current_level:
+		pending = " | ★关卡名已改,回车切换到 %s" % _level_edit.text.strip_edges()
+	_status.text = "%s | 格(%d,%d) px(%d,%d) | 模块数 %d | 左键放/拖 右键删 中键平移 滚轮缩放 Ctrl+S保存%s" % [
+		mode, floori(mp.x / CELL), floori(mp.y / CELL), int(mp.x), int(mp.y), _world.get_child_count(), pending]
 
 
 func _zoom_at_mouse(factor: float) -> void:
@@ -308,6 +320,22 @@ func _level_path() -> String:
 	return LEVEL_DIR + _level_edit.text.strip_edges() + ".json"
 
 
+# 关卡栏回车切换关卡:先把当前世界存回原关卡(防把A关内容误写进B关),再载入新关卡(无存档=空关)
+func _switch_level() -> void:
+	var new_id := _level_edit.text.strip_edges()
+	if new_id == "" or new_id == _current_level:
+		return
+	if _world.get_child_count() > 0:
+		_level_edit.text = _current_level
+		_save_level()
+		_level_edit.text = new_id
+	_current_level = new_id
+	get_window().title = "momat20 地图编辑器 — %s" % _current_level
+	_cancel_placing()
+	_load_level()
+	print("[编辑器] 已切换到关卡 %s" % new_id)
+
+
 func _save_level() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(LEVEL_DIR))
 	var modules: Array = []
@@ -327,6 +355,7 @@ func _save_level() -> void:
 	var f := FileAccess.open(_level_path(), FileAccess.WRITE)
 	f.store_string(JSON.stringify(data, "  "))
 	f.close()
+	_current_level = _level_edit.text.strip_edges()
 	print("[编辑器] 已保存 %s (%d 个模块)" % [_level_path(), modules.size()])
 
 
@@ -357,6 +386,7 @@ func _load_level() -> void:
 					p2["rot"] = r
 				node.set_meta("params", p2)
 	print("[编辑器] 已读取 %s" % _level_path())
+	_current_level = _level_edit.text.strip_edges()
 
 
 func _clear_level() -> void:
@@ -371,6 +401,26 @@ func _playtest() -> void:
 
 
 # ---- 编辑器内绘图层 ----
+
+class _BgDraw:
+	extends Node2D
+	# 背景预览:按当前关卡名读占位远景图,铺满整关(X0~关底, Y0~360视野高),半透明便于看网格
+	var editor: Node2D
+	var _cache_id := ""
+	var _tex: Texture2D = null
+
+	func _draw() -> void:
+		var id: String = editor._level_edit.text.strip_edges()
+		if id != _cache_id:
+			_cache_id = id
+			var p := "res://assets/placeholder/placeholder_bg_%s_far.png" % id
+			_tex = load(p) if ResourceLoader.exists(p) else null
+		if _tex == null:
+			return
+		var spec: Dictionary = LevelSpecs.get_spec(id)
+		var length_px: float = spec.length_cells * 20.0
+		draw_texture_rect(_tex, Rect2(0.0, 0.0, length_px, 360.0), false, Color(1, 1, 1, 0.35))
+
 
 class _GridDraw:
 	extends Node2D
