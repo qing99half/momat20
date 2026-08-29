@@ -1,30 +1,28 @@
 extends TrapBase
 # MovingHazard 位移轨迹陷阱:config.motion 选择运动模式。
 #   0=摆锤:鸡毛掸子,正弦旋转 ±amplitude 度,周期 period 秒(锚点顶部,config.anchor_top=true)
-#   1=坠落:酒瓶,待命 period 秒 → 阴影预警 warn_duration → 白闪2帧 → 坠落 fall_distance px
+#   1=酒瓶发射器:本体固定在发射口不动,周期性向下发射酒瓶弹体;
+#     弹体加速下坠 fall_distance px,全程致死,掉落 3s 后消失(BottleProjectile)。
 
-const FALL_SPEED := 400.0  # 坠落速度(px/s)
+const FALL_SPEED := 400.0      # 弹体坠落速度(px/s)
+const BOTTLE_LIFETIME := 3.0   # 弹体掉落后存活(秒),到期淡出消失
 
 var _t := 0.0
-var _origin := Vector2.ZERO
-var _falling := false           # 坠落模式:仅坠落途中致死
-var _fall_tween: Tween = null   # 坠落 Tween(死亡重置时 kill)
-var _loop_gen := -1             # 自由坠落循环已启动的代际标记(-1=未启动/节拍驱动)
 
 
 func _on_ready() -> void:
-	_origin = position
 	if config.motion == 0:
 		trap_activated.emit()  # 摆锤开始摆动
 	elif config.beat_sync:
-		_beat_mode_boot(_fall_loop)  # 酒瓶对拍坠落;无音乐时回退自由定时
+		_beat_mode_boot(_free_fire_loop)  # 有 Conductor 对拍击发;无音乐回退自由定时
 	else:
-		_fall_loop()
+		_free_fire_loop()
 
 
 func _dangerous() -> bool:
+	# 发射器本体不致死,致死的是弹体(BottleProjectile 自带判定)
 	if config.motion == 1:
-		return config.damage > 0 and _falling
+		return false
 	return super._dangerous()
 
 
@@ -42,62 +40,103 @@ func _physics_process(delta: float) -> void:
 			if absf(diff) > Conductor.EPSILON * Conductor.SEC_PER_BEAT:
 				_t -= diff
 		rotation = sin(_t * TAU / config.period) * deg_to_rad(config.amplitude)
-	elif _falling:
-		_poll_hits()  # 坠落速度快,body_entered可能落在落地之后,运动期间轮询兜底
 
 
-func _fall_loop() -> void:
+# 无 Conductor 时的自由击发循环(与 _fall_loop 旧职责相同,但本体不动)
+func _free_fire_loop() -> void:
 	var gen := _gen
-	_loop_gen = gen  # 标记:本陷阱走自由定时(死亡重置后按此重排)
 	while is_inside_tree() and gen == _gen:
-		# 待命
-		_falling = false
 		await get_tree().create_timer(config.period).timeout
 		if gen != _gen:
-			return  # 代际作废:旧循环退出,新循环由 reset_trap 重排
+			return
 		await _run_fire_sequence()  # 自由定时:不做落拍等待
 
 
 # 击发序列·前半(任务3:基类排程调用,trap_activated 由基类在拍点上发射)
 func _fire_warn_flash() -> void:
 	var gen := _gen
-	# 第一层预警:阴影/摇晃(持续 warn_duration)
+	# 第一层预警:发射口明暗脉冲/摇晃(持续 warn_duration)
 	play_warning(config.warn_duration)
 	await get_tree().create_timer(config.warn_duration).timeout
 	if gen != _gen:
-		return  # 死亡重置:预警中止,位置/调制已由 reset_trap 复原
+		return
 	# 第二层:击发前白闪2帧
 	await flash_white()
 
 
-# 击发序列·后半:坠落激活窗口
+# 击发序列·后半:发射一枚酒瓶弹体(本体位置不动,编辑器看到的位置=游戏里的发射口)
 func _fire_activate() -> void:
-	var gen := _gen
-	# 坠落(加速下坠)
-	_falling = true
-	var fall_time := config.fall_distance / FALL_SPEED
-	_fall_tween = create_tween()
-	_fall_tween.tween_property(self, "position:y", _origin.y + config.fall_distance, fall_time) \
-		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	if not await _await_tween(_fall_tween, gen):
-		return  # 死亡重置:坠落 Tween 已 kill,位置由 reset_trap 复原
-	# 落地后仍保持0.5s致死(碎玻璃茬),再回位(碎裂粒子任务4接)
-	await get_tree().create_timer(0.5).timeout
-	if gen != _gen:
+	if config.motion != 1:
 		return
-	_falling = false
-	position = _origin
+	var bottle := BottleProjectile.new()
+	bottle.setup(config)
+	add_child(bottle)  # 挂发射器下,随发射器一起被关卡管理;死亡时由 player_died 自清
+	bottle.launch(config.fall_distance, FALL_SPEED, BOTTLE_LIFETIME)
 
 
 func reset_trap() -> void:
-	var was_free := _loop_gen >= 0  # 先记驱动方式,super 会推进代际
 	super.reset_trap()
 	_t = 0.0        # 摆锤相位归零(回到起始角度)
 	rotation = 0.0
-	position = _origin
-	_falling = false
-	if _fall_tween and _fall_tween.is_valid():
-		_fall_tween.kill()
-	_fall_tween = null
-	if config.motion == 1 and was_free and is_inside_tree():
-		_fall_loop()  # 自由定时:旧循环已随代际退出,从待命相位重排
+	# 自由定时模式由基类代际推进自动作废旧循环;本陷阱死亡重排在 _beat_fire_enabled 分支已由基类处理
+	if config.motion == 1 and not _beat_fire_enabled and is_inside_tree():
+		_free_fire_loop()  # 自由定时:旧循环已随代际退出,从待命相位重排
+
+
+# ---- 酒瓶弹体 ----
+class BottleProjectile:
+	extends Area2D
+	# 发射器射出的酒瓶:加速下坠,全程致死(含落地静置期),存活 bottle_lifetime 秒后淡出消失。
+
+	var _config: TrapConfig
+	var _hit_cd := 0.0
+
+	func setup(cfg: TrapConfig) -> void:
+		_config = cfg
+		collision_layer = 2  # 约定:角色Layer=1,陷阱Layer=2
+		collision_mask = 1
+		var sprite := Sprite2D.new()
+		sprite.texture = cfg.texture
+		add_child(sprite)
+		var shape := CollisionShape2D.new()
+		var rect := RectangleShape2D.new()
+		# 与 TrapBase 同一硬约束:致死判定体四边各内缩2px(擦尖不死)
+		rect.size = Vector2(maxf(cfg.hitbox_size.x - 4.0, 2.0), maxf(cfg.hitbox_size.y - 4.0, 2.0))
+		shape.shape = rect
+		add_child(shape)
+		body_entered.connect(_on_body_entered)
+		EventBus.player_died.connect(_on_player_died)
+
+	func launch(fall_px: float, speed: float, lifetime: float) -> void:
+		# 加速下坠(重力感)
+		var tween := create_tween()
+		tween.tween_property(self, "position:y", position.y + fall_px, fall_px / speed) \
+			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		# 存活倒计时 → 淡出消失
+		var life := get_tree().create_timer(lifetime)
+		life.timeout.connect(_fade_out)
+
+	func _physics_process(delta: float) -> void:
+		_hit_cd = maxf(_hit_cd - delta, 0.0)
+		# 高速下坠可能一帧穿过 body_entered,运动期间轮询兜底(与 TrapBase 同一策略)
+		if _hit_cd <= 0.0:
+			for body in get_overlapping_bodies():
+				if body is CharacterBody2D:
+					_on_body_entered(body)
+
+	func _on_body_entered(body: Node2D) -> void:
+		if _hit_cd > 0.0 or not (body is CharacterBody2D):
+			return
+		_hit_cd = 0.5
+		if body.has_method("receive_hazard"):
+			body.receive_hazard(_config.knockback, _config.source_id)
+		else:
+			EventBus.player_died.emit()
+
+	func _fade_out() -> void:
+		var tween := create_tween()
+		tween.tween_property(self, "modulate:a", 0.0, 0.3)
+		tween.tween_callback(queue_free)
+
+	func _on_player_died() -> void:
+		queue_free()  # 死亡重生:清空场景内所有飞行/静置弹体

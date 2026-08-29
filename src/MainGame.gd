@@ -40,11 +40,14 @@ func _ready() -> void:
 
 
 # 游戏层恒以 320×180 渲染、整数倍放大(窗口1280×720→4倍,全屏1920×1080→6倍)。
-# SubViewportContainer.stretch 会把视口改成 容器尺寸/stretch_shrink,故 shrink=窗口/320。
+# 像素完美:游戏层尺寸=320×180×整数倍,窗口多出来的边留黑边居中——
+# 若铺满窗口,SubViewport 会被拉伸成非整数倍(如325×185),像素大小不一导致画面毛糙。
 func _fit_game_layer() -> void:
 	var ws := get_viewport_rect().size
-	$GameLayer.size = ws
-	$GameLayer.stretch_shrink = maxi(int(ws.x) / 320, 1)
+	var shrink := maxi(mini(int(ws.x) / 320, int(ws.y) / 180), 1)
+	$GameLayer.size = Vector2(320.0 * shrink, 180.0 * shrink)
+	$GameLayer.position = (ws - $GameLayer.size) / 2.0
+	$GameLayer.stretch_shrink = shrink
 
 
 # F3:开关碰撞箱可视化(验收陷阱判定/美术对齐用)

@@ -26,22 +26,43 @@
         "w": 5
       },
       "px": 40.0,
-      "py": 112.0
+      "py": 96.0
+    },
+    {
+      "id": "bottle",
+      "params": {},
+      "px": 64.0,
+      "py": 56.0
+    },
+    {
+      "id": "platform_h5",
+      "params": {
+        "h": 1,
+        "w": 5
+      },
+      "px": 80.0,
+      "py": 80.0
+    },
+    {
+      "id": "bottle",
+      "params": {},
+      "px": 88.0,
+      "py": 80.0
     },
     {
       "id": "washboard",
       "params": {},
-      "px": 88.0,
-      "py": 112.0
+      "px": 128.0,
+      "py": 80.0
     },
     {
-      "id": "platform_h5",
+      "id": "platform_h3",
       "params": {
         "h": 1,
-        "w": 5
+        "w": 3
       },
-      "px": 96.0,
-      "py": 112.0
+      "px": 136.0,
+      "py": 80.0
     },
     {
       "id": "platform_h2",
@@ -49,32 +70,29 @@
         "h": 1,
         "w": 2
       },
-      "px": 136.0,
-      "py": 96.0
+      "px": 168.0,
+      "py": 64.0
     },
     {
       "id": "pendulum",
       "params": {},
-      "px": 160.0,
-      "py": 24.0
-    },
-    {
-      "id": "platform_h2",
-      "params": {
-        "h": 1,
-        "w": 2
-      },
-      "px": 160.0,
-      "py": 88.0
-    },
-    {
-      "id": "platform_h5",
-      "params": {
-        "h": 1,
-        "w": 5
-      },
       "px": 176.0,
-      "py": 112.0
+      "py": 0.0
+    },
+    {
+      "id": "platform_h4",
+      "params": {
+        "h": 1,
+        "w": 4
+      },
+      "px": 192.0,
+      "py": 96.0
+    },
+    {
+      "id": "washboard",
+      "params": {},
+      "px": 232.0,
+      "py": 96.0
     },
     {
       "id": "platform_v2",
@@ -83,62 +101,16 @@
         "style": "platform",
         "w": 1
       },
-      "px": 216.0,
-      "py": 104.0
-    },
-    {
-      "id": "bottle",
-      "params": {},
-      "px": 216.0,
-      "py": 64.0
-    },
-    {
-      "id": "bottle",
-      "params": {},
-      "px": 224.0,
-      "py": 56.0
-    },
-    {
-      "id": "platform_h1",
-      "params": {
-        "h": 1,
-        "w": 1
-      },
-      "px": 224.0,
-      "py": 96.0
-    },
-    {
-      "id": "platform_h1",
-      "params": {
-        "h": 1,
-        "w": 1
-      },
-      "px": 232.0,
+      "px": 240.0,
       "py": 88.0
     },
     {
-      "id": "bottle",
-      "params": {},
-      "px": 232.0,
-      "py": 48.0
-    },
-    {
-      "id": "platform_h1",
+      "id": "platform_h3",
       "params": {
         "h": 1,
-        "w": 1
+        "w": 3
       },
-      "px": 240.0,
-      "py": 80.0
-    },
-    {
-      "id": "platform_v3",
-      "params": {
-        "h": 3,
-        "style": "platform",
-        "w": 1
-      },
-      "px": 248.0,
+      "px": 264.0,
       "py": 88.0
     },
     {
@@ -148,23 +120,13 @@
         "style": "ground",
         "w": 5
       },
-      "px": 256.0,
+      "px": 296.0,
       "py": 112.0
     },
     {
       "id": "lamp",
       "params": {},
-      "px": 288.0,
-      "py": 112.0
-    },
-    {
-      "id": "ground_h3",
-      "params": {
-        "h": 4,
-        "style": "ground",
-        "w": 3
-      },
-      "px": 296.0,
+      "px": 320.0,
       "py": 112.0
     }
   ]
